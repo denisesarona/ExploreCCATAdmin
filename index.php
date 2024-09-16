@@ -10,7 +10,7 @@
     <form action="">
         <h1>ADMIN LOGIN</h1>
             <div class="input-box">
-                <input type="text" placeholder="Username" 
+                <input type="text" placeholder="Email" 
                 required>
                 <i class='bx bxs-user'></i>
             </div>
@@ -26,9 +26,5 @@
             </div>
 
             <button type="submit" class="btn">LOGIN</button>
-                
-            <div class="register-link">
-                <p>Don't have an account? <a href="">Register</a></p>
-            </div>  
         </form>
 </div>
