@@ -1,38 +1,43 @@
-<link rel="stylesheet" href="admin/assets/js/sidebar.js">
-
-<div class="container">
-    <nav>
-        <div class="top">
-            <i class="uil uil-bars sidebar-toggle"></i>
+<aside id="sidebar">
+    <div class="d-flex">
+        <button class="toggle-btn" type="button">
+            <i class='bx bxs-dashboard' ></i>
+        </button>
+        <div class="sidebar-logo">
+            <a href="#">CvSU CCAT</a>
         </div>
-        <div class="logo-name">
-            <span class="logo_name">CvSU CCAT</span>
-        </div>
-
-        <div class="menu-items">
-            <ul class="nav-links">
-                <li><a href="admin.php">
-                    <i class='bx bxs-user'></i>
-                    <span class="link-name">ADMIN</span>
-                </a></li>
-                <li><a href="addAdmin.php">
-                    <i class='bx bx-plus-circle'></i>
-                    <span class="link-name">ADD ADMIN</span>
-                </a></li>
-                <li><a href="facultyMember.php">
-                    <i class='bx bx-group'></i>
-                    <span class="link-name">FACULTY MEMBERS</span>
-                </a></li>
-                <li><a href="addFacultyMember.php">
-                    <i class='bx bx-plus-circle'></i>
-                    <span class="link-name">ADD FACULTY MEMBERS</span>
-                </a></li>
-                <!-- Wrap the button inside an <li> -->
-                <li>
-                    <button type="button" class="btn">LOGOUT</button>
-                </li>
-            </ul>
-            <div class="mode-toggle"></div>
-        </div>
-    </nav>
-</div>
+    </div>
+    <ul class="sidebar-nav">
+        <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+            <i class='bx bxs-user'></i>
+                <span>ADMINS</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+            <i class='bx bxs-plus-circle'></i>
+                <span>ADD ADMIN</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+            <i class='bx bxs-user'></i>
+                <span>ADMINS</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+            <i class='bx bxs-plus-circle'></i>
+                <span>ADD ADMIN</span>
+            </a>
+        </li>
+    </ul>
+    <div class="sidebar-footer">
+        <a href="#" class="sidebar-link">
+            <i class='bx bx-log-out'></i>
+            <span>LOGOUT</span>
+        </a>
+    </div>
+</aside>
+<script src="assets/js/sidebar.js"></script>
