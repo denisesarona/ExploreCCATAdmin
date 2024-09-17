@@ -15,8 +15,4 @@
 <body>
     <div class="wrapper">
         <?php include 'sidebar.php'; ?>
-        <div class="main p-3">
-            <div class="text-center">
-                <h1>
-                    Sidebar Bootstrap 5
-                </h1>
+        <div class="main p-1">
