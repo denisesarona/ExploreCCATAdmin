@@ -1,10 +1,11 @@
 <?php 
-    session_start();
     include('includes/header.php');
     include('../functions/queries.php');
+    include('../middleware/adminMiddleware.php');
 ?>
 <link rel="stylesheet" href="assets/css/style.css">
 
+<!--------------- ADMINS PAGE --------------->
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -13,7 +14,7 @@
                     <h4 style="font-family: 'Poppins', sans-serif; font-size: 32px; color:#064918">ADMINS</h4>
                 </div>
                 <div class="card-body">
-                    <!--------------- USERS TABLE --------------->
+                    <!--------------- ADMIN TABLE --------------->
                     <table class="table text-center">
                         <thead>
                             <tr style="text-align: center; vertical-align: middle;">
@@ -25,22 +26,21 @@
                         </thead>
                         <tbody>
                             <?php
-                                $users = getData("users"); // FUNCTION TO FETCH USER DATA FROM THE DATABASE
-                                if(mysqli_num_rows($users) > 0){ // CHECK IF THERE ARE ANY USERS
-                                    foreach($users as $item){ // ITERATE THROUGH EACH USER
+                                $users = getData("users"); // FUNCTION TO FETCH ADMIN DATA FROM THE DATABASE
+                                if(mysqli_num_rows($users) > 0){ // CHECK IF THERE ARE ANY ADMIN
+                                    foreach($users as $item){ // ITERATE THROUGH EACH ADMIN
                                         $user_id = $item['user_id'];
-                                        // Fetch current role from the database
-                                        $query = "SELECT role FROM users WHERE user_id = $user_id"; // Adjust table and column names as per your database structure
+                                        // FETCH CURRENT ROLE FROM DATABASE
+                                        $query = "SELECT role FROM users WHERE user_id = $user_id";
                                         $result = mysqli_query($con, $query);
 
                                         if ($result && mysqli_num_rows($result) > 0) {
                                             $row = mysqli_fetch_assoc($result);
                                             $current_role = $row['role'];
                                         } else {
-                                            $current_role = null; // Handle case where user's role is not found or query fails
+                                            $current_role = null; 
                                         }
 
-                                        // Define role options based on your application's role definitions
                                         $roleOptions = [
                                             1 => 'Admin'
                                         ];

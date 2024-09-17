@@ -12,12 +12,16 @@
     color: #064918;
 }
 
-.BluBtn{
-    color: #013D67; 
+.BlueBtn{
+    color: white; 
     font-size: 13px; 
     font-family: 'Poppins';
     font-size: 500;
-    background-color: #89C5F1!important;
+    background-color: #064918;
+}
+.BlueBtn:hover{
+    background-color: #f90000;
+    color: white; 
   }
 .RedBtn{
     color: white; 

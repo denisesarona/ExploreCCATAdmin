@@ -1,46 +1,52 @@
-<!--------------- INCLUDES --------------->
-<?php 
-    session_start();
-    include('includes/header.php');
-?>
+    <?php 
+        include('includes/header.php');
+        include('../functions/queries.php');
+    ?>
+    <link rel="stylesheet" href="assets/css/style.css">
 
-<link rel="stylesheet" href="assets/css/addAdmin.css">
-
-<section class="dashboard">
-        <div class="register-container">
-            <div class="title">
-                <i class='bx bx-plus-circle'></i>
-                <span class="text">ADMIN</span>
+    <!--------------- ADD ADMINS PAGE --------------->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4 style="font-family: 'Poppins', sans-serif; font-size: 35px;">ADD ADMIN</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="codes.php" method="POST" enctype="multipart/form-data">
+                            <div class="row" style="font-family: 'Poppins', sans-serif;">
+                                <div class="col-md-6 mb-3"> 
+                                    <div class="form-group">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input type="text" class="form-control" placeholder="Enter Admin Name" name="name" id="name" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3"> 
+                                    <div class="form-group">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="text" class="form-control" placeholder="Enter Email" name="email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3"> 
+                                    <div class="form-group">
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" placeholder="Enter Password" name="password" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3"> 
+                                    <div class="form-group">
+                                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                                        <input type="confirm_password" class="form-control" placeholder="Confirm your Password" name="confirm_password" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <button type="submit" class="btn BlueBtn mt-2" name="addAdmin_button">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>  
             </div>
-            <form class="AdminReg">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="firstn" class="form-label">Full Name</label>
-                        <input type="text" name="adminName" class="form-control" id="adminName" placeholder="Enter admin name">
-                    </div>
-                    <div class="form-group">
-                        <label for="em" class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" id="em" placeholder="Enter email address">
-                    </div>
-                </div>
-        
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="pass" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" id="pass" placeholder="Enter password">
-                        <div class="progress mt-2">
-                            <div id="barCheck" class="progress-bar" role="progressbar" style="width: 0%;"></div>
-                        </div>
-                        <p id="strength-message" class="mt-2"></p>
-                    </div>
-                    <div class="form-group">
-                        <label for="type" class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control" id="type" placeholder="Confirm your password">
-                        <p id="match-message" class="mt-2"></p>
-                    </div>
-                </div>
-        
-                <button type="submit" class="btn">SAVE</button>
-            </form>
         </div>
-</section>
+    </div><!--------------- FOOTER --------------->
+    <?php include('includes/footer.php'); ?>
