@@ -10,7 +10,7 @@
             <div class="col-md-12">
                 <div class="card mt-4">
                     <div class="card-header">
-                        <h4 style="font-family: 'Poppins', sans-serif; font-size: 35px;">ADD ADMIN</h4>
+                        <h4 style="font-family: 'Poppins', sans-serif; font-size: 35px; color:#064918">ADD ADMIN</h4>
                     </div>
                     <div class="card-body">
                         <form action="codes.php" method="POST" enctype="multipart/form-data">
@@ -39,7 +39,7 @@
                                         <input type="confirm_password" class="form-control" placeholder="Confirm your Password" name="confirm_password" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6 text-end">
+                                <div class="col-md-6">
                                     <button type="submit" class="btn BlueBtn mt-2" name="addAdmin_button">Save</button>
                                 </div>
                             </div>

@@ -111,6 +111,12 @@ a.sidebar-link {
     display: block;
     font-size: 18px;
     text-align: center;
+    transition: background-color 0.3s, color 0.3s; /* Add transition for smooth effect */
+}
+
+a.sidebar-link:hover {
+    background-color: #598D66 !important; /* Change background color on hover */
+    color: white !important; /* Change text color on hover */
 }
 
 .sidebar-link i {
@@ -119,13 +125,13 @@ a.sidebar-link {
     margin-right: .75rem;
 }
 
-a.sidebar-link:hover {
-    background-color: #598D66;
-    color: white;
-}
-
 .sidebar-item {
     position: relative;
+}
+
+a.sidebar-link:hover .sidebar-txt,
+a.sidebar-link:hover i {
+    color: white; /* Change both text and icon color on hover */
 }
 
 #sidebar:not(.expand) .sidebar-item .sidebar-dropdown {

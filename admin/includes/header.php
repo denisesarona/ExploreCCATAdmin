@@ -13,6 +13,31 @@
     <!-- Alertify JS -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css"/>
+    <style>
+    .BlueBtn{
+    color: white; 
+    font-size: 13px; 
+    font-family: 'Poppins';
+    font-size: 500;
+    background-color: #598D66;
+    }
+    .BlueBtn:hover{
+        background-color: #064918 !important;
+        color: white; 
+    }
+    
+    .RedBtn{
+        color: white; 
+        font-size: 13px; 
+        font-family: 'Poppins';
+        font-size: 500;
+        background-color: #f43737dd;
+    }
+    .RedBtn:hover{
+        background-color: #f90000;
+        color: white; 
+    }
+    </style>
 </head>
 
 <body>

@@ -11,29 +11,6 @@
     font-size: 20px;
     color: #064918;
 }
-
-.BlueBtn{
-    color: white; 
-    font-size: 13px; 
-    font-family: 'Poppins';
-    font-size: 500;
-    background-color: #064918;
-}
-.BlueBtn:hover{
-    background-color: #f90000;
-    color: white; 
-  }
-.RedBtn{
-    color: white; 
-    font-size: 13px; 
-    font-family: 'Poppins';
-    font-size: 500;
-    background-color: #f43737dd;
-}
-.RedBtn:hover{
-    background-color: #f90000;
-    color: white; 
-  }
 /* Responsive adjustments */
 @media (max-width: 1000px) {
     nav {
