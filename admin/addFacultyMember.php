@@ -18,29 +18,37 @@
                                 <div class="col-md-6 mb-3"> 
                                     <div class="form-group">
                                         <label for="name" class="form-label">Name</label>
-                                        <input type="text" class="form-control" placeholder="Enter Admin Name" name="name" id="name" required>
+                                        <input type="text" class="form-control" placeholder="Enter Faculty Members Name" name="name" id="name" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-3"> 
                                     <div class="form-group">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input type="text" class="form-control" placeholder="Enter Email" name="email" required>
+                                        <label for="position" class="form-label">Position</label>
+                                        <select class="form-control" name="position" id="position">
+                                            <option value="">Select Position</option>
+                                            <option value="Chairperson">Chairperson</option>
+                                            <option value="Lecturer">Lecturer</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3"> 
+                                <div class="col-md-12 mb-3"> 
                                     <div class="form-group">
-                                        <label for="password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" placeholder="Enter Password" name="password" required>
+                                        <label for="department" class="form-label">Department</label>
+                                        <select class="form-control" name="department" id="department">
+                                            <option value="">Select Department</option>
+                                            <option value="DCS">DCS</option>
+                                            <option value="DMS">DMS</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3"> 
+                                <div class="col-md-12 mb-3"> 
                                     <div class="form-group">
-                                        <label for="confirm_password" class="form-label">Confirm Password</label>
-                                        <input type="confirm_password" class="form-control" placeholder="Confirm your Password" name="confirm_password" required>
+                                        <label for="image" class="form-label">Upload Image</label>
+                                        <input type="file" class="form-control" name="img" id="img">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <button type="submit" class="btn BlueBtn mt-2" name="addAdmin_button">Save</button>
+                                    <button type="submit" class="btn BlueBtn mt-2" name="addFaculty_button">Save</button>
                                 </div>
                             </div>
                         </form>
