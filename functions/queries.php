@@ -7,9 +7,12 @@
         return $query_run = mysqli_query($con,$query);
     }
 
-    function getByID($table, $id){ // FETCH DATA FROM SPECIFIC TABLE BASED ON ID
-        global $con; // ACCESS GLOBAL DATABASE VARIABLE
-        $query = "SELECT * FROM $table WHERE id='$id'"; // SQL QUERY O SELECT ALL DATA FROM THE TABLE WHERE ID MATCHES THE PROVIDED ID
-        return $query_run = mysqli_query($con, $query); // EXECUTE QUERY AND RETURN RESULT
+    function getFacultyByID($table, $id) {
+        global $con;
+        $stmt = $con->prepare("SELECT * FROM $table WHERE faculty_id = ?"); // Use 'faculty_id'
+        $stmt->bind_param("i", $id); // Assuming faculty_id is an integer
+        $stmt->execute();
+        return $stmt->get_result();
     }
+    
 ?>
