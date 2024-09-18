@@ -37,8 +37,8 @@
                                             </td>
                                             <td class="d-none d-lg-table-cell">
                                                 <form action="codes.php" method="POST">
-                                                    <input type="hidden" name="user_id" value="<?= $item['faculty_id'];?>">
-                                                    <button type="submit" class="btn RedBtn" style="margin-top: 10px;" name="deleteUser_button">Delete</button>
+                                                    <input type="hidden" name="faculty_id" value="<?= $item['faculty_id'];?>">
+                                                    <button type="submit" class="btn RedBtn" style="margin-top: 10px;" name="deleteFaculty_button">Delete</button>
                                                 </form>
                                             </td>
                                         </tr>

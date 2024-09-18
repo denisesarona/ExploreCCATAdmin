@@ -10,14 +10,13 @@ if(isset($_POST['addAdmin_button'])){
     $confirm_password = $_POST['confirm_password'];
 
 } else if(isset($_POST['deleteUser_button'])){
-    $user_id = $_POST['user_id']; // Adjusted to 'customer_id' as per the form input name
+    $user_id = $_POST['user_id']; 
 
-    // Fetch user data (optional, for logging or additional operations)
     $user_query = "SELECT * FROM users WHERE user_id='$user_id'";
     $user_query_run = mysqli_query($con, $user_query);
     $user_data = mysqli_fetch_array($user_query_run);
 
-    // Delete the user
+    // DELETE ADMIN
     $delete_query = "DELETE FROM users WHERE user_id='$user_id'";
     $delete_query_run = mysqli_query($con, $delete_query);
 
@@ -97,6 +96,26 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: facultyMember.php");
         exit();
     }    
+} else if(isset($_POST['deleteFaculty_button'])){
+    $faculty_id = $_POST['faculty_id'];
+
+    $faculty_query = "SELECT * FROM facultytb WHERE faculty_id='$faculty_id'";
+    $faculty_query_run = mysqli_query($con, $faculty_query);
+    $faculty_data = mysqli_fetch_array($faculty_query_run);
+
+    // DELETE FACULTY MEMBER
+    $delete_query = "DELETE FROM facultytb WHERE faculty_id='$faculty_id'";
+    $delete_query_run = mysqli_query($con, $delete_query);
+
+    if($delete_query_run){
+        $_SESSION['success'] = "✔ Faculty Member deleted successfully!";
+        header("Location: facultyMember.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Deleting faculty member failed!";
+        header("Location: facultyMember.php");
+        exit();
+    }
 } else if(isset($_POST['addDepartment_button'])){
     $department = $_POST['dept_name'];
 
