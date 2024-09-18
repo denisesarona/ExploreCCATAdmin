@@ -17,13 +17,10 @@
                 <input type="password" placeholder="Password" name="password" required>
                 <i class='bx bxs-lock-alt' ></i>
             </div>
-
-            <div class="remember-forgot">
-                <label><input type="checkbox">Remember me</label>
-                <a href="changePassword.php">Forgot password?</a>
-            </div>
-
             <button type="submit" class="btn" name="loginBtn">LOGIN</button>
+            <div class="register-link mt-3 mb-3 text-center">
+                <p class="text"><a href="forgotPassword.php">Forgot password?</a></p>
+            </div>
         </form>
 </div>
 

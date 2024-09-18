@@ -1,6 +1,5 @@
 <!--------------- INCLUDES --------------->
 <?php 
-    session_start();
     include('includes/header.php');
 ?>
 <!--------------- CSS --------------->
@@ -12,7 +11,7 @@
     </a>
 
     <div class="wrapper">
-        <form action="">
+        <form action="functions/authcode.php" method="POST">
             <h1>Forgot your password</h1>
             <div class="word">
                 <p>Enter your Email Address</p>
