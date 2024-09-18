@@ -2,7 +2,7 @@
 include('includes/header.php');
 include('../functions/queries.php');
 ?>
-
+<link rel="stylesheet" href="assets/css/style.css">
 <!--------------- VIEW AND EDIT FACULTY MEMBERS DETAILS PAGE --------------->
 
 <div class="container">

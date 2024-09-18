@@ -124,4 +124,40 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: product.php");
         exit();
     }
+} else if(isset($_POST['addDepartment_button'])){
+    $department = $_POST['dept_name'];
+
+    $dept_query = "INSERT INTO departmenttb(name) VALUES ('$department')";
+
+    $dept_query_run = mysqli_query($con, $dept_query);
+
+    if($dept_query_run){
+        $_SESSION['success'] = "✔ Department added successfully!";
+        header("Location: department.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Adding Department failed!";
+        header("Location: department.php");
+        exit();
+    }
+} else if(isset($_POST['deleteDepartment_button'])){
+    $dept_id = $_POST['dept_id']; 
+
+    $dept_query = "SELECT * FROM departmenttb WHERE dept_id='$dept_id'";
+    $dept_query_run = mysqli_query($con, $dept_query);
+    $dept_data = mysqli_fetch_array($dept_query_run);
+
+    // DELETE DEPARTMENT
+    $delete_query = "DELETE FROM departmenttb WHERE dept_id='$dept_id'";
+    $delete_query_run = mysqli_query($con, $delete_query);
+
+    if($delete_query_run){
+        $_SESSION['success'] = "✔ Department deleted successfully!";
+        header("Location: department.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Deleting department failed!";
+        header("Location: department.php");
+        exit();
+    }
 }
