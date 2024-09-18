@@ -4,7 +4,7 @@
 ?>
 <link rel="stylesheet" href="assets/css/style.css">
 
-<!--------------- ADMINS PAGE --------------->
+<!--------------- DEPARTMENTS PAGE --------------->
 <div class="container">
     <div class="row">
         <div class="col-md-12">

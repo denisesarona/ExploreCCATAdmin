@@ -22,7 +22,7 @@
         </li>
         <li class="sidebar-item">
             <a href="facultyMember.php" class="sidebar-link">
-            <i class='bx bxs-user'></i>
+            <i class='bx bxs-group'></i>
                 <span class="sidebar-txt">FACULTY MEMBERS</span>
             </a>
         </li>
@@ -30,6 +30,18 @@
             <a href="addFacultyMember.php" class="sidebar-link">
             <i class='bx bxs-plus-circle'></i>
                 <span class="sidebar-txt">ADD FACULTY MEMBERS</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="department.php" class="sidebar-link">
+            <i class='bx bxs-building-house'></i>
+                <span class="sidebar-txt">DEPARTMENTS</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="faculty_position.php" class="sidebar-link">
+            <i class='bx bxs-user-detail'></i>
+                <span class="sidebar-txt">FACULTY POSITIONS</span>
             </a>
         </li>
     </ul>
