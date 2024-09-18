@@ -77,53 +77,26 @@ if(isset($_POST['addAdmin_button'])){
 
     $path = "../uploads";
 
-    $update_query = "UPDATE product SET name='$name', size='$size', selling_price='$selling_price', quantity='$quantity',
-    status='$status', image='$update_filename' WHERE id='$product_id' ";
+    $update_query = "UPDATE facultytb SET name='$name', position='$position', department='$department', img='$update_filename' WHERE faculty_id='$faculty_id'";
 
     $update_query_run = mysqli_query($con, $update_query);
 
-    if($update_query_run){
-        if($_FILES['image']['name'] != ""){
-            move_uploaded_file($_FILES['image']['tmp_name'], $path.'/'.$update_filename);
-            if(file_exists("../uploads/".$old_image)){
-                unlink("../uploads/".$old_image);
+    if ($update_query_run) {
+        if ($_FILES['image']['name'] != "") {
+            move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $update_filename);
+            if (file_exists("../uploads/" . $old_image)) {
+                unlink("../uploads/" . $old_image);
             }
         }
-        $quantity_query = "SELECT quantity FROM product WHERE id='$product_id'";
-        $quantity_query_run = mysqli_query($con, $quantity_query);
-
-        $update_query_run = mysqli_query($con, $update_query);
-
-        if ($update_query_run) {
-            // Update the status if quantity is zero
-            if ($quantity == 0) {
-                $status_query = "UPDATE product SET status='0' WHERE id='$product_id'";
-                $status_query_run = mysqli_query($con, $status_query);
-            } else {
-                // Otherwise, set status to 1
-                $status_query = "UPDATE product SET status='1' WHERE id='$product_id'";
-                $status_query_run = mysqli_query($con, $status_query);
-            }
-        
-            if ($_FILES['image']['name'] != "") {
-                move_uploaded_file($_FILES['image']['tmp_name'], $path.'/'.$update_filename);
-                if (file_exists("../uploads/".$old_image)) {
-                    unlink("../uploads/".$old_image);
-                }
-            }
-            $_SESSION['success'] = "✔ Product updated successfully!";
-            header("Location: product.php");
-            exit();
-        } else {
-            $_SESSION['error'] = "Updating product failed!";
-            header("Location: product.php");
-            exit();
-        }
-    } else{
-        $_SESSION['error'] = "Updating product failed!";
-        header("Location: product.php");
+    
+        $_SESSION['success'] = "✔ Faculty Member Details updated successfully!";
+        header("Location: facultyMember.php");
         exit();
-    }
+    } else {
+        $_SESSION['error'] = "Updating Faculty Member Details failed! Error: " . mysqli_error($con);
+        header("Location: facultyMember.php");
+        exit();
+    }    
 } else if(isset($_POST['addDepartment_button'])){
     $department = $_POST['dept_name'];
 

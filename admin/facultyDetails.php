@@ -1,6 +1,8 @@
 <?php 
 include('includes/header.php');
 include('../functions/queries.php');
+$positionresultSet = getData("positiontb");
+$departmentresultSet = getData("departmenttb");
 ?>
 <link rel="stylesheet" href="assets/css/style.css">
 <!--------------- VIEW AND EDIT FACULTY MEMBERS DETAILS PAGE --------------->
@@ -35,28 +37,48 @@ include('../functions/queries.php');
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Position</label>
-                                            <select class="form-control" name="position" id="position">
-                                                <option value="">Select Position</option>
-                                                <option value="Chairperson">Chairperson</option>
-                                                <option value="Professor">Professor</option>
+                                            <select class="form-control" name="position">
+                                                <?php
+                                                $current_position = $data['position'];
+                                                ?>
+                                                <option value='<?=$current_position?>' selected><?=$current_position?></option>
+                                                <?php
+                                                    // Fetch positions and ensure the current one is not listed again
+                                                    while ($rows = $positionresultSet->fetch_assoc()) {
+                                                        $position_name = $rows['name'];
+                                                        if ($position_name !== $current_position) { // Only show if it's not the current position
+                                                            echo "<option value='$position_name'>$position_name</option>";
+                                                        }
+                                                    }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-12 mb-3"> 
+                                    <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Department</label>
-                                            <select class="form-control" name="position" id="position">
-                                                <option value="">Select Department</option>
-                                                <option value="DCS">DCS</option>
-                                                <option value="DMS">DMS</option>
+                                            <select class="form-control" name="department">
+                                                <?php
+                                                $current_department = $data['department'];
+                                                ?>
+                                                <option value='<?=$current_department?>' selected><?=$current_department?></option>
+                                                <?php
+                                                    // Fetch positions and ensure the current one is not listed again
+                                                    while ($rows = $departmentresultSet->fetch_assoc()) {
+                                                        $department_name = $rows['name'];
+                                                        if ($department_name !== $current_department) { // Only show if it's not the current position
+                                                            echo "<option value='$department_name'>$department_name</option>";
+                                                        }
+                                                    }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Upload Image</label>
-                                            <input type="file" class="form-control" name="img" id="img">
+                                            <input type="file" class="form-control" name="image">
                                             <label for="" style="margin-right: 10px;">Current Image</label>
                                             <input type="hidden" name="old_image" value="<?=$data['img']; ?>">
                                             <img src="../uploads/<?=$data['img']; ?>" height="50px" width="50px" alt="">
