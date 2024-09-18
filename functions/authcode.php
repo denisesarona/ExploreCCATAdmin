@@ -62,5 +62,89 @@
             header('Location: ../index.php');
             exit();
         }
+    } else if(isset($_POST['forgotPassword_button'])){
+        $email = $_POST['email'];
+        $_SESSION['forgotPass_data'] = $_POST; // STORE EMAIL IN SESSION FOR LATER USE
+
+        // PREPARE SQL QUERY TO CHECK IF EMAIL EXISTS IN THE DATABASE
+        $email_check_sql = "SELECT * FROM users WHERE email = ?";
+        $stmt = $con->prepare($email_check_sql);
+        $stmt->bind_param("s", $email); // BIND EMAIL PARAMETER
+        $stmt->execute(); // EXECUTE THE QUERY
+        $email_check_sql_run = $stmt->get_result(); // GET THE RESULT
+
+        // CHECK IF EMAIL EXISTS IN DATABASE
+        if ($email_check_sql_run->num_rows == 0) {
+            // EMAIL NOT REGISTERED, REDIRECT TO REGISTRATION PAGE WITH MESSAGE
+            $_SESSION['error'] = "Email not registered. Register first!";
+            header('Location: ../register.php');
+            exit();
+        }
+
+        // INITIALIZE PHPMailer
+        $mail = new PHPMailer(true);
+        
+        try {
+            // CONFIGURE SMTP OPTIONS FOR SECURE CONNECTION
+            $mail->SMTPOptions = [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                ],
+            ];
+            
+            $mail->SMTPDebug = SMTP::DEBUG_SERVER; // ENABLE DEBUG OUTPUT
+            $mail->isSMTP(); // SET MAILER TO USE SMTP
+            $mail->Host = 'smtp.gmail.com'; // SPECIFY SMTP SERVER
+            $mail->SMTPAuth = true; // ENABLE SMTP AUTHENTICATION
+            $mail->Username = 'aquaflow024@gmail.com'; // SMTP USERNAME
+            $mail->Password = 'pamu swlw fxyj pavq'; // SMTP PASSWORD
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // ENABLE TLS ENCRYPTION
+            $mail->Port = 587; // TCP PORT TO CONNECT TO
+
+            // SET EMAIL SENDER AND RECIPIENT
+            $mail->setFrom('aquaflow024@gmail.com', 'AquaFlow');
+            $mail->addAddress($email, 'AquaFlow'); // ADD RECIPIENT EMAIL
+            $mail->isHTML(true); // SET EMAIL FORMAT TO HTML
+
+            // GENERATE A VERIFICATION CODE
+            $verification_code = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
+
+            // SET EMAIL SUBJECT AND BODY CONTENT
+            $mail->Subject = 'Email verification';
+            $mail->Body = '<p>Your verification code is: <b style="font-size: 30px;">' . $verification_code . '</b></p>';
+            $mail->send(); // SEND THE EMAIL
+
+            // INSERT VERIFICATION CODE INTO DATABASE
+            $sql = "INSERT INTO verification_codes (email, verification_code) VALUES (?, ?)";
+            $stmt = $con->prepare($sql);
+            $stmt->bind_param("ss", $email, $verification_code); // BIND PARAMETERS
+            $stmt->execute(); // EXECUTE THE QUERY
+
+            $user_id = mysqli_insert_id($con);
+
+            // Store user_id in session for future use
+            $_SESSION['user_id'] = $user_id;
+            // CHECK IF STATEMENT EXECUTED SUCCESSFULLY
+            if ($stmt) {
+                // REDIRECT TO VERIFICATION PAGE WITH SUCCESS MESSAGE
+                $_SESSION['success'] = "Verification code sent to email";
+                header("Location: ../forgot-passVerify.php?email=" . urlencode($email) );
+                exit();
+            } else {
+                // REDIRECT TO INDEX PAGE WITH ERROR MESSAGE
+                $_SESSION['error'] = "Error sending email!";
+                header('Location: ../index.php');
+                exit();
+            }
+        } catch (Exception $e) {
+            // HANDLE MAIL SENDING ERROR
+            $_SESSION['error'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}!";
+            header('Location: ../index.php');
+            exit();
+        } finally {
+            $con->close(); // CLOSE THE DATABASE CONNECTION
+        }
     }
 ?>
