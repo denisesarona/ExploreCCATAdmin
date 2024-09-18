@@ -3,6 +3,21 @@
     include('../config/dbconnect.php');
     // START SESSION
     session_start();
+    ob_start();
+    
+    // INCLUDE PHPMailer FILES
+    require '../PHPMailer/src/PHPMailer.php';
+    require '../PHPMailer/src/SMTP.php';
+    require '../PHPMailer/src/Exception.php';    
+    
+    // USE PHPMailer NAMESPACES
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\SMTP;
+    use PHPMailer\PHPMailer\Exception;
+    
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    
 
     if (isset($_POST['loginBtn'])) {
         // RETRIEVE EMAIL AND PASSWORD FROM POST REQUEST
@@ -76,8 +91,8 @@
         // CHECK IF EMAIL EXISTS IN DATABASE
         if ($email_check_sql_run->num_rows == 0) {
             // EMAIL NOT REGISTERED, REDIRECT TO REGISTRATION PAGE WITH MESSAGE
-            $_SESSION['error'] = "Email not registered. Register first!";
-            header('Location: ../register.php');
+            $_SESSION['error'] = "Email not in database!";
+            header('Location: ../inde.php');
             exit();
         }
 
