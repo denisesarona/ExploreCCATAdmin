@@ -160,4 +160,40 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: department.php");
         exit();
     }
+} else if(isset($_POST['addPosition_button'])){
+    $position = $_POST['name'];
+
+    $position_query = "INSERT INTO positiontb(name) VALUES ('$position')";
+
+    $position_query_run = mysqli_query($con, $position_query);
+
+    if($position_query_run){
+        $_SESSION['success'] = "✔ Position added successfully!";
+        header("Location: faculty_position.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Adding Position failed!";
+        header("Location: faculty_position.php");
+        exit();
+    }
+} else if(isset($_POST['deletePosition_button'])){
+    $position_id = $_POST['position_id']; 
+
+    $position_query = "SELECT * FROM positiontb WHERE position_id='$position_id'";
+    $position_query_run = mysqli_query($con, $position_query);
+    $positiont_data = mysqli_fetch_array($position_query_run);
+
+    // DELETE DEPARTMENT
+    $delete_query = "DELETE FROM positiontb WHERE position_id='$position_id'";
+    $delete_query_run = mysqli_query($con, $delete_query);
+
+    if($delete_query_run){
+        $_SESSION['success'] = "✔ Position deleted successfully!";
+        header("Location: faculty_position.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Deleting position failed!";
+        header("Location: faculty_position.php");
+        exit();
+    }
 }

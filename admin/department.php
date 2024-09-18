@@ -22,8 +22,8 @@
                                     <input type="text" class="form-control" placeholder="Enter Department Name" name="dept_name" required>
                                 </div>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end"> <!-- Align items vertically -->
-                                <div class="form-group w-100"> <!-- Full width for the button -->
+                            <div class="col-md-2 d-flex align-items-end"> 
+                                <div class="form-group w-100"> 
                                     <button type="submit" class="btn BlueBtn mt-2" name="addDepartment_button">Save</button>
                                 </div>
                             </div>
@@ -39,9 +39,9 @@
                         </thead>
                         <tbody>
                             <?php
-                                $dept = getData("departmenttb"); // FUNCTION TO FETCH ADMIN DATA FROM THE DATABASE
-                                if(mysqli_num_rows($dept) > 0){ // CHECK IF THERE ARE ANY ADMIN
-                                    foreach($dept as $item){ // ITERATE THROUGH EACH DEPARTMENTs
+                                $dept = getData("departmenttb"); // FUNCTION TO FETCH DATA FROM THE DATABASE
+                                if(mysqli_num_rows($dept) > 0){ // CHECK IF THERE ARE ANY 
+                                    foreach($dept as $item){ // ITERATE THROUGH EACH DEPARTMENT
                             ?>
                                         <tr style="text-align: center; vertical-align: middle;">
                                             <td><?= $item['name']; ?></td>
