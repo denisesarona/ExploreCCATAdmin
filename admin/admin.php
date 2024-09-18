@@ -1,7 +1,6 @@
 <?php 
     include('includes/header.php');
     include('../functions/queries.php');
-    include('../middleware/adminMiddleware.php');
 ?>
 <link rel="stylesheet" href="assets/css/style.css">
 

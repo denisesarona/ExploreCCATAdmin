@@ -9,32 +9,32 @@
     </div>
     <ul class="sidebar-nav">
         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
+            <a href="admin.php" class="sidebar-link">
             <i class='bx bxs-user'></i>
                 <span>ADMINS</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
+            <a href="addAdmin.php" class="sidebar-link">
             <i class='bx bxs-plus-circle'></i>
                 <span>ADD ADMIN</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
+            <a href="facultyMember.php" class="sidebar-link">
             <i class='bx bxs-user'></i>
                 <span>FACULTY MEMBERS</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="#" class="sidebar-link">
+            <a href="addFacultyMember.php" class="sidebar-link">
             <i class='bx bxs-plus-circle'></i>
                 <span>ADD FACULTY MEMBERS</span>
             </a>
         </li>
     </ul>
     <div class="sidebar-footer">
-        <a href="#" class="sidebar-link">
+        <a href="logout.php" class="sidebar-link">
             <i class='bx bx-log-out'></i>
             <span>LOGOUT</span>
         </a>
