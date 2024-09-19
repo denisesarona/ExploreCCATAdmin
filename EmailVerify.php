@@ -23,3 +23,5 @@
         <button type="submit" name="emailVerify_button" class="btn">SUBMIT</button> 
     </form>
 </div> 
+<!--------------- FOOTER --------------->
+<?php include('includes/footer.php');?>

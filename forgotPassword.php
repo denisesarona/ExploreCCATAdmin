@@ -23,3 +23,5 @@
         <button type="submit" name="forgotPassword_button" class="btn">CONTINUE</button> 
     </form>
 </div> 
+<!--------------- FOOTER --------------->
+<?php include('includes/footer.php');?>

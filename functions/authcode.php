@@ -154,5 +154,68 @@
         } finally {
             $con->close(); // CLOSE THE DATABASE CONNECTION
         }
+    } else if(isset($_POST['emailVerify_button'])){
+        // RETRIEVE EMAIL FROM SESSION DATA OR SET TO NULL
+        $email = $_SESSION['forgotPass_data']['email'] ?? null;
+        $user_id = $_SESSION['user_id'];
+        // RETRIEVE VERIFICATION CODE AND USER ID FROM POST DATA
+        $code = $_POST['code'];
+
+        // CHECK IF ANY FIELD IS EMPTY
+        if (empty($code)) {
+            // SET ERROR MESSAGE AND REDIRECT TO forgot-passVerify.php WITH EMAIL PARAMETER
+            $_SESSION['error'] = "Please fill in all fields!";
+            header("Location: ../emailVerify.php?email=" . urlencode($email));
+            exit();
+        }
+
+        // ESTABLISH DATABASE CONNECTION
+        $con = mysqli_connect("localhost", "root", "", "capstonedb");
+        // CHECK IF CONNECTION IS SUCCESSFUL
+        if (!$con) {
+            // SET ERROR MESSAGE AND REDIRECT TO INDEX.PHP
+            $_SESSION['message'] = "Database connection failed: " . mysqli_connect_error();
+            header("Location: ../index.php");
+            exit();
+        }
+
+        // PREPARE SQL STATEMENT TO SELECT VERIFICATION CODE BASED ON EMAIL AND USER ID
+        $query = "SELECT verification_code FROM verification_codes WHERE email = ? AND code_id=?";
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("si", $email, $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // CHECK IF VERIFICATION CODE EXISTS FOR GIVEN EMAIL AND USER ID
+        if ($result->num_rows > 0) {
+            // FETCH ROW FROM RESULT
+            $row = $result->fetch_assoc();
+            // RETRIEVE STORED VERIFICATION CODE
+            $stored_verification_code = $row['verification_code'];
+
+            // CHECK IF ENTERED CODE MATCHES STORED CODE
+            if ($code === $stored_verification_code) {
+                $delete_code = "DELETE FROM verification_codes WHERE email='$email' AND code_id='$user_id'";
+                $delete_code_query = mysqli_query($con, $delete_code);
+
+                if($delete_code_query){
+                    // SET SUCCESS MESSAGE AND REDIRECT TO changePassword.php WITH EMAIL AND USER ID PARAMETERS
+                    unset($_SESSION['user_id']);
+                    $_SESSION['success'] = "Verification code correct!";
+                    header("Location: ../changePassword.php?email=" . urlencode($email));
+                    exit();
+                }
+            } else {
+                // SET ERROR MESSAGE AND REDIRECT TO forgot-passVerify.php WITH EMAIL PARAMETER
+                $_SESSION['error'] = "Incorrect verification code! Please try again!";
+                header("Location: ../emailVerify.php?email=" . urlencode($email));
+                exit();
+            }
+        } else {
+            // SET ERROR MESSAGE AND REDIRECT TO INDEX.PHP
+            $_SESSION['error'] = "No verification code found for the provided email!";
+            header("Location: ../index.php");
+            exit();
+        }
     }
 ?>
