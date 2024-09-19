@@ -22,7 +22,7 @@
         </li>
         <li class="sidebar-item">
             <a href="addAdmin.php" class="sidebar-link">
-            <i class='bx bxs-plus-circle'></i>
+            <i class='bx bx-plus'></i>
                 <span class="sidebar-txt">ADD ADMIN</span>
             </a>
         </li>
@@ -34,7 +34,7 @@
         </li>
         <li class="sidebar-item">
             <a href="addFacultyMember.php" class="sidebar-link">
-            <i class='bx bxs-plus-circle'></i>
+            <i class='bx bx-plus'></i>
                 <span class="sidebar-txt">ADD FACULTY MEMBERS</span>
             </a>
         </li>

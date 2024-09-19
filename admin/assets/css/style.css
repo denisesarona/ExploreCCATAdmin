@@ -11,6 +11,10 @@
     font-size: 20px;
     color: #064918;
 }
+.form-control:focus {
+    border-color: #064918; 
+    box-shadow: 0 0 8px rgba(6, 73, 24, 0.5);
+}
 
 /* Responsive adjustments */
 @media (max-width: 1000px) {
