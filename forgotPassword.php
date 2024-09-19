@@ -20,6 +20,6 @@
         <div class="input-box">
             <input type="text" class="form-control" placeholder="Enter email Address" name="email" required>
         </div>
-        <button type="submit" name="forgotPass" class="btn">CONTINUE</button> 
+        <button type="submit" name="forgotPassword_button" class="btn">CONTINUE</button> 
     </form>
 </div> 
