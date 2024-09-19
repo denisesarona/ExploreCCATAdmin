@@ -137,7 +137,7 @@
             // CHECK IF STATEMENT EXECUTED SUCCESSFULLY
             if ($stmt) {
                 // REDIRECT TO VERIFICATION PAGE WITH SUCCESS MESSAGE
-                $_SESSION['success'] = "Verification code sent to email";
+                $_SESSION['success'] = "Verification code sent to email!";
                 header("Location: ../EmailVerify.php?email=" . urlencode($email) );
                 exit();
             } else {
@@ -217,5 +217,40 @@
             header("Location: ../index.php");
             exit();
         }
-    } 
+    } else if(isset($_POST['changePassword_button'])){
+        // RETRIEVE EMAIL FROM SESSION DATA OR SET TO NULL
+        $email = $_SESSION['forgotPass_data']['email'] ?? null;
+        // RETRIEVE NEW PASSWORD AND CONFIRM PASSWORD FROM POST DATA
+        $new_password = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
+
+        // CHECK IF NEW PASSWORD MATCHES CONFIRM PASSWORD AND EMAIL EXISTS
+        if ($new_password === $confirm_password && $email) {
+            // HASH THE NEW PASSWORD
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+            // PREPARE SQL STATEMENT TO UPDATE PASSWORD
+            $update_query = "UPDATE users SET password = ? WHERE email = ?";
+            $stmt = $con->prepare($update_query);
+            $stmt->bind_param("ss", $hashed_password, $email);
+
+            // EXECUTE UPDATE QUERY
+            if ($stmt->execute()) {
+                // SET SUCCESS MESSAGE AND REDIRECT TO INDEX.PHP
+                $_SESSION['success'] = "Password updated successfully!";
+                header("Location: ../index.php");
+                exit();
+            } else {
+                // SET ERROR MESSAGE AND REDIRECT TO forgot-passVerify.php WITH EMAIL PARAMETER
+                $_SESSION['error'] = "Failed to update password. Please try again!";
+                header("Location: ../forgotPassword.php?email=" . urlencode($email));
+                exit();
+            }
+        } else {
+            // SET ERROR MESSAGE AND REDIRECT TO forgot-passVerify.php WITH EMAIL PARAMETER
+            $_SESSION['error'] = "Passwords do not match!";
+            header("Location: ../changePassword.php?email=" . urlencode($email));
+            exit();
+        }
+    }
 ?>
