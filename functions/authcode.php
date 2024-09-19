@@ -163,7 +163,7 @@
 
         // CHECK IF ANY FIELD IS EMPTY
         if (empty($code)) {
-            // SET ERROR MESSAGE AND REDIRECT TO forgot-passVerify.php WITH EMAIL PARAMETER
+            // SET ERROR MESSAGE AND REDIRECT TO forgotPassword.php WITH EMAIL PARAMETER
             $_SESSION['error'] = "Please fill in all fields!";
             header("Location: ../emailVerify.php?email=" . urlencode($email));
             exit();
@@ -206,7 +206,7 @@
                     exit();
                 }
             } else {
-                // SET ERROR MESSAGE AND REDIRECT TO forgot-passVerify.php WITH EMAIL PARAMETER
+                // SET ERROR MESSAGE AND REDIRECT TO forgotPassword.php WITH EMAIL PARAMETER
                 $_SESSION['error'] = "Incorrect verification code! Please try again!";
                 header("Location: ../emailVerify.php?email=" . urlencode($email));
                 exit();
@@ -217,5 +217,5 @@
             header("Location: ../index.php");
             exit();
         }
-    }
+    } 
 ?>
