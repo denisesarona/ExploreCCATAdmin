@@ -3,7 +3,6 @@ session_start();
 include('../config/dbconnect.php');
 include('../functions/queries.php');
 
-session_start();
 ob_start();
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -13,13 +12,143 @@ require '../vendor/autoload.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+function checkPasswordStrength($password) {
+    $strength = 0;
+
+    // Criteria for strength
+    if (strlen($password) >= 8) {
+        $strength += 1;
+    }
+    if (preg_match('/[A-Z]/', $password)) {
+        $strength += 1;
+    }
+    if (preg_match('/[a-z]/', $password)) {
+        $strength += 1;
+    }
+    if (preg_match('/[0-9]/', $password)) {
+        $strength += 1;
+    }
+    if (preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
+        $strength += 1;
+    }
+
+    // Determine the strength level
+    switch ($strength) {
+        case 0:
+        case 1:
+        case 2:
+            return 'Weak';
+        case 3:
+        case 4:
+            return 'Good';
+        case 5:
+            return 'Strong';
+        default:
+            return 'Weak';
+    }
+}
+
 if(isset($_POST['addAdmin_button'])){   
     $name = $_POST['name'];
     $email = $_POST['email'];
-    $email_verified = $_POST['email_checkbox'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
+    
+    $passwordStrength = checkPasswordStrength($password);
+    
+    if ($passwordStrength === 'Weak') {
+        $_SESSION['error'] = 'Password is too weak. Please choose a stronger password!';
+        header("Location: addAdmin.php");
+        exit();
+    } 
+    // VALIDATION
+    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
+        // IF ANY FIELD IS EMPTY, SET ERROR MESSAGE AND REDIRECT TO REGISTER PAGE
+        $_SESSION['error'] = "Please fill in all fields!";
+        header("Location: addAdmin.php");
+        exit();
+    }
+    
+    // CHECK IF PASSWORD AND CONFIRM PASSWORD MATCH
+    if ($password === $confirm_password) {
+        $_SESSION['registration_data'] = $_POST;
 
+        $mail = new PHPMailer(true);
+
+        // CHECK IF EMAIL ALREADY EXISTS IN DATABASE
+        $email_check_sql = "SELECT * FROM users WHERE email='$email'";
+        $email_check_sql = $con->query($email_check_sql);
+
+        if($email_check_sql->num_rows > 0){
+            // IF EMAIL EXISTS, SET ERROR MESSAGE AND REDIRECT TO REGISTER PAGE
+            $_SESSION['error'] = "Admin already exists!";
+            header("Location: addAdmin.php");
+            exit();
+        }
+        
+        try {
+            // SET SMTP OPTIONS FOR MAILER
+            $mail->SMTPOptions = [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                ],
+            ];
+            
+            // SET MAILER DEBUG LEVEL
+            $mail -> SMTPDebug = SMTP::DEBUG_SERVER;
+            $mail -> isSMTP();
+            $mail -> Host = 'smtp.gmail.com';
+            $mail -> SMTPAuth = true;
+            $mail -> Username = 'aquaflow024@gmail.com';
+            $mail -> Password = 'pamu swlw fxyj pavq';
+            $mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail -> Port = 587;
+    
+            // SET EMAIL SENDER AND RECIPIENT
+            $mail -> setFrom('aquaflow024@gmail.com', 'AquaFlow');
+            $mail -> addAddress($email, $name);
+            $mail -> isHTML(true);
+    
+            // GENERATE VERIFICATION CODE
+            $verification_code = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
+    
+            // SET EMAIL SUBJECT AND BODY
+            $mail -> Subject = 'Email verification';
+            $mail -> Body = '<p>Your verification code is: <b style="font-size: 30px;">' . $verification_code . '</b></p>';
+            $mail -> send();
+    
+            // CONNECT PHP MAILER TO DATABASE
+            $con = mysqli_connect("localhost: 3306", "root", "", "capstonedb");
+            if (!$con) {
+                throw new Exception("Database connection failed: " . mysqli_connect_error());
+            }
+
+            // INSERT VERIFICATION CODE INTO DATABASE
+            $sql = "INSERT INTO verification_codes(email, verification_code) VALUES (?, ?)";
+            $stmt = $con->prepare($sql);
+            $stmt->bind_param("ss", $email, $verification_code);
+            $stmt->execute();
+
+            // Retrieve the newly inserted user_id
+            $id = mysqli_insert_id($con);
+
+            // Store user_id in session for later use
+            $_SESSION['user_id'] = $id;
+
+            // Redirect to verification page with email
+            header("Location: verifyEmail.php?email=" . urlencode($email));
+            exit();
+        } catch (Exception $e) {
+            // CATCH AND DISPLAY MAILER ERROR
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+    } else {
+        $_SESSION['error'] = "Password does not match!";
+        header("Location: addAdmin.php");
+        exit();
+    }
 } else if (isset($_POST['emailVerify_button'])) {
     $email = $_POST['email'];
     $email_checkbox = isset($_POST['email_checkbox']) ? 1 : 0; // Check if checkbox was set
