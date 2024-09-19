@@ -11,61 +11,97 @@
     require '../vendor/autoload.php';
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
-
+    function checkPasswordStrength($password) {
+        $strength = 0;
+    
+        // Criteria for strength
+        if (strlen($password) >= 8) {
+            $strength += 1;
+        }
+        if (preg_match('/[A-Z]/', $password)) {
+            $strength += 1;
+        }
+        if (preg_match('/[a-z]/', $password)) {
+            $strength += 1;
+        }
+        if (preg_match('/[0-9]/', $password)) {
+            $strength += 1;
+        }
+        if (preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
+            $strength += 1;
+        }
+    
+        // Determine the strength level
+        switch ($strength) {
+            case 0:
+            case 1:
+            case 2:
+                return 'Weak';
+            case 3:
+            case 4:
+                return 'Good';
+            case 5:
+                return 'Strong';
+            default:
+                return 'Weak';
+        }
+    }
+    
     if (isset($_POST['loginBtn'])) {
-        // RETRIEVE EMAIL AND PASSWORD FROM POST REQUEST
+        // Retrieve email and password from POST request
         $email = $_POST['email'];
         $password = $_POST['password'];
-
+    
         if (empty($email) || empty($password)) {
-            // IF ANY FIELD IS EMPTY, SET ERROR MESSAGE AND REDIRECT TO LOGIN PAGE
+            // If any field is empty, set error message and redirect to login page
             $_SESSION['error'] = "Please fill in all fields!";
             header("Location: ../index.php");
             exit();
         }
        
-        // PREPARE SQL QUERY TO CHECK IF EMAIL EXISTS IN THE DATABASE
+        // Prepare SQL query to check if email exists in the database
         $login_query = "SELECT * FROM users WHERE email=?";
         $stmt = mysqli_prepare($con, $login_query);
-        mysqli_stmt_bind_param($stmt, "s", $email); // BIND EMAIL PARAMETER
-        mysqli_stmt_execute($stmt); // EXECUTE THE QUERY
-        $result = mysqli_stmt_get_result($stmt); // GET THE RESULT
-
-        // CHECK IF EXACTLY ONE ROW IS RETURNED
+        mysqli_stmt_bind_param($stmt, "s", $email); // Bind email parameter
+        mysqli_stmt_execute($stmt); // Execute the query
+        $result = mysqli_stmt_get_result($stmt); // Get the result
+    
+        // Check if exactly one row is returned
         if(mysqli_num_rows($result) == 1) {
-            $userdata = mysqli_fetch_assoc($result); // FETCH USER DATA
-            $stored_password = $userdata['password']; // GET STORED PASSWORD
-
-            // VERIFY PASSWORD BY DIRECT COMPARISON
-            if($password === $stored_password) {
-                // SET SESSION VARIABLES FOR AUTHENTICATED USER
+            $userdata = mysqli_fetch_assoc($result); // Fetch user data
+            $stored_password = $userdata['password']; // Get stored password
+    
+            // Verify password
+            if(password_verify($password, $stored_password)) {
+                // Set session variables for authenticated user
                 $_SESSION['auth'] = true;
                 $_SESSION['user_id'] = $userdata['user_id']; // Ensure that user_id is set in the session
                 $_SESSION['auth_user'] = [
                     'name' => $userdata['name'],
                     'email' => $userdata['email']
                 ];
-
+    
                 $role = $userdata['role']; // Get user role
-                
                 $_SESSION['role'] = $role;
-                
+    
                 // Redirect based on user role
                 if($role == 1) {
                     $_SESSION['success'] = "Welcome to Admin Dashboard!";
                     header('Location: ../admin/index.php');
+                    exit();
                 } else {
                     $_SESSION['error'] = "Unauthorized Access!";
                     header('Location: ../index.php');
+                    exit();
                 }
             } else {
-                // SET ERROR MESSAGE FOR INCORRECT PASSWORD
+                // Set error message for incorrect password
                 $_SESSION['error'] = "Incorrect Password!";
                 header("Location: ../index.php");
                 exit();
             }
         } else {
-            // SET ERROR MESSAGE FOR INVALID CREDENTIALS
+            // Set error message for invalid credentials
             $_SESSION['error'] = "Email not Registered!";
             header('Location: ../index.php');
             exit();
@@ -221,13 +257,20 @@
         // RETRIEVE EMAIL FROM SESSION DATA OR SET TO NULL
         $email = $_SESSION['forgotPass_data']['email'] ?? null;
         // RETRIEVE NEW PASSWORD AND CONFIRM PASSWORD FROM POST DATA
-        $new_password = $_POST['new_password'];
+        $password = $_POST['new_password'];
         $confirm_password = $_POST['confirm_password'];
 
+        $passwordStrength = checkPasswordStrength($password);
+        
+        if ($passwordStrength === 'Weak') {
+            $_SESSION['error'] = 'Password is too weak. Please choose a stronger password!';
+            header("Location: ../changePassword.php?email=" . urlencode($email));
+            exit();
+        } 
         // CHECK IF NEW PASSWORD MATCHES CONFIRM PASSWORD AND EMAIL EXISTS
-        if ($new_password === $confirm_password && $email) {
+        if ($password === $confirm_password && $email) {
             // HASH THE NEW PASSWORD
-            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
             // PREPARE SQL STATEMENT TO UPDATE PASSWORD
             $update_query = "UPDATE users SET password = ? WHERE email = ?";
