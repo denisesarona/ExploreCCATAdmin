@@ -3,6 +3,14 @@
     include('../config/dbconnect.php');
     // START SESSION
     session_start();
+    ob_start();
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\SMTP;
+    use PHPMailer\PHPMailer\Exception;
+    // REQUIRE AUTOMATIC LOADER FOR PHPMAILER AND SET ERROR REPORTING
+    require '../vendor/autoload.php';
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
 
     if (isset($_POST['loginBtn'])) {
         // RETRIEVE EMAIL AND PASSWORD FROM POST REQUEST
@@ -76,8 +84,8 @@
         // CHECK IF EMAIL EXISTS IN DATABASE
         if ($email_check_sql_run->num_rows == 0) {
             // EMAIL NOT REGISTERED, REDIRECT TO REGISTRATION PAGE WITH MESSAGE
-            $_SESSION['error'] = "Email not registered. Register first!";
-            header('Location: ../register.php');
+            $_SESSION['error'] = "Unauthorize Access!";
+            header('Location: ../index.php');
             exit();
         }
 
@@ -130,7 +138,7 @@
             if ($stmt) {
                 // REDIRECT TO VERIFICATION PAGE WITH SUCCESS MESSAGE
                 $_SESSION['success'] = "Verification code sent to email";
-                header("Location: ../forgot-passVerify.php?email=" . urlencode($email) );
+                header("Location: ../EmailVerify.php?email=" . urlencode($email) );
                 exit();
             } else {
                 // REDIRECT TO INDEX PAGE WITH ERROR MESSAGE
