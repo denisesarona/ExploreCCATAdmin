@@ -6,6 +6,12 @@
     margin: 0;
     padding: 0;
 }
+.large-icon {
+    font-size: 30px; /* Adjust this value as needed */
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+}
 
 a {
     text-decoration: none;

@@ -14,4 +14,16 @@
         $stmt->execute();
         return $stmt->get_result();
     }
+
+    function countItem($con, $table) {
+        $query = "SELECT COUNT(*) AS total_item FROM $table";
+        $result = $con->query($query);
+    
+        $totalItem = 0;
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $totalItem = $row['total_item'];
+        }
+        return $totalItem;
+    }
 ?>

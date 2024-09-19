@@ -9,6 +9,12 @@
     </div>
     <ul class="sidebar-nav">
         <li class="sidebar-item">
+            <a href="index.php" class="sidebar-link">
+            <i class='bx bxs-dashboard'></i>
+                <span class="sidebar-txt">DASHBOARD</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
             <a href="admin.php" class="sidebar-link">
             <i class='bx bxs-user'></i>
                 <span class="sidebar-txt">ADMINS</span>
