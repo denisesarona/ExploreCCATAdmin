@@ -51,6 +51,7 @@ function checkPasswordStrength($password) {
 if(isset($_POST['addAdmin_button'])){   
     $name = $_POST['name'];
     $email = $_POST['email'];
+    $role = $_POST['role'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     
@@ -71,7 +72,13 @@ if(isset($_POST['addAdmin_button'])){
     
     // CHECK IF PASSWORD AND CONFIRM PASSWORD MATCH
     if ($password === $confirm_password) {
-        $_SESSION['registration_data'] = $_POST;
+        $_SESSION['registration_data'] = [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'confirm_password' => $confirm_password,
+            'role' => $role // Add this line
+        ];
 
         $mail = new PHPMailer(true);
 
@@ -135,7 +142,7 @@ if(isset($_POST['addAdmin_button'])){
             $id = mysqli_insert_id($con);
 
             // Store user_id in session for later use
-            $_SESSION['user_id'] = $id;
+            $_SESSION['code_id'] = $id;
 
             // Redirect to verification page with email
             header("Location: verifyEmail.php?email=" . urlencode($email));
@@ -149,58 +156,85 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: addAdmin.php");
         exit();
     }
-} else if (isset($_POST['emailVerify_button'])) {
-    $email = $_POST['email'];
-    $email_checkbox = isset($_POST['email_checkbox']) ? 1 : 0; // Check if checkbox was set
-
-    if (empty($email)) {
-        $_SESSION['error'] = "Please fill in all fields!";
-        header("Location: addAdmin.php");
-        exit();
-    }
-
-    // INITIALIZE PHPMailer
-    $mail = new PHPMailer(true);
-    try {
-        // SMTP configuration...
-        
-        // SET EMAIL SENDER AND RECIPIENT
-        $mail->setFrom('aquaflow024@gmail.com', 'AquaFlow');
-        $mail->addAddress($email); // ADD RECIPIENT EMAIL
-        $mail->isHTML(true); // SET EMAIL FORMAT TO HTML
-
-        // GENERATE A VERIFICATION CODE
-        $verification_code = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
-
-        // SET EMAIL SUBJECT AND BODY CONTENT
-        $mail->Subject = 'Email verification';
-        $mail->Body = '<p>Your verification code is: <b style="font-size: 30px;">' . $verification_code . '</b></p>';
-        $mail->send(); // SEND THE EMAIL
-
-        // INSERT VERIFICATION CODE INTO DATABASE
-        $sql = "INSERT INTO verification_codes (email, verification_code) VALUES (?, ?)";
-        $stmt = $con->prepare($sql);
-        $stmt->bind_param("ss", $email, $verification_code);
-        $stmt->execute();
-
-        // Set session variable to indicate email was sent
-        $_SESSION['email_sent'] = true;
-
-        if ($stmt) {
-            $_SESSION['success'] = "Verification code sent to email!";
-            header("Location: addAdmin.php");
-            exit();
-        } else {
-            $_SESSION['error'] = "Error sending email!";
-            header('Location: addAdmin.php');
+}   else if (isset($_SESSION['registration_data'])) {
+    $registration_data = $_SESSION['registration_data'];
+    $code_id = $_SESSION['code_id'];
+    $name = $registration_data["name"];
+    $email = $registration_data["email"];
+    $role = $registration_data["role"];
+    $password = $registration_data["password"];
+    $confirm_password = $registration_data["confirm_password"];
+    
+    // VERIFICATION CODE LOGIC
+    if (isset($_POST['emailVerify_button'])) {
+        // RETRIEVE VERIFICATION CODE AND USER_ID FROM FORM
+        $code = $_POST['code'];
+    
+        if (empty($code)) {
+            // IF CODE IS EMPTY, SET ERROR MESSAGE AND REDIRECT TO VERIFICATION PAGE
+            $_SESSION['error'] = "Please fill in all fields!";
+            header("Location: verifyEmail.php?email=" . urlencode($email));
             exit();
         }
-    } catch (Exception $e) {
-        $_SESSION['error'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}!";
-        header('Location: addAdmin.php');
-        exit();
-    } finally {
-        $con->close(); // CLOSE THE DATABASE CONNECTION
+
+        // ESTABLISH DATABASE CONNECTION
+        $con = mysqli_connect("localhost:3306", "root", "", "capstonedb");
+        if (!$con) {
+            // HANDLE ERROR IF CONNECTION FAILS
+            $_SESSION['error'] = "Database connection failed: " . mysqli_connect_error();
+            header("Location: department.php");
+            exit();
+        }
+        
+        // QUERY TO RETRIEVE USER ID AND VERIFICATION CODE
+        $query = "SELECT verification_code FROM verification_codes WHERE email = ? AND code_id = ?";
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("si", $email, $code_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if (mysqli_num_rows($result) > 0) {
+            // FETCH THE VERIFICATION CODE FROM DATABASE
+            $row = $result->fetch_assoc();
+            $stored_verification_code = $row['verification_code'];
+
+            if ($code === $stored_verification_code) {
+                // IF CODES MATCH, INSERT USER DATA INTO DATABASE
+                $encrypted_password = password_hash($password, PASSWORD_DEFAULT);
+                $sql = "INSERT INTO users(name, email, role, password) VALUES (?, ?, ?, ?)";
+                $stmt = $con->prepare($sql);
+                if (!$stmt) {
+                    // HANDLE ERROR IF PREPARE STATEMENT FAILS
+                    $_SESSION['error'] = "Prepare statement error: " . $con->error;
+                    header("Location: index.php");
+                    exit();
+                }
+
+                $stmt->bind_param("ssss", $name, $email, $role, $encrypted_password);
+                $stmt->execute();
+                // UNSET THE USER ID AND REGISTRATION DATA SESSION VARIABLES AFTER SUCCESSFUL REGISTRATION
+
+                $delete_code = "DELETE FROM verification_codes WHERE email='$email' AND code_id ='$code_id'";
+                $delete_code_query = mysqli_query($con, $delete_code);
+
+                if($delete_code_query){
+                    // UNSET THE USER ID AND REGISTRATION DATA SESSION VARIABLES AFTER SUCCESSFUL REGISTRATION
+                    unset($_SESSION['registration_data']);
+                    $_SESSION['success'] = "Registered Successfully!";
+                    header("Location: faculty_position.php");
+                    exit();
+                }
+            } else {
+                $_SESSION['error'] = "Incorrect Verification Code! Please try again.";
+                header("Location: admin.php?email=" . urlencode($email));
+                exit();
+            }
+        } else {
+            // IF NO VERIFICATION CODE FOUND, SET ERROR MESSAGE AND REDIRECT TO REGISTRATION PAGE
+            $_SESSION['error'] = "No verification code found for the provided email: $email!";
+            header("Location: facultyMember.php");
+            exit();
+        }
     }
 } else if(isset($_POST['deleteUser_button'])){
     $user_id = $_POST['user_id']; 

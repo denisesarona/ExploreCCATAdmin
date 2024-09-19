@@ -55,6 +55,7 @@ include('../functions/queries.php');
                                 <div class="form-group">
                                     <label for="name" class="form-label">Role</label>
                                     <input type="text" class="form-control" placeholder="Admin" disabled required>
+                                    <input type="hidden" name="role" value="1">
                                 </div>
                             </div>
                         </div>
