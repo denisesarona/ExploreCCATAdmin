@@ -1,28 +1,25 @@
-<!--------------- INCLUDES --------------->
+<!--------------- INCLUDES ---------------> 
 <?php 
     include('includes/header.php');
 ?>
-<!--------------- CSS --------------->
-<link rel="stylesheet" href="assets/css/EmailVerify.css">    
+<!--------------- CSS ---------------> 
+<link rel="stylesheet" href="assets/css/login.css">    
 
-<!-- Back Button -->
-<a href="#" class="back-btn">
+<div class="back-btn-container">
+    <a href="forgotPassword.php" class="back-btn">
         <i class='bx bx-arrow-back'></i>
     </a>
+</div>
 
-<section class="p-5 p-md-5 text-sm-start mt-4">
-    <div class="Register mt-4 p-5" style="position: relative;">
-        <div class="heading" style="margin-bottom: 1px; font-size: 38px">Verify Email</div>
-            <form>
-                <div class="EnterV" style="text-align: center;">
-                    <p>Enter your code to verify.</p>
-                </div>
-                <div class="VerifyCode">
-                    <input type="text" name="code" placeholder="Enter a code">
-                </div>
-                <div class="input-box row-md-4 mb-3">
-                    <button type="submit" id="submitbtn" name="codeBtn" class="button-text">SUBMIT</button>
-                </div>
-            </form>
-    </div>
-</section>
+<div class="wrapper">
+    <form action="functions/authcode.php" method="POST">
+        <h1  style="font-size: 28px">Verify Email</h1>
+        <div class="word text-center">
+            <p>Enter your code to verify</p>
+        </div>
+        <div class="input-box">
+            <input type="text" class="form-control" placeholder="Enter a Code" name="code" required>
+        </div>
+        <button type="submit" name="emailVerify_button" class="btn">SUBMIT</button> 
+    </form>
+</div> 
