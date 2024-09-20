@@ -1,4 +1,5 @@
 <?php
+session_start(); // Start the session
 include('includes/header.php'); // Include header or any other necessary files
 include('config/dbconnect.php'); // Include the database connection
 
@@ -19,9 +20,45 @@ function getFacultyNodes($con) {
 
 // Fetch faculty nodes from the database
 $nodes = getFacultyNodes($con);
+
+// Handle form submission to update PID
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_pid'])) {
+    $faculty_id = intval($_POST['faculty_id']);
+    $new_pid = intval($_POST['new_pid']);
+
+    // Update the PID in the database
+    $update_sql = "UPDATE facultytb SET pid = ? WHERE faculty_id = ?";
+    $stmt = $con->prepare($update_sql);
+    $stmt->bind_param("ii", $new_pid, $faculty_id);
+
+    if ($stmt->execute()) {
+        echo "<script>alert('Parent ID updated successfully!');</script>";
+    } else {
+        echo "<script>alert('Error updating Parent ID.');</script>";
+    }
+    $stmt->close();
+}
 ?>
 
 <div id="tree"></div>
+
+<!-- Form to update PID -->
+<div>
+    <h3>Update Parent ID</h3>
+    <form method="POST" action="">
+        <label for="faculty_id">Select Faculty:</label>
+        <select name="faculty_id" id="faculty_id" required>
+            <?php foreach ($nodes as $node): ?>
+                <option value="<?php echo $node['id']; ?>"><?php echo $node['name']; ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <label for="new_pid">New Parent ID:</label>
+        <input type="number" name="new_pid" id="new_pid" required>
+
+        <button type="submit" name="update_pid">Update PID</button>
+    </form>
+</div>
 
 <script>
 let nodes = <?php echo json_encode($nodes); ?>; // Convert PHP array to JSON
@@ -35,35 +72,9 @@ let chart = new OrgChart("#tree", {
     },
     nodes: nodes,  // Use the data retrieved from the database
 
-    enableDragDrop: true,
-
-    // Listen for node drop event
-    onDrop: function(sender, dragNode, dropNode) {
-        // Prepare the data to send to the server
-        let data = {
-            id: dragNode.id,
-            pid: dropNode.id // The new parent ID
-        };
-
-        // Send the update to the server
-        fetch('updateNode.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data) // Send data as JSON
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                console.log("Node updated successfully");
-            } else {
-                console.error("Failed to update node:", result.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    enableDragDrop: true // Enable drag-and-drop
 });
 </script>
-<!--------------- FOOTER --------------->
-<?php include('includes/footer.php');?>
+
+<!--------------- FOOTER ---------------> 
+<?php include('includes/footer.php'); ?>
