@@ -5,18 +5,21 @@ include('config/dbconnect.php'); // Include the database connection
 
 // Function to fetch all faculty members
 function getFacultyNodes($con) {
-    $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid FROM facultytb"; // Include ppid
-    $result = $con->query($sql); // Execute the query
+    $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid FROM facultytb"; 
+    $result = $con->query($sql);
 
-    $nodes = []; // Initialize an array to hold the nodes
-    if ($result->num_rows > 0) { // Check if there are results
-        while ($row = $result->fetch_assoc()) { // Fetch each row as an associative array
-            $nodes[] = $row; // Append the row to the nodes array
+    $nodes = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            // Adjust the image path if necessary
+            $row['img'] = 'uploads/' . $row['img']; // Ensure this is correct
+            $nodes[] = $row;
         }
     }
 
-    return $nodes; // Return the array of nodes
+    return $nodes;
 }
+
 
 // Fetch faculty nodes from the database
 $nodes = getFacultyNodes($con);
@@ -84,13 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
 </div>
 
 <script>
-OrgChart.templates.ana.field_0 = 
-    '<text width="230" style="font-size: 18px; fill: #ffffff; font-family: Poppins; text-transform: uppercase;" x="125" y="95" text-anchor="middle" class="field_0">{val}</text>';
-
-OrgChart.templates.ana.field_1 = 
-    '<text data-width="130" data-text-overflow="multiline" style="font-size: 14px; fill: #ffffff; font-family: Poppins;" x="230" y="30" text-anchor="end" class="field_1">{val}</text>';
-
 let nodes = <?php echo json_encode($nodes); ?>; // Convert PHP array to JSON
+
+OrgChart.LINK_ROUNDED_CORNERS = 10;
 
 var chart = new OrgChart(document.getElementById("tree"), {
     template: "olivia",
