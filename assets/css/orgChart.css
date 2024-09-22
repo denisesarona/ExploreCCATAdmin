@@ -15,6 +15,22 @@ body {
     background-position: center;
 }
 
+[data-n-id] rect {
+    fill: #064A18;
+}
+
+.field_0 {
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    fill: #ffffff!important; /* Text color */
+}
+
+.field_1 {
+    font-family: 'Poppins', sans-serif;
+    fill: #ffffff; /* Text color */
+}
+
+
 .wrapper {
     color: #064A18;
 }

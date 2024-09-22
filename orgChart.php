@@ -5,7 +5,7 @@ include('config/dbconnect.php'); // Include the database connection
 
 // Function to fetch all faculty members
 function getFacultyNodes($con) {
-    $sql = "SELECT faculty_id AS id, name, position AS title, img AS image, department, pid FROM facultytb"; // Include ppid
+    $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid FROM facultytb"; // Include ppid
     $result = $con->query($sql); // Execute the query
 
     $nodes = []; // Initialize an array to hold the nodes
@@ -84,12 +84,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
 </div>
 
 <script>
+OrgChart.templates.ana.field_0 = 
+    '<text width="230" style="font-size: 18px; fill: #ffffff; font-family: Poppins; text-transform: uppercase;" x="125" y="95" text-anchor="middle" class="field_0">{val}</text>';
+
+OrgChart.templates.ana.field_1 = 
+    '<text data-width="130" data-text-overflow="multiline" style="font-size: 14px; fill: #ffffff; font-family: Poppins;" x="230" y="30" text-anchor="end" class="field_1">{val}</text>';
+
 let nodes = <?php echo json_encode($nodes); ?>; // Convert PHP array to JSON
 
 var chart = new OrgChart(document.getElementById("tree"), {
     template: "olivia",
     layout: OrgChart.tree,    
     enableDragDrop: false, // Disable drag-and-drop
+    enableSearch: false,
     mouseScrool: OrgChart.none,
     align: OrgChart.ORIENTATION,
     scaleInitial: OrgChart.match.boundary,
@@ -108,9 +115,8 @@ var chart = new OrgChart(document.getElementById("tree"), {
     },
     nodeBinding: {
         field_0: "name",
-        field_1: "title",  
-        img: "image",      
-        field_2: "department" 
+        field_1: "position",  
+        img_0: "img",      
     },
     nodes: nodes  // Use the data retrieved from the database
 });
