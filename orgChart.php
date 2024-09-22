@@ -5,7 +5,7 @@ include('config/dbconnect.php'); // Include the database connection
 
 // Function to fetch all faculty members
 function getFacultyNodes($con) {
-    $sql = "SELECT faculty_id AS id, name, position AS title, img AS image, department, pid, ppid FROM facultytb"; // Include ppid
+    $sql = "SELECT faculty_id AS id, name, position AS title, img AS image, department, pid FROM facultytb"; // Include ppid
     $result = $con->query($sql); // Execute the query
 
     $nodes = []; // Initialize an array to hold the nodes
@@ -30,13 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
         $_SESSION['error'] = "Error processing updated node data.";
     } else {
         foreach ($updated_nodes as $node) {
-            if (isset($node['id']) && isset($node['pid']) && isset($node['ppid'])) {
+            if (isset($node['id']) && isset($node['pid']) && isset($node['pid'])) {
                 $node_id = intval($node['id']);
                 $parent_id = intval($node['pid']);
-                $partner_parent_id = intval($node['ppid']);
 
                 // Prepare the SQL statement
-                $update_sql = "UPDATE facultytb SET pid = ?, ppid = ? WHERE faculty_id = ?";
+                $update_sql = "UPDATE facultytb SET pid = ? WHERE faculty_id = ?";
                 $stmt = $con->prepare($update_sql);
                 
                 // Check if preparation was successful
@@ -45,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
                     continue; // Skip to the next node
                 }
         
-                $stmt->bind_param("iii", $parent_id, $partner_parent_id, $node_id);
+                $stmt->bind_param("ii", $parent_id, $node_id);
                 
                 // Execute the statement
                 if (!$stmt->execute()) {
@@ -66,22 +65,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
 <div class="container">
     <div class="wrapper mt-5">
         <h3 class="text-center">Faculty Organizational Chart</h3>
-        <form method="POST" action="">
-            <div class="form-group">
+        <form method="POST" action="" class="row">
+            <div class="form-group col-12 col-md-6 mb-3">
                 <label for="nodeId">Node ID:</label>
                 <input type="text" class="form-control" id="nodeId" name="nodeId" required>
             </div>
-            <div class="form-group">
+            <div class="form-group col-12 col-md-6 mb-3">
                 <label for="pid">Parent ID (pid):</label>
                 <input type="text" class="form-control" id="pid" name="pid" required>
             </div>
-            <div class="form-group">
-                <label for="ppid">Partner Parent ID (ppid):</label>
-                <input type="text" class="form-control" id="ppid" name="ppid" required>
-            </div>
-            <!-- Hidden input to store updated node data -->
             <input type="hidden" name="updated_nodes" id="updated_nodes">
-            <button type="submit" class="btn btn-success btn-block" name="save_changes">Save Changes</button>
+            <div class="col-12">
+                <button type="submit" class="btn btn-success btn-block" name="save_changes">Save Changes</button>
+            </div>
         </form>
         <div id="tree" class="mt-4"></div>
     </div>
@@ -125,12 +121,10 @@ function gatherUpdatedNodeData() {
     // Get the node ID and new pid, ppid from the form
     let nodeId = document.getElementById('nodeId').value;
     let parentId = document.getElementById('pid').value;
-    let partnerParentId = document.getElementById('ppid').value;
 
     updatedNodes.push({
         id: nodeId,
-        pid: parentId,
-        ppid: partnerParentId
+        pid: parentId
     });
 
     document.getElementById('updated_nodes').value = JSON.stringify(updatedNodes);
