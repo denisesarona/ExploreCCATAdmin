@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
 let nodes = <?php echo json_encode($nodes); ?>; // Convert PHP array to JSON
 
 var chart = new OrgChart(document.getElementById("tree"), {
-    template: "ula",
+    template: "olivia",
     layout: OrgChart.tree,    
     enableDragDrop: false, // Disable drag-and-drop
     mouseScrool: OrgChart.none,
