@@ -15,9 +15,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
-                <div class="card-header d-flex justify-content-center align-items-center">
-                    <h4 style="font-family: 'Poppins', sans-serif; font-size: 35px; color:#064918">ADMIN DASHBOARD</h4>
-                </div>
+                <h3>ADMIN DASHBOARD</h3>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">

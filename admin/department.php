@@ -9,9 +9,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
-                <div class="card-header d-flex justify-content-center align-items-center">
-                    <h4 style="font-family: 'Poppins', sans-serif; font-size: 32px; color:#064918">DEPARTMENTS</h4>
-                </div>
+                <h3>DEPARTMENTS</h3>
                 <div class="card-body">
                     <!--------------- DEPARTMENT TABLE --------------->
                     <form action="codes.php" method="POST">

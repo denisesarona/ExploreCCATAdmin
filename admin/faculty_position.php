@@ -9,9 +9,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
-                <div class="card-header d-flex justify-content-center align-items-center">
-                    <h4 style="font-family: 'Poppins', sans-serif; font-size: 32px; color:#064918">FACULTY POSITIONS</h4>
-                </div>
+                <h3>FACULTY POSITIONS</h3>
                 <div class="card-body">
                     <!--------------- FACULTY POSITION TABLE --------------->
                     <form action="codes.php" method="POST">

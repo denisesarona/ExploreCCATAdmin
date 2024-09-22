@@ -2,8 +2,24 @@
 include('includes/header.php'); // Include header or any other necessary files
 include('../config/dbconnect.php'); // Include the database connection
 include('../functions/queries.php');
-// Fetch faculty nodes from the database
-$nodes = getFacultyNodes($con);
+
+// Check if a department ID is provided
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']); // Capture the ID from the URL
+
+    // Fetch faculty nodes from the database based on department ID
+    $nodes = getFacultyNodes($con);
+
+    // Fetch department details
+    $dept = getDepartmentsByID('departmenttb', $id);
+    
+    if ($dept && mysqli_num_rows($dept) > 0) {
+        $data = mysqli_fetch_array($dept);
+        $dept_name = htmlspecialchars($data['name']); // Assuming 'name' is the column that holds the department name
+    } else {
+        $dept_name = "Department not found.";
+    }
+}
 
 // Handle saving the updated node positions in the backend
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
@@ -14,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
         $_SESSION['error'] = "Error processing updated node data.";
     } else {
         foreach ($updated_nodes as $node) {
-            if (isset($node['id']) && isset($node['pid']) && isset($node['pid'])) {
+            if (isset($node['id']) && isset($node['pid'])) {
                 $node_id = intval($node['id']);
                 $parent_id = intval($node['pid']);
 
@@ -42,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
         $_SESSION['success'] = "Node positions updated successfully!";
     }
 }
-
 ?>
 
 <link rel="stylesheet" href="assets/css/orgChart.css">
@@ -50,30 +65,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
-                <h3 class="text-center">Faculty Organizational Chart</h3>
+                <h3 class="text-center"><?php echo $dept_name; ?></h3>
             </div>
             <div class="card-body">
                 <form action="codes.php" method="POST">
-                        <div class="row mb-3"> 
-                            <div class="col-md-6 mt-2"> 
-                                <div class="form-group">
-                                    <label for="nodeId">Node ID:</label>
-                                    <input type="text" class="form-control" id="nodeId" name="nodeId" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-2"> 
-                                <div class="form-group">
-                                    <label for="pid">Parent ID (Node it is connected to):</label>
-                                    <input type="text" class="form-control" id="pid" name="pid" required>
-                                </div>
-                                <input type="hidden" name="updated_nodes" id="updated_nodes">
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end mt-2"> 
-                                <div class="form-group w-100">
-                                <button type="submit" class="btn btn-success btn-block" name="save_changes">Save Changes</button>
-                                </div>
+                    <div class="row mb-3"> 
+                        <div class="col-md-6 mt-2"> 
+                            <div class="form-group">
+                                <label for="nodeId">Node ID:</label>
+                                <input type="text" class="form-control" id="nodeId" name="nodeId" required>
                             </div>
                         </div>
+                        <div class="col-md-6 mt-2"> 
+                            <div class="form-group">
+                                <label for="pid">Parent ID (Node it is connected to):</label>
+                                <input type="text" class="form-control" id="pid" name="pid" required>
+                            </div>
+                            <input type="hidden" name="updated_nodes" id="updated_nodes">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end mt-2"> 
+                            <div class="form-group w-100">
+                                <button type="submit" class="btn btn-success btn-block" name="save_changes">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 <div id="tree" class="mt-4"></div>
             </div>
@@ -98,6 +113,8 @@ OrgChart.templates.myTemplate.field_1 =
     
 OrgChart.templates.myTemplate.field_2 = 
     `<text style="font-size: 12px;" fill="#FFFFFFFF" x="280" y="20" text-anchor="right">Node ID {val}</text>`;
+
+// OrgChart configuration
 var chart = new OrgChart(document.getElementById("tree"), {
     template: "olivia",
     layout: OrgChart.tree,    
@@ -142,7 +159,6 @@ function gatherUpdatedNodeData() {
 document.querySelector('form').addEventListener('submit', function(event) {
     gatherUpdatedNodeData(); // Gather updated data
 });
-
 </script>
 
 <?php include('includes/footer.php'); ?>

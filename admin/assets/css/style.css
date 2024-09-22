@@ -16,6 +16,14 @@
     box-shadow: 0 0 8px rgba(6, 73, 24, 0.5);
 }
 
+h3 {
+    margin-top: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 36px;
+    color: #064A18;
+    text-align: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1000px) {
     nav {

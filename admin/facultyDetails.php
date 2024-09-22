@@ -19,9 +19,7 @@ $departmentresultSet = getData("departmenttb");
                     $data = mysqli_fetch_array($facultymember);
             ?>  
                     <div class="card mt-5">
-                        <div class="card-header d-flex justify-content-center align-items-center">
-                            <h4 style="font-family: 'Poppins', sans-serif; font-size: 32px; color:#064918">FACULTY MEMBERS DETAILS</h4>
-                        </div>
+                        <h3>FACULTY MEMBERS DETAILS</h3>
                         <div class="card-body">
                             <!--------------- FORM --------------->
 

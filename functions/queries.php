@@ -58,4 +58,34 @@
         }
         return $departments;
     }
+
+    function getDepartmentsByID($table, $id) {
+        global $con; // Use the existing database connection
+    
+        // Prepare the SQL statement
+        $stmt = $con->prepare("SELECT * FROM $table WHERE dept_id = ?");
+        
+        // Check if preparation was successful
+        if ($stmt === false) {
+            die("Error preparing statement: " . $con->error);
+        }
+    
+        // Bind the parameters
+        $stmt->bind_param("i", $id); // Assuming dept_id is an integer
+    
+        // Execute the statement
+        if (!$stmt->execute()) {
+            die("Error executing statement: " . $stmt->error);
+        }
+    
+        // Get the result
+        $result = $stmt->get_result();
+    
+        // Close the statement
+        $stmt->close();
+    
+        return $result; // Return the result set
+    }
+    
+    
 ?>

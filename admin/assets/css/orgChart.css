@@ -45,14 +45,11 @@ html, body{
               background-color: #f4f4f4;
           }
 
-.wrapper {
-    color: #064A18;
-}
-
-.wrapper h3 {
+h3 {
     margin-top: 20px;
     font-family: 'Poppins', sans-serif;
     font-size: 36px;
+    color: #064A18;
     text-align: center;
 }
 .wrapper .orgInput {

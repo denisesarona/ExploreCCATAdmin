@@ -12,9 +12,7 @@ $departmentresultSet = getData("departmenttb");
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
-                <div class="card-header d-flex justify-content-center align-items-center">
-                    <h4 style="font-family: 'Poppins', sans-serif; font-size: 35px; color:#064918">ADD FACULTY MEMBERS</h4>
-                </div>
+                <h3>ADD FACULTY MEMBERS</h3>
                 <div class="card-body">
                     <form action="codes.php" method="POST" enctype="multipart/form-data">
                         <div class="row" style="font-family: 'Poppins', sans-serif;">
