@@ -29,4 +29,20 @@
         }
         return $totalItem;
     }
+
+    function getFacultyNodes($con) {
+        $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid FROM facultytb"; 
+        $result = $con->query($sql);
+    
+        $nodes = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                // Adjust the image path if necessary
+                $row['img'] = 'uploads/' . $row['img']; // Ensure this is correct
+                $nodes[] = $row;
+            }
+        }
+    
+        return $nodes;
+    }
 ?>

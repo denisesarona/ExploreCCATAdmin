@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+/*CSS*/
+html, body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    color: #064918;
+  }
+  #tree{
+    width:100%;
+    height:100%;
+  }
+     
+          [data-n-id] rect {
+              fill: #064A18;
+          }
+  
+          .node.red rect {
+              fill: #750000;
+          }
+          
+          .field_0 {
+              font-family: 'Poppins';
+              text-transform: uppercase;
+              fill: #ffffff;
+          }
+  
+          .field_1 {
+              fill: #ff0000;
+          }
+  
+          [data-l-id] path {
+              stroke: #064A18;
+          }
+
+          #tree>svg {
+              background-color: #f4f4f4;
+          }
+
+.wrapper {
+    color: #064A18;
+}
+
+.wrapper h3 {
+    margin-top: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 36px;
+    text-align: center;
+}
+.wrapper .orgInput {
+    position: relative;
+    width: 100%;
+    height: 60px;
+    margin: 20px 0;
+}
+
+.orgInput {
+    width: 100%;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    border: 1px solid #064A18;
+    border-radius: 10px;
+    font-size: 16px;
+    color: #064A18;
+    padding: 20px 45px 20px 20px;
+}
+
+.orgInput::placeholder {
+    color: #064A18;
+}
+
+.orgInput i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+}
+
+.wrapper .btn {
+    width: 100%;
+    height: 45px;
+    background: #4BAE4F;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.wrapper .btn:hover{
+    background-color: #064A18;
+    color: white;
+}
+
+.back-btn-container {
+    position: absolute;
+    top: 20px; /* Adjust the value as needed */
+    left: 20px; /* Adjust the value as needed */
+    z-index: 1000; /* Ensure it is above other elements */
+}
+
+.back-btn {
+    color: white; /* Ensure the icon is visible */
+    font-size: 24px; /* Adjust size if needed */
+    text-decoration: none; /* Remove underline */
+}
+
+/* Media Query for Smaller Screens */
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 20px 30px;
+    }
+
+    .wrapper h3 {
+        font-size: 28px;
+    }
+
+    .wrapper .orgInput {
+        margin: 20px 0;
+    }
+
+    .wrapper .orgInput {
+        padding: 15px 40px 15px 15px;
+    }
+
+    .wrapper .btn {
+        font-size: 14px;
+        height: 40px;
+    }
+}
+
+/* Media Query for Extra Small Screens */
+@media (max-width: 480px) {
+    .wrapper {
+        padding: 15px 20px;
+    }
+
+    .wrapper h3 {
+        font-size: 24px;
+    }
+
+    .wrapper .orgInput {
+        padding: 10px 35px 10px 10px;
+    }
+
+    .wrapper .btn {
+        font-size: 12px;
+        height: 35px;
+    }
+}
