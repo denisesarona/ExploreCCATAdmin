@@ -259,23 +259,25 @@ if(isset($_POST['addAdmin_button'])){
 } else if (isset($_POST['addFaculty_button'])) {
     $name = $_POST['name'];
     $position = $_POST['position'];
-    $department = $_POST['department'];
+    $department_id = $_POST['dept_id']; // Get the department ID
+    $department_name = $_POST['department']; // This will still work if you capture the name earlier
 
-    $image = $_FILES['img']['name']; // GET THE ORIGINAL NAME OF THE UPLOADED FILE 
+    $image = $_FILES['img']['name']; // Get the original name of the uploaded file 
 
-    $path = "../uploads"; // DEFINE THE DIRECTORY WHERE UPLOADED IMAGES WILL BE STORED 
+    $path = "../uploads"; // Define the directory where uploaded images will be stored 
 
-    $image_ext = pathinfo($image, PATHINFO_EXTENSION); // GET THE FILE EXTENSION OF THE UPLOADED IMAGE 
-    $filename = time() . '.' . $image_ext; // GENERATE A UNIQUE FILENAME FOR THE UPLOADED IMAGE
+    $image_ext = pathinfo($image, PATHINFO_EXTENSION); // Get the file extension of the uploaded image 
+    $filename = time() . '.' . $image_ext; // Generate a unique filename for the uploaded image
 
+    // Update the query to insert both the department name and ID
     $addFaculty_query = "INSERT INTO facultytb
-        (name, position, department, img)
-        VALUES ('$name', '$position', '$department', '$filename')"; 
+        (name, position, dept_id, department    , img) 
+        VALUES ('$name', '$position', '$department_id', '$department_name', '$filename')"; 
     
-    $addFaculty_query_run = mysqli_query($con, $addFaculty_query); // EXECUTE THE SQL QUERY TO INSERT FACULTY INFORMATION INTO THE DATABASE 
+    $addFaculty_query_run = mysqli_query($con, $addFaculty_query); // Execute the SQL query to insert faculty information into the database 
 
     if ($addFaculty_query_run) {
-        move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename); // MOVE THE UPLOADED IMAGE FILE 
+        move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename); // Move the uploaded image file 
         $_SESSION['success'] = "✔ Faculty member added successfully!";
         header("Location: facultyMember.php");
         exit();

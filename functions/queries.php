@@ -46,6 +46,48 @@
         return $nodes;
     }
 
+    function getFacultyByDepartment($con, $dept_id) {
+        // Prepare the SQL statement
+        $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid 
+                FROM facultytb 
+                WHERE department = ?";
+        
+        // Prepare the statement
+        $stmt = $con->prepare($sql);
+        
+        // Check if preparation was successful
+        if ($stmt === false) {
+            die("Error preparing statement: " . $con->error);
+        }
+        
+        // Bind the department ID
+        $stmt->bind_param("i", $dept_id); // 
+        
+        // Execute the statement
+        if (!$stmt->execute()) {
+            die("Error executing statement: " . $stmt->error);
+        }
+        
+        // Get the result
+        $result = $stmt->get_result();
+        
+        // Initialize an array for nodes
+        $nodes = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                // Adjust the image path if necessary
+                $row['img'] = 'uploads/' . $row['img']; // Ensure this is correct
+                $nodes[] = $row;
+            }
+        }
+        
+        // Close the statement
+        $stmt->close();
+        
+        return $nodes; // Return the array of nodes
+    }
+    
+    
     function getDepartments($con) {
         $sql = "SELECT DISTINCT department AS name FROM facultytb";
         $result = $con->query($sql);

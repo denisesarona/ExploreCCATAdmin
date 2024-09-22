@@ -1,6 +1,5 @@
 <?php
 include('includes/header.php'); // Include header or any other necessary files
-include('../config/dbconnect.php'); // Include the database connection
 include('../functions/queries.php');
 
 // Check if a department ID is provided
@@ -8,10 +7,11 @@ if (isset($_GET['id'])) {
     $id = intval($_GET['id']); // Capture the ID from the URL
 
     // Fetch faculty nodes from the database based on department ID
-    $nodes = getFacultyNodes($con);
 
     // Fetch department details
     $dept = getDepartmentsByID('departmenttb', $id);
+
+    $nodes = getFacultyByDepartment($con, $dept);
     
     if ($dept && mysqli_num_rows($dept) > 0) {
         $data = mysqli_fetch_array($dept);
@@ -70,20 +70,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
             <div class="card-body">
                 <form action="codes.php" method="POST">
                     <div class="row mb-3"> 
-                        <div class="col-md-6 mt-2"> 
+                        <div class="col-md-6 mt-4"> 
                             <div class="form-group">
                                 <label for="nodeId">Node ID:</label>
                                 <input type="text" class="form-control" id="nodeId" name="nodeId" required>
                             </div>
                         </div>
-                        <div class="col-md-6 mt-2"> 
+                        <div class="col-md-6 mt-4"> 
                             <div class="form-group">
                                 <label for="pid">Parent ID (Node it is connected to):</label>
                                 <input type="text" class="form-control" id="pid" name="pid" required>
                             </div>
                             <input type="hidden" name="updated_nodes" id="updated_nodes">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end mt-2"> 
+                        <div class="col-md-2 d-flex align-items-end mt-3"> 
                             <div class="form-group w-100">
                                 <button type="submit" class="btn btn-success btn-block" name="save_changes">Save Changes</button>
                             </div>
