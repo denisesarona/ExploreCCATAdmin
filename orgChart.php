@@ -90,7 +90,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
 let nodes = <?php echo json_encode($nodes); ?>; // Convert PHP array to JSON
 
 OrgChart.LINK_ROUNDED_CORNERS = 10;
+// Define the template first
+OrgChart.templates.myTemplate = OrgChart.templates.olivia;
 
+// Then set the fields
+OrgChart.templates.myTemplate.size = [350, 120];
+OrgChart.templates.myTemplate.field_0 = 
+    `<text style="font-size: 14px;" font-weight="bold" fill="#FFFFFFFF" x="100" y="60" text-anchor="right">{val}</text>`;
+
+OrgChart.templates.myTemplate.field_1 = 
+    `<text style="font-size: 12px;" fill="#FFFFFFFF" x="100" y="80" text-anchor="right">{val}</text>`;
+    
 var chart = new OrgChart(document.getElementById("tree"), {
     template: "olivia",
     layout: OrgChart.tree,    
@@ -100,12 +110,6 @@ var chart = new OrgChart(document.getElementById("tree"), {
     align: OrgChart.ORIENTATION,
     scaleInitial: OrgChart.match.boundary,
     nodeMouseClick: OrgChart.action.edit,
-    nodeMenu: {
-        details: { text: "Details" },
-        edit: { text: "Edit" },
-        add: { text: "Add" },
-        remove: { text: "Remove" }
-    },
     toolbar: {
         layout: true,
         zoom: true,
