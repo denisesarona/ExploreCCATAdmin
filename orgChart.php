@@ -5,7 +5,7 @@ include('config/dbconnect.php'); // Include the database connection
 
 // Function to fetch all faculty members
 function getFacultyNodes($con) {
-    $sql = "SELECT faculty_id AS id, name, position AS title, img AS image, department, pid FROM facultytb";
+    $sql = "SELECT faculty_id AS id, name, position AS title, img AS image, department, pid, ppid FROM facultytb"; // Include ppid
     $result = $con->query($sql); // Execute the query
 
     $nodes = []; // Initialize an array to hold the nodes
@@ -30,15 +30,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
         $_SESSION['error'] = "Error processing updated node data.";
     } else {
         foreach ($updated_nodes as $node) {
-            if (isset($node['id']) && isset($node['pid'])) {
+            if (isset($node['id']) && isset($node['pid']) && isset($node['ppid'])) {
                 $node_id = intval($node['id']);
                 $parent_id = intval($node['pid']);
+                $partner_parent_id = intval($node['ppid']);
 
-                // Update each node's parent ID in the database
-                $update_sql = "UPDATE facultytb SET pid = ? WHERE faculty_id = ?";
+                // Prepare the SQL statement
+                $update_sql = "UPDATE facultytb SET pid = ?, ppid = ? WHERE faculty_id = ?";
                 $stmt = $con->prepare($update_sql);
-                $stmt->bind_param("ii", $parent_id, $node_id);
-                $stmt->execute();
+                
+                // Check if preparation was successful
+                if ($stmt === false) {
+                    $_SESSION['error'] = "Error preparing statement: " . $con->error;
+                    continue; // Skip to the next node
+                }
+        
+                $stmt->bind_param("iii", $parent_id, $partner_parent_id, $node_id);
+                
+                // Execute the statement
+                if (!$stmt->execute()) {
+                    $_SESSION['error'] = "Error executing statement: " . $stmt->error;
+                }
+        
                 $stmt->close();
             }
         }
@@ -54,6 +67,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
     <div class="wrapper mt-5">
         <h3 class="text-center">Faculty Organizational Chart</h3>
         <form method="POST" action="">
+            <div class="form-group">
+                <label for="nodeId">Node ID:</label>
+                <input type="text" class="form-control" id="nodeId" name="nodeId" required>
+            </div>
+            <div class="form-group">
+                <label for="pid">Parent ID (pid):</label>
+                <input type="text" class="form-control" id="pid" name="pid" required>
+            </div>
+            <div class="form-group">
+                <label for="ppid">Partner Parent ID (ppid):</label>
+                <input type="text" class="form-control" id="ppid" name="ppid" required>
+            </div>
             <!-- Hidden input to store updated node data -->
             <input type="hidden" name="updated_nodes" id="updated_nodes">
             <button type="submit" class="btn btn-success btn-block" name="save_changes">Save Changes</button>
@@ -67,7 +92,7 @@ let nodes = <?php echo json_encode($nodes); ?>; // Convert PHP array to JSON
 
 var chart = new OrgChart(document.getElementById("tree"), {
     layout: OrgChart.tree,    
-    enableDragDrop: true,
+    enableDragDrop: false, // Disable drag-and-drop
     mouseScrool: OrgChart.none,
     align: OrgChart.ORIENTATION,
     scaleInitial: OrgChart.match.boundary,
@@ -93,26 +118,29 @@ var chart = new OrgChart(document.getElementById("tree"), {
     nodes: nodes  // Use the data retrieved from the database
 });
 
-// Capture the updated positions after a drag-and-drop event
-chart.on('drop', function (sender, draggedNodeId, droppedNodeId) {
-    var draggedNode = sender.getNode(draggedNodeId);
-    var droppedNode = sender.getNode(droppedNodeId);
+// Function to gather updated node data before form submission
+function gatherUpdatedNodeData() {
+    let updatedNodes = [];
     
-    // Update the dragged node's parent ID
-    draggedNode.pid = droppedNodeId; // Set the new parent ID
-    sender.updateNode(draggedNode); // Update the node in the chart
+    // Get the node ID and new pid, ppid from the form
+    let nodeId = document.getElementById('nodeId').value;
+    let parentId = document.getElementById('pid').value;
+    let partnerParentId = document.getElementById('ppid').value;
 
-    // Prepare the updated node structure for submission
-    let updatedNodes = sender.getAllNodes().map(node => {
-        return { id: node.id, pid: node.pid };
+    updatedNodes.push({
+        id: nodeId,
+        pid: parentId,
+        ppid: partnerParentId
     });
+
     document.getElementById('updated_nodes').value = JSON.stringify(updatedNodes);
+}
+
+// Add an event listener to the form submission
+document.querySelector('form').addEventListener('submit', function(event) {
+    gatherUpdatedNodeData(); // Gather updated data
 });
 
-// Show layout options when the chart is initialized
-chart.on('init', function (sender) {
-    sender.toolbarUI.showLayout();
-});
 </script>
 
 <?php include('includes/footer.php'); ?>
