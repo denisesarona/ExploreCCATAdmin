@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
                 <input type="text" class="form-control" id="nodeId" name="nodeId" required>
             </div>
             <div class="form-group col-12 col-md-6 mb-3">
-                <label for="pid">Parent ID (pid):</label>
+                <label for="pid">Parent ID (Node it is connected to):</label>
                 <input type="text" class="form-control" id="pid" name="pid" required>
             </div>
             <input type="hidden" name="updated_nodes" id="updated_nodes">
@@ -101,6 +101,8 @@ OrgChart.templates.myTemplate.field_0 =
 OrgChart.templates.myTemplate.field_1 = 
     `<text style="font-size: 12px;" fill="#FFFFFFFF" x="100" y="80" text-anchor="right">{val}</text>`;
     
+OrgChart.templates.myTemplate.field_2 = 
+    `<text style="font-size: 12px;" fill="#FFFFFFFF" x="280" y="20" text-anchor="right">Node ID {val}</text>`;
 var chart = new OrgChart(document.getElementById("tree"), {
     template: "olivia",
     layout: OrgChart.tree,    
@@ -111,14 +113,15 @@ var chart = new OrgChart(document.getElementById("tree"), {
     scaleInitial: OrgChart.match.boundary,
     nodeMouseClick: OrgChart.action.edit,
     toolbar: {
-        layout: true,
+        layout: false,
         zoom: true,
-        fit: true,
-        expandAll: true
+        fit: false,
+        expandAll: false
     },
     nodeBinding: {
         field_0: "name",
-        field_1: "position",  
+        field_1: "position",
+        field_2: "id",  
         img_0: "img",      
     },
     nodes: nodes  // Use the data retrieved from the database
