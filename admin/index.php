@@ -1,6 +1,5 @@
 <?php 
     include('includes/header.php');
-    include('../middleware/adminMiddleware.php');
     include('../config/dbconnect.php');
     include('../functions/queries.php');
 

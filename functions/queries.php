@@ -45,4 +45,17 @@
     
         return $nodes;
     }
+
+    function getDepartments($con) {
+        $sql = "SELECT DISTINCT department AS name FROM facultytb";
+        $result = $con->query($sql);
+    
+        $departments = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $departments[] = $row;
+            }
+        }
+        return $departments;
+    }
 ?>

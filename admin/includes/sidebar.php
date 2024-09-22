@@ -50,6 +50,12 @@
                 <span class="sidebar-txt">FACULTY POSITIONS</span>
             </a>
         </li>
+        <li class="sidebar-item">
+            <a href="orgChart.php" class="sidebar-link">
+            <i class='bx bx-git-repo-forked'></i>
+                <span class="sidebar-txt">ORGANIZATIONAL CHARTS</span>
+            </a>
+        </li>
     </ul>
     <div class="sidebar-footer">
         <a href="logout.php" class="sidebar-link">
