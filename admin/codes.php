@@ -290,6 +290,7 @@ if(isset($_POST['addAdmin_button'])){
     $faculty_id = $_POST['faculty_id'];
     $name = $_POST['name'];
     $position = $_POST['position'];
+    $department_id = $_POST['dept_id'];
     $department = $_POST['department'];
     $image = $_POST['image'];
 
@@ -305,7 +306,7 @@ if(isset($_POST['addAdmin_button'])){
 
     $path = "../uploads";
 
-    $update_query = "UPDATE facultytb SET name='$name', position='$position', department='$department', img='$update_filename' WHERE faculty_id='$faculty_id'";
+    $update_query = "UPDATE facultytb SET name='$name', position='$position', dept_id='$department_id', department='$department', img='$update_filename' WHERE faculty_id='$faculty_id'";
 
     $update_query_run = mysqli_query($con, $update_query);
 

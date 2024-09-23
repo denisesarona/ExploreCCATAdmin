@@ -56,21 +56,21 @@ $departmentresultSet = getData("departmenttb");
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Department</label>
-                                            <select class="form-control" name="department">
+                                            <select class="form-control" name="department" id="department" onchange="updateDeptId()">
                                                 <?php
                                                 $current_department = $data['department'];
                                                 ?>
                                                 <option value='<?=$current_department?>' selected><?=$current_department?></option>
                                                 <?php
-                                                    // Fetch positions and ensure the current one is not listed again
                                                     while ($rows = $departmentresultSet->fetch_assoc()) {
                                                         $department_name = $rows['name'];
-                                                        if ($department_name !== $current_department) { // Only show if it's not the current position
-                                                            echo "<option value='$department_name'>$department_name</option>";
-                                                        }
+                                                        $dept_id = $rows['dept_id'];
+                                                        // Set the option value to dept_id but display department name
+                                                        echo "<option value='$department_name' data-dept-id='$dept_id'>$department_name</option>";
                                                     }
                                                 ?>
                                             </select>
+                                            <input type="hidden" name="dept_id" id="dept_id">
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
@@ -101,7 +101,14 @@ $departmentresultSet = getData("departmenttb");
         </div>
     </div>
 </div>
-
+<script>
+function updateDeptId() {
+    var departmentSelect = document.getElementById('department');
+    var deptIdInput = document.getElementById('dept_id');
+    var selectedOption = departmentSelect.options[departmentSelect.selectedIndex];
+    deptIdInput.value = selectedOption.getAttribute('data-dept-id'); // Get the dept ID from data attribute
+}
+</script>
 <!--------------- FOOTER --------------->
 
 <?php include('includes/footer.php');?>
