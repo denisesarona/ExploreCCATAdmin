@@ -25,7 +25,7 @@ if (isset($_POST['addDepartment_button'])) {
                 dept_id INT(6) NOT NULL,
                 department VARCHAR(200) NOT NULL,
                 img VARCHAR(200) NOT NULL,
-                pid INT DEFAULT NULL,
+                pid INT(10) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )";
 
