@@ -257,35 +257,56 @@ if(isset($_POST['addAdmin_button'])){
         exit();
     }
 } else if (isset($_POST['addFaculty_button'])) {
-    $name = $_POST['name'];
-    $position = $_POST['position'];
-    $department_id = $_POST['dept_id']; // Get the department ID
-    $department_name = $_POST['department']; // This will still work if you capture the name earlier
-
-    $image = $_FILES['img']['name']; // Get the original name of the uploaded file 
-
-    $path = "../uploads"; // Define the directory where uploaded images will be stored 
-
-    $image_ext = pathinfo($image, PATHINFO_EXTENSION); // Get the file extension of the uploaded image 
-    $filename = time() . '.' . $image_ext; // Generate a unique filename for the uploaded image
-
-    // Update the query to insert both the department name and ID
-    $addFaculty_query = "INSERT INTO facultytb
-        (name, position, dept_id, department    , img) 
-        VALUES ('$name', '$position', '$department_id', '$department_name', '$filename')"; 
+    // Sanitize inputs to prevent SQL Injection
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+    $position = mysqli_real_escape_string($con, $_POST['position']);
+    $department_id = mysqli_real_escape_string($con, $_POST['dept_id']);
+    $department_name = mysqli_real_escape_string($con, $_POST['department']);
     
-    $addFaculty_query_run = mysqli_query($con, $addFaculty_query); // Execute the SQL query to insert faculty information into the database 
+    // Handle file upload
+    $image = $_FILES['img']['name'];
+    $path = "../uploads";
+    $image_ext = pathinfo($image, PATHINFO_EXTENSION);
+    $filename = time() . '.' . $image_ext;
 
-    if ($addFaculty_query_run) {
-        move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename); // Move the uploaded image file 
-        $_SESSION['success'] = "✔ Faculty member added successfully!";
-        header("Location: facultyMember.php");
-        exit();
+    // Insert faculty data into the database
+    $addFaculty_query = "INSERT INTO facultytb (name, position, dept_id, department, img) 
+                         VALUES ('$name', '$position', '$department_id', '$department_name', '$filename')";
+    $addFaculty_query_run = mysqli_query($con, $addFaculty_query);
+
+    // Fetch department data
+    $dept_query = "SELECT * FROM departmenttb WHERE dept_id='$department_id'";
+    $dept_query_run = mysqli_query($con, $dept_query);
+    $dept_data = mysqli_fetch_array($dept_query_run);
+
+    if ($dept_data) {
+        // Prepare the table name
+        $dept_name = $dept_data['name'];
+        $table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($dept_name));
+        
+        // Insert into the department-specific table
+        $insert_query = "INSERT INTO $table_name (name, position, dept_id, department, img) 
+                         VALUES ('$name', '$position', '$department_id', '$department_name', '$filename')";
+        $insert_query_run = mysqli_query($con, $insert_query);
+
+        // Check if both queries were successful
+        if ($addFaculty_query_run && $insert_query_run) {
+            // Move the uploaded file
+            if (move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
+                $_SESSION['success'] = "✔ Faculty member added successfully!";
+            } else {
+                $_SESSION['error'] = "Image upload failed!";
+            }
+        } else {
+            $_SESSION['error'] = "Adding Faculty member failed!";
+        }
     } else {
-        $_SESSION['error'] = "Adding Faculty member failed!";
-        header("Location: facultyMember.php");
-        exit();
+        $_SESSION['error'] = "Department not found!";
     }
+
+    // Redirect back to the faculty member page
+    header("Location: facultyMember.php");
+    exit();
 } else if(isset($_POST['editFaculty_button'])){
     $faculty_id = $_POST['faculty_id'];
     $name = $_POST['name'];
