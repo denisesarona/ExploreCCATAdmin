@@ -50,8 +50,8 @@
         // Prepare the SQL statement
         $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid 
                 FROM facultytb 
-                WHERE department = ?";
-        
+                WHERE department = ?"; // Assuming 'department' is the ID
+    
         // Prepare the statement
         $stmt = $con->prepare($sql);
         
@@ -61,7 +61,7 @@
         }
         
         // Bind the department ID
-        $stmt->bind_param("i", $dept_id); // 
+        $stmt->bind_param("i", $dept_id);
         
         // Execute the statement
         if (!$stmt->execute()) {
@@ -76,7 +76,7 @@
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 // Adjust the image path if necessary
-                $row['img'] = 'uploads/' . $row['img']; // Ensure this is correct
+                $row['img'] = 'uploads/' . $row['img'];
                 $nodes[] = $row;
             }
         }
@@ -86,6 +86,7 @@
         
         return $nodes; // Return the array of nodes
     }
+    
     
     
     function getDepartments($con) {

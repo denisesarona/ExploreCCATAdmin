@@ -6,20 +6,22 @@ include('../functions/queries.php');
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']); // Capture the ID from the URL
 
-    // Fetch faculty nodes from the database based on department ID
-
     // Fetch department details
     $dept = getDepartmentsByID('departmenttb', $id);
-
-    $nodes = getFacultyByDepartment($con, $dept);
     
     if ($dept && mysqli_num_rows($dept) > 0) {
         $data = mysqli_fetch_array($dept);
-        $dept_name = htmlspecialchars($data['name']); // Assuming 'name' is the column that holds the department name
+        $dept_name = htmlspecialchars($data['name']);
+        $dept_id = intval($data['dept_id']); // Assuming 'id' is the column for department ID
+
+        // Fetch faculty nodes based on department ID
+        $nodes = getFacultyByDepartment($con, $dept_id); // Pass the correct department ID
     } else {
         $dept_name = "Department not found.";
+        $nodes = []; // Initialize nodes as an empty array
     }
 }
+
 
 // Handle saving the updated node positions in the backend
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
