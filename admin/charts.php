@@ -15,23 +15,33 @@ if (isset($_GET['id'])) {
         $dept_id = intval($data['dept_id']); // Assuming 'id' is the column for department ID
 
         // Fetch faculty nodes based on department ID
+        // Fetch faculty nodes based on department ID
         $nodes = getFacultyByDepartment($con, $dept_id); // Pass the correct department ID
 
-        $lowest_pid = null;
-        foreach ($nodes as $node) {
-            if ($lowest_pid === null || $node['pid'] < $lowest_pid) {
-                $lowest_pid = $node['pid'];
+        if ($nodes) {
+            // Loop through nodes to find the lowest pid
+            $lowest_pid = null;
+            foreach ($nodes as $node) {
+                if ($lowest_pid === null || $node['pid'] < $lowest_pid) {
+                    $lowest_pid = $node['pid'];
+                }
+            }
+
+            // Only set pid to NULL if it's not a child of any other node
+            $root_candidates = array_filter($nodes, function($node) {
+                return $node['pid'] === null; // Adjust condition as necessary
+            });
+
+            if ($lowest_pid !== null && empty($root_candidates)) {
+                // Set the lowest pid to NULL only if it has no parent
+                $update_sql = "UPDATE facultytb SET pid = NULL WHERE pid = ?";
+                $stmt = $con->prepare($update_sql);
+                $stmt->bind_param("i", $lowest_pid);
+                $stmt->execute();
+                $stmt->close();
             }
         }
-        
-        // Update the lowest pid to NULL in the database
-        if ($lowest_pid !== null) {
-            $update_sql = "UPDATE facultytb SET pid = NULL WHERE pid = ?";
-            $stmt = $con->prepare($update_sql);
-            $stmt->bind_param("i", $lowest_pid);
-            $stmt->execute();
-            $stmt->close();
-        }
+
     } else {
         $dept_name = "Department not found.";
         $nodes = []; // Initialize nodes as an empty array
@@ -51,27 +61,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
             if (isset($node['id']) && isset($node['pid'])) {
                 $node_id = intval($node['id']);
                 $parent_id = intval($node['pid']);
-
-                // Prepare the SQL statement
-                $update_sql = "UPDATE facultytb SET pid = ? WHERE faculty_id = ?";
-                $stmt = $con->prepare($update_sql);
                 
-                // Check if preparation was successful
-                if ($stmt === false) {
-                    $_SESSION['error'] = "Error preparing statement: " . $con->error;
-                    continue; // Skip to the next node
-                }
-        
-                $stmt->bind_param("ii", $parent_id, $node_id);
+                // Make sure the parent_id exists in the nodes before updating
+                $valid_parents = array_column($nodes, 'faculty_id');
                 
-                // Execute the statement
-                if (!$stmt->execute()) {
-                    $_SESSION['error'] = "Error executing statement: " . $stmt->error;
+                if (in_array($parent_id, $valid_parents) || $parent_id === null) {
+                    // Proceed with the update if parent_id is valid or null
+                    $update_sql = "UPDATE facultytb SET pid = ? WHERE faculty_id = ?";
+                    $stmt = $con->prepare($update_sql);
+                    $stmt->bind_param("ii", $parent_id, $node_id);
+                    $stmt->execute();
+                    $stmt->close();
+                } else {
+                    $_SESSION['error'] = "Invalid parent ID for node: " . $node_id;
                 }
-        
-                $stmt->close();
             }
         }
+        
 
         $_SESSION['success'] = "Node positions updated successfully!";
     }

@@ -12,7 +12,7 @@
                 <h3>DEPARTMENTS</h3>
                 <div class="card-body">
                     <!--------------- DEPARTMENT TABLE --------------->
-                    <form action="codes.php" method="POST">
+                    <form action="depttblCreate.php" method="POST">
                         <div class="row mb-3"> 
                             <div class="col-md-10"> 
                                 <div class="form-group">

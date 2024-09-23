@@ -156,7 +156,7 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: addAdmin.php");
         exit();
     }
-}   else if (isset($_SESSION['registration_data'])) {
+} else if (isset($_SESSION['registration_data'])) {
     $registration_data = $_SESSION['registration_data'];
     $code_id = $_SESSION['code_id'];
     $name = $registration_data["name"];
@@ -344,22 +344,6 @@ if(isset($_POST['addAdmin_button'])){
     } else {
         $_SESSION['error'] = "Deleting faculty member failed!";
         header("Location: facultyMember.php");
-        exit();
-    }
-} else if(isset($_POST['addDepartment_button'])){
-    $department = $_POST['dept_name'];
-
-    $dept_query = "INSERT INTO departmenttb(name) VALUES ('$department')";
-
-    $dept_query_run = mysqli_query($con, $dept_query);
-
-    if($dept_query_run){
-        $_SESSION['success'] = "✔ Department added successfully!";
-        header("Location: department.php");
-        exit();
-    } else {
-        $_SESSION['error'] = "Adding Department failed!";
-        header("Location: department.php");
         exit();
     }
 } else if(isset($_POST['deleteDepartment_button'])){

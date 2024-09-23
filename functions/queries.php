@@ -129,5 +129,23 @@
         return $result; // Return the result set
     }
     
+    if(isset($_POST['addDepartment_button'])){
+        $department = $_POST['dept_name'];
     
+        $dept_query = "INSERT INTO departmenttb(name) VALUES ('$department')";
+    
+        $dept_query_run = mysqli_query($con, $dept_query);
+    
+        if($dept_query_run){
+            $_SESSION['success'] = "✔ Department added successfully!";
+            header("Location: department.php");
+            exit();
+        } else {
+            $_SESSION['error'] = "Adding Department failed!";
+            header("Location: department.php");
+            exit();
+        }
+
+        
+    }
 ?>
