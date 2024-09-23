@@ -19,11 +19,10 @@ if (isset($_POST['addDepartment_button'])) {
             $table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($department));
             $sql_create_dept_table = "CREATE TABLE `$table_name` (
                 faculty_id INT(6) AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(200),
-                position VARCHAR(200),
-                dept_id INT(6),
-                department VARCHAR(200),
-                img VARCHAR(200),
+                name VARCHAR(200) NOT NULL,
+                dept_id INT(6) NOT NULL,
+                department VARCHAR(200) NOT NULL,
+                img VARCHAR(200) NOT NULL,
                 pid INT DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )";
