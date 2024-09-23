@@ -382,4 +382,4 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: faculty_position.php");
         exit();
     }
-}
+} 

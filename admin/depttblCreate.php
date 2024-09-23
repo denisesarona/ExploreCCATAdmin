@@ -1,23 +1,13 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "capstonedb";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+session_start();
+include('../config/dbconnect.php');
 
 if (isset($_POST['addDepartment_button'])) {
     $department = $_POST['dept_name'];
 
     // Prepare to insert the new department
     $dept_query = "INSERT INTO departmenttb(name) VALUES (?)";
-    $stmt = $conn->prepare($dept_query);
+    $stmt = $con->prepare($dept_query);
     
     if ($stmt) {
         $stmt->bind_param("s", $department);
@@ -38,18 +28,15 @@ if (isset($_POST['addDepartment_button'])) {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )";
 
-            // Debugging output
-            echo "SQL for creating department table: $sql_create_dept_table<br>"; // Display the SQL query
 
-            if ($conn->query($sql_create_dept_table) === TRUE) {
-                $_SESSION['success'] .= " Table '$table_name' created successfully.";
+            if ($con->query($sql_create_dept_table) === TRUE) {
+                $_SESSION['success'] = "✔ Department added successfully!"; 
+                header("Location: department.php");// Corrected to use .=
             } else {
-                $_SESSION['error'] = "Error creating table '$table_name': " . $conn->error;
-                echo "Error creating table: " . $conn->error . "<br>"; // Debugging output
+                $_SESSION['error'] = "Error creating table '$table_name': " . $con->error;
+                header("Location: department.php");
             }
 
-            // Redirect to the department page
-            header("Location: department.php");
             exit();
         } else {
             $_SESSION['error'] = "Adding Department failed: " . $stmt->error;
@@ -59,14 +46,14 @@ if (isset($_POST['addDepartment_button'])) {
 
         $stmt->close();
     } else {
-        echo "Error preparing statement: " . $conn->error . "<br>";
+        echo "Error preparing statement: " . $con->error . "<br>";
     }
 } else if (isset($_POST['deleteDepartment_button'])) {
     $dept_id = $_POST['dept_id']; 
 
     // Fetch department details to get the table name
     $dept_query = "SELECT * FROM departmenttb WHERE dept_id='$dept_id'";
-    $dept_query_run = mysqli_query($conn, $dept_query);
+    $dept_query_run = mysqli_query($con, $dept_query);
     $dept_data = mysqli_fetch_array($dept_query_run);
     
     if ($dept_data) {
@@ -76,16 +63,16 @@ if (isset($_POST['addDepartment_button'])) {
         
         // Delete the department from the departmenttb
         $delete_query = "DELETE FROM departmenttb WHERE dept_id='$dept_id'";
-        $delete_query_run = mysqli_query($conn, $delete_query);
+        $delete_query_run = mysqli_query($con, $delete_query);
 
         // If department deletion was successful, delete the associated table
         if ($delete_query_run) {
             // Drop the department-specific table
             $drop_table_query = "DROP TABLE IF EXISTS `$table_name`";
-            if (mysqli_query($conn, $drop_table_query)) {
-                $_SESSION['success'] = "✔ Department and associated table deleted successfully!";
+            if (mysqli_query($con, $drop_table_query)) {
+                $_SESSION['success'] = "✔ Department deleted successfully!";
             } else {
-                $_SESSION['error'] = "Department deleted, but failed to drop the table: " . mysqli_error($conn);
+                $_SESSION['error'] = "Department deleted, but failed to drop the table: " . mysqli_error($con);
             }
         } else {
             $_SESSION['error'] = "Deleting department failed!";
@@ -99,5 +86,5 @@ if (isset($_POST['addDepartment_button'])) {
     exit();
 }
 
-$conn->close();
+$con->close();
 ?>
