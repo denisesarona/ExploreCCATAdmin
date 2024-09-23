@@ -74,13 +74,13 @@ $departmentresultSet = getData("departmenttb");
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Upload Image</label>
-                                            <input type="file" class="form-control" name="image">
-                                            <label for="" style="margin-right: 10px;">Current Image</label>
-                                            <input type="hidden" name="old_image" value="<?=$data['img']; ?>">
-                                            <img src="../uploads/<?=$data['img']; ?>" height="50px" width="50px" alt="">
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="">Upload Image</label>
+                                        <input type="file" class="form-control" name="image">
+                                        <label for="" style="margin-right: 10px;">Current Image</label>
+                                        <input type="hidden" name="old_image" value="<?= $data['img']; ?>">
+                                        <img src="../uploads/<?= $data['img']; ?>" height="50px" width="50px" alt="">
+                                    </div>
                                     </div>
                                     <!--------------- SAVE BUTTON --------------->
                                     <div class="col-md-6">

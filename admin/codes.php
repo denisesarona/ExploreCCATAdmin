@@ -307,46 +307,100 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect back to the faculty member page
     header("Location: facultyMember.php");
     exit();
-} else if(isset($_POST['editFaculty_button'])){
+} else if (isset($_POST['editFaculty_button'])) {
     $faculty_id = $_POST['faculty_id'];
     $name = $_POST['name'];
     $position = $_POST['position'];
-    $department_id = $_POST['dept_id'];
-    $department = $_POST['department'];
-    $image = $_POST['image'];
-
-    $new_image = $_FILES['image']['name']; // GET THE ORIGINAL NAME OF THE UPLOADED FILE 
+    $new_department_id = $_POST['dept_id'];
+    $department = $_POST['department']; // Ensure this input exists in your form
+    $new_image = $_FILES['image']['name'];
     $old_image = $_POST['old_image'];
 
-    if($new_image != ""){
-        $image_ext = pathinfo($new_image, PATHINFO_EXTENSION); // GET THE FILE EXTENSION OF THE UPLOADED IMAGE 
-        $update_filename = time().'.'.$image_ext; // GENERATE A UNIQUE FILENAME FOR THE UPLOADED IMAGE BY APPEDING THE CURRENT TIMESTAMP AND THE ORIGINAL FILE EXT
-    } else{
-        $update_filename = $old_image;
-    }                                               
+    // Fetch the current faculty details to get the old department ID
+    $faculty_query = "SELECT dept_id FROM facultytb WHERE faculty_id=?";
+    $faculty_stmt = $con->prepare($faculty_query);
+    $faculty_stmt->bind_param("i", $faculty_id);
+    $faculty_stmt->execute();
+    $faculty_result = $faculty_stmt->get_result();
+    $faculty_data = $faculty_result->fetch_assoc();
+    $old_department_id = $faculty_data['dept_id'];
+
+    // Set the update filename
+    $update_filename = $new_image ? time() . '.' . pathinfo($new_image, PATHINFO_EXTENSION) : $old_image;
 
     $path = "../uploads";
 
-    $update_query = "UPDATE facultytb SET name='$name', position='$position', dept_id='$department_id', department='$department', img='$update_filename' WHERE faculty_id='$faculty_id'";
+    // Update faculty details
+    $update_query = "UPDATE facultytb SET name=?, position=?, dept_id=?, department=?, img=? WHERE faculty_id=?";
+    $stmt = $con->prepare($update_query);
 
-    $update_query_run = mysqli_query($con, $update_query);
+    if (!$stmt) {
+        die("Prepare failed: (" . $con->errno . ") " . $con->error);
+    }
 
-    if ($update_query_run) {
-        if ($_FILES['image']['name'] != "") {
+    // Bind parameters
+    $stmt->bind_param("ssissi", $name, $position, $new_department_id, $department, $update_filename, $faculty_id);
+
+    // Execute update
+    if ($stmt->execute()) {
+        // If the department has changed, move the entry to the new department table
+        if ($old_department_id !== $new_department_id) {
+            // Fetch the old department table name
+            $old_dept_query = "SELECT name FROM departmenttb WHERE dept_id=?";
+            $old_dept_stmt = $con->prepare($old_dept_query);
+            $old_dept_stmt->bind_param("i", $old_department_id);
+            $old_dept_stmt->execute();
+            $old_dept_result = $old_dept_stmt->get_result();
+            $old_dept_data = $old_dept_result->fetch_assoc();
+            $old_table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($old_dept_data['name']));
+
+            // Check if the old department table exists
+            if (mysqli_query($con, "SHOW TABLES LIKE '$old_table_name'")->num_rows > 0) {
+                // Delete from the old department table
+                $delete_old_query = "DELETE FROM $old_table_name WHERE faculty_id=?";
+                $delete_old_stmt = $con->prepare($delete_old_query);
+                $delete_old_stmt->bind_param("i", $faculty_id);
+                $delete_old_stmt->execute();
+                $delete_old_stmt->close();
+            }
+
+            // Prepare the new department table name
+            $new_table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($department));
+
+            // Check if the new department table exists
+            if (mysqli_query($con, "SHOW TABLES LIKE '$new_table_name'")->num_rows > 0) {
+                // Insert into the new department-specific table
+                $insert_new_query = "INSERT INTO $new_table_name (name, position, dept_id, department, img) VALUES (?, ?, ?, ?, ?)";
+                $insert_stmt = $con->prepare($insert_new_query);
+
+                if (!$insert_stmt) {
+                    die("Prepare failed: (" . $con->errno . ") " . $con->error);
+                }
+
+                $insert_stmt->bind_param("ssiss", $name, $position, $new_department_id, $department, $update_filename);
+                $insert_stmt->execute();
+                $insert_stmt->close();
+            }
+        }
+
+        // Handle image upload
+        if ($new_image) {
             move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $update_filename);
             if (file_exists("../uploads/" . $old_image)) {
                 unlink("../uploads/" . $old_image);
             }
         }
-    
+
         $_SESSION['success'] = "✔ Faculty Member Details updated successfully!";
         header("Location: facultyMember.php");
         exit();
     } else {
-        $_SESSION['error'] = "Updating Faculty Member Details failed! Error: " . mysqli_error($con);
+        $_SESSION['error'] = "Updating Faculty Member Details failed! Error: " . $stmt->error;
         header("Location: facultyMember.php");
         exit();
-    }    
+    }
+
+    $stmt->close();
 } else if(isset($_POST['deleteFaculty_button'])){
     $faculty_id = $_POST['faculty_id'];
 
