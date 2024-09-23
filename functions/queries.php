@@ -50,7 +50,7 @@
         // Prepare the SQL statement
         $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid 
                 FROM facultytb 
-                WHERE dept_id = ?"; // Assuming 'department' is the ID
+                WHERE dept_id = ? ORDER BY pid ASC"; // Assuming 'department' is the ID
     
         // Prepare the statement
         $stmt = $con->prepare($sql);

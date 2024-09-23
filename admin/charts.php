@@ -16,6 +16,22 @@ if (isset($_GET['id'])) {
 
         // Fetch faculty nodes based on department ID
         $nodes = getFacultyByDepartment($con, $dept_id); // Pass the correct department ID
+
+        $lowest_pid = null;
+        foreach ($nodes as $node) {
+            if ($lowest_pid === null || $node['pid'] < $lowest_pid) {
+                $lowest_pid = $node['pid'];
+            }
+        }
+        
+        // Update the lowest pid to NULL in the database
+        if ($lowest_pid !== null) {
+            $update_sql = "UPDATE facultytb SET pid = NULL WHERE pid = ?";
+            $stmt = $con->prepare($update_sql);
+            $stmt->bind_param("i", $lowest_pid);
+            $stmt->execute();
+            $stmt->close();
+        }
     } else {
         $dept_name = "Department not found.";
         $nodes = []; // Initialize nodes as an empty array
@@ -70,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
                 <h3 class="text-center"><?php echo $dept_name; ?></h3>
             </div>
             <div class="card-body">
-                <form action="codes.php" method="POST">
+                <form action="" method="POST">
                     <div class="row mb-3"> 
                         <div class="col-md-6 mt-4"> 
                             <div class="form-group">
