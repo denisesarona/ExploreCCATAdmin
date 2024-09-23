@@ -18,7 +18,8 @@ if (isset($_POST['addDepartment_button'])) {
             // Create the department-specific table
             $table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($department));
             $sql_create_dept_table = "CREATE TABLE `$table_name` (
-                faculty_id INT(6) AUTO_INCREMENT PRIMARY KEY,
+                dept_faculty_id INT(6) AUTO_INCREMENT PRIMARY KEY,
+                faculty_id INT(6) NOT NULL,
                 name VARCHAR(200) NOT NULL,
                 position VARCHAR(200) NOT NULL,
                 dept_id INT(6) NOT NULL,
