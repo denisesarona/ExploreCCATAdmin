@@ -6,9 +6,10 @@ $dbname = "capstonedb";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
+
 // Check connection
 if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
 if (isset($_POST['addDepartment_button'])) {
@@ -60,8 +61,43 @@ if (isset($_POST['addDepartment_button'])) {
     } else {
         echo "Error preparing statement: " . $conn->error . "<br>";
     }
-}
+} else if (isset($_POST['deleteDepartment_button'])) {
+    $dept_id = $_POST['dept_id']; 
 
+    // Fetch department details to get the table name
+    $dept_query = "SELECT * FROM departmenttb WHERE dept_id='$dept_id'";
+    $dept_query_run = mysqli_query($conn, $dept_query);
+    $dept_data = mysqli_fetch_array($dept_query_run);
+    
+    if ($dept_data) {
+        // Get the department name and construct the table name
+        $department_name = $dept_data['name'];
+        $table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($department_name));
+        
+        // Delete the department from the departmenttb
+        $delete_query = "DELETE FROM departmenttb WHERE dept_id='$dept_id'";
+        $delete_query_run = mysqli_query($conn, $delete_query);
+
+        // If department deletion was successful, delete the associated table
+        if ($delete_query_run) {
+            // Drop the department-specific table
+            $drop_table_query = "DROP TABLE IF EXISTS `$table_name`";
+            if (mysqli_query($conn, $drop_table_query)) {
+                $_SESSION['success'] = "✔ Department and associated table deleted successfully!";
+            } else {
+                $_SESSION['error'] = "Department deleted, but failed to drop the table: " . mysqli_error($conn);
+            }
+        } else {
+            $_SESSION['error'] = "Deleting department failed!";
+        }
+    } else {
+        $_SESSION['error'] = "Department not found!";
+    }
+
+    // Redirect to the department page
+    header("Location: department.php");
+    exit();
+}
 
 $conn->close();
 ?>

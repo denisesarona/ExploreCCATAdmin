@@ -44,7 +44,7 @@
                                         <tr style="text-align: center; vertical-align: middle;">
                                             <td><?= $item['name']; ?></td>
                                             <td>
-                                                <form action="codes.php" method="POST">
+                                                <form action="depttblCreate.php" method="POST">
                                                     <input type="hidden" name="dept_id" value="<?= $item['dept_id'];?>">
                                                     <button type="submit" class="btn RedBtn" style="margin-top: 10px;" name="deleteDepartment_button">Delete</button>
                                                 </form>
