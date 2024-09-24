@@ -76,7 +76,7 @@
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 // Adjust the image path if necessary
-                $row['img'] = 'uploads/' . $row['img'];
+                $row['img'] = '../uploads/' . $row['img'];
                 $nodes[] = $row;
             }
         }
