@@ -272,39 +272,15 @@ if(isset($_POST['addAdmin_button'])){
     // Insert faculty data into the database
     $addFaculty_query = "INSERT INTO facultytb (name, position, dept_id, department, img) 
                          VALUES ('$name', '$position', '$department_id', '$department_name', '$filename')";
-    $addFaculty_query_run = mysqli_query($con, $addFaculty_query);
-
-    // Fetch the last inserted faculty ID
-    $faculty_id = mysqli_insert_id($con);
-
-    // Fetch department data
-    $dept_query = "SELECT * FROM departmenttb WHERE dept_id='$department_id'";
-    $dept_query_run = mysqli_query($con, $dept_query);
-    $dept_data = mysqli_fetch_array($dept_query_run);
-
-    if ($dept_data) {
-        // Prepare the table name
-        $dept_name = $dept_data['name'];
-        $table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($dept_name));
-        
-        // Insert into the department-specific table
-        $insert_query = "INSERT INTO $table_name (faculty_id, name, position, dept_id, department, img) 
-                         VALUES ('$faculty_id', '$name', '$position', '$department_id', '$department_name', '$filename')";
-        $insert_query_run = mysqli_query($con, $insert_query);
-
-        // Check if both queries were successful
-        if ($addFaculty_query_run && $insert_query_run) {
-            // Move the uploaded file
-            if (move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
-                $_SESSION['success'] = "✔ Faculty member added successfully!";
-            } else {
-                $_SESSION['error'] = "Image upload failed!";
-            }
+    
+    if (mysqli_query($con, $addFaculty_query)) {
+        if (move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
+            $_SESSION['success'] = "✔ Faculty member added successfully!";
         } else {
-            $_SESSION['error'] = "Adding Faculty member failed!";
+            $_SESSION['error'] = "Image upload failed!";
         }
     } else {
-        $_SESSION['error'] = "Department not found!";
+        $_SESSION['error'] = "Adding Faculty member failed: " . mysqli_error($con);
     }
 
     // Redirect back to the faculty member page
@@ -315,18 +291,9 @@ if(isset($_POST['addAdmin_button'])){
     $name = $_POST['name'];
     $position = $_POST['position'];
     $new_department_id = $_POST['dept_id'];
-    $department = $_POST['department']; // Ensure this input exists in your form
+    $department = $_POST['department'];
     $new_image = $_FILES['image']['name'];
     $old_image = $_POST['old_image'];
-
-    // Fetch the current faculty details to get the old department ID
-    $faculty_query = "SELECT dept_id FROM facultytb WHERE faculty_id=?";
-    $faculty_stmt = $con->prepare($faculty_query);
-    $faculty_stmt->bind_param("i", $faculty_id);
-    $faculty_stmt->execute();
-    $faculty_result = $faculty_stmt->get_result();
-    $faculty_data = $faculty_result->fetch_assoc();
-    $old_department_id = $faculty_data['dept_id'];
 
     // Set the update filename
     $update_filename = $new_image ? time() . '.' . pathinfo($new_image, PATHINFO_EXTENSION) : $old_image;
@@ -336,7 +303,7 @@ if(isset($_POST['addAdmin_button'])){
     // Update faculty details
     $update_query = "UPDATE facultytb SET name=?, position=?, dept_id=?, department=?, img=? WHERE faculty_id=?";
     $stmt = $con->prepare($update_query);
-
+    
     if (!$stmt) {
         die("Prepare failed: (" . $con->errno . ") " . $con->error);
     }
@@ -346,46 +313,6 @@ if(isset($_POST['addAdmin_button'])){
 
     // Execute update
     if ($stmt->execute()) {
-        // If the department has changed, move the entry to the new department table
-        if ($old_department_id !== $new_department_id) {
-            // Fetch the old department table name
-            $old_dept_query = "SELECT name FROM departmenttb WHERE dept_id=?";
-            $old_dept_stmt = $con->prepare($old_dept_query);
-            $old_dept_stmt->bind_param("i", $old_department_id);
-            $old_dept_stmt->execute();
-            $old_dept_result = $old_dept_stmt->get_result();
-            $old_dept_data = $old_dept_result->fetch_assoc();
-            $old_table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($old_dept_data['name']));
-
-            // Check if the old department table exists
-            if (mysqli_query($con, "SHOW TABLES LIKE '$old_table_name'")->num_rows > 0) {
-                // Delete from the old department table
-                $delete_old_query = "DELETE FROM $old_table_name WHERE faculty_id=?";
-                $delete_old_stmt = $con->prepare($delete_old_query);
-                $delete_old_stmt->bind_param("i", $faculty_id);
-                $delete_old_stmt->execute();
-                $delete_old_stmt->close();
-            }
-
-            // Prepare the new department table name
-            $new_table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($department));
-
-            // Check if the new department table exists
-            if (mysqli_query($con, "SHOW TABLES LIKE '$new_table_name'")->num_rows > 0) {
-                // Insert into the new department-specific table
-                $insert_new_query = "INSERT INTO $new_table_name (faculty_id, name, position, dept_id, department, img) VALUES (?,?, ?, ?, ?, ?)";
-                $insert_stmt = $con->prepare($insert_new_query);
-
-                if (!$insert_stmt) {
-                    die("Prepare failed: (" . $con->errno . ") " . $con->error);
-                }
-
-                $insert_stmt->bind_param("ississ", $faculty_id, $name, $position, $new_department_id, $department, $update_filename);
-                $insert_stmt->execute();
-                $insert_stmt->close();
-            }
-        }
-
         // Handle image upload
         if ($new_image) {
             move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $update_filename);
@@ -395,60 +322,25 @@ if(isset($_POST['addAdmin_button'])){
         }
 
         $_SESSION['success'] = "✔ Faculty Member Details updated successfully!";
-        header("Location: facultyMember.php");
-        exit();
     } else {
         $_SESSION['error'] = "Updating Faculty Member Details failed! Error: " . $stmt->error;
-        header("Location: facultyMember.php");
-        exit();
     }
 
-    $stmt->close();
+    // Redirect back to the faculty member page
+    header("Location: facultyMember.php");
+    exit();
 } else if (isset($_POST['deleteFaculty_button'])) {
     $faculty_id = $_POST['faculty_id'];
 
-    // Fetch the faculty details to determine the department
-    $faculty_query = "SELECT dept_id FROM facultytb WHERE faculty_id='$faculty_id'";
-    $faculty_query_run = mysqli_query($con, $faculty_query);
-    $faculty_data = mysqli_fetch_array($faculty_query_run);
+    // Delete the faculty member from the facultytb
+    $delete_query = "DELETE FROM facultytb WHERE faculty_id=?";
+    $delete_stmt = $con->prepare($delete_query);
+    $delete_stmt->bind_param("i", $faculty_id);
 
-    if ($faculty_data) {
-        $department_id = $faculty_data['dept_id'];
-
-        // Fetch the department name to determine the correct table
-        $dept_query = "SELECT name FROM departmenttb WHERE dept_id='$department_id'";
-        $dept_query_run = mysqli_query($con, $dept_query);
-        $dept_data = mysqli_fetch_array($dept_query_run);
-
-        if ($dept_data) {
-            // Prepare the table name
-            $table_name = 'dept_' . preg_replace('/\s+/', '_', strtolower($dept_data['name']));
-
-            // Delete from the department-specific table
-            $deletes_query = "DELETE FROM $table_name WHERE faculty_id='$faculty_id'";
-            $deletes_query_run = mysqli_query($con, $deletes_query);
-
-            // Check if the deletion was successful
-            if ($deletes_query_run && mysqli_affected_rows($con) > 0) {
-                // Now delete the faculty member from the facultytb
-                $delete_query = "DELETE FROM facultytb WHERE faculty_id=?";
-                $delete_stmt = $con->prepare($delete_query);
-                $delete_stmt->bind_param("i", $faculty_id);
-                $delete_query_run = $delete_stmt->execute();
-
-                if ($delete_query_run) {
-                    $_SESSION['success'] = "✔ Faculty Member deleted successfully!";
-                } else {
-                    $_SESSION['error'] = "Deleting faculty member from facultytb failed!";
-                }
-            } else {
-                $_SESSION['error'] = "Faculty member not found in department table!";
-            }
-        } else {
-            $_SESSION['error'] = "Department not found!";
-        }
+    if ($delete_stmt->execute()) {
+        $_SESSION['success'] = "✔ Faculty Member deleted successfully!";
     } else {
-        $_SESSION['error'] = "Faculty member not found!";
+        $_SESSION['error'] = "Deleting faculty member from facultytb failed: " . $delete_stmt->error;
     }
 
     // Redirect to faculty member page
@@ -490,4 +382,42 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: faculty_position.php");
         exit();
     }
-} 
+} if (isset($_POST['addDepartment_button'])) {
+    $department = $_POST['dept_name'];
+
+    // Prepare to insert the new department
+    $dept_query = "INSERT INTO departmenttb(name) VALUES (?)";
+    $stmt = $con->prepare($dept_query);
+    
+    if ($stmt) {
+        $stmt->bind_param("s", $department);
+
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "✔ Department added successfully!";
+            header("Location: department.php");
+        } else {
+            $_SESSION['error'] = "Adding Department failed: " . $stmt->error;
+            header("Location: department.php");
+        }
+
+        $stmt->close();
+    } else {
+        echo "Error preparing statement: " . $con->error . "<br>";
+    }
+} else if (isset($_POST['deleteDepartment_button'])) {
+    $dept_id = $_POST['dept_id']; 
+
+    // Delete the department from the departmenttb
+    $delete_query = "DELETE FROM departmenttb WHERE dept_id='$dept_id'";
+    $delete_query_run = mysqli_query($con, $delete_query);
+
+    if ($delete_query_run) {
+        $_SESSION['success'] = "✔ Department deleted successfully!";
+    } else {
+        $_SESSION['error'] = "Deleting department failed!";
+    }
+
+    // Redirect to the department page
+    header("Location: department.php");
+    exit();
+}
