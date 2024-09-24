@@ -92,7 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updated_nodes'])) {
                         </div>
                     </div>
                 </form>
-                <div id="tree" class="mt-4"></div>
+                <div id="tree" class="mt-4" style="overflow-x: auto;"> <!-- Allow horizontal scrolling -->
+                </div>
             </div>
         </div>   
     </div>
@@ -138,6 +139,7 @@ var chart = new OrgChart(document.getElementById("tree"), {
         field_2: "id",  
         img_0: "img",      
     },
+    editForm: false,
     nodes: nodes  // Use the data retrieved from the database
 });
 
