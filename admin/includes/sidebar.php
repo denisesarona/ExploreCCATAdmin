@@ -56,6 +56,12 @@
                 <span class="sidebar-txt">ORGANIZATIONAL CHARTS</span>
             </a>
         </li>
+        <li class="sidebar-item">
+            <a href="buildings.php" class="sidebar-link">
+            <i class='bx bxs-buildings' ></i>
+                <span class="sidebar-txt">BUILDING INFORMATION</span>
+            </a>
+        </li>
     </ul>
     <div class="sidebar-footer">
         <a href="logout.php" class="sidebar-link">

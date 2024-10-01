@@ -45,4 +45,4 @@
     <div class="wrapper">
         <?php include 'sidebar.php'; ?>
         <div class="main p-1">
-        <?php session_start(); ?>
+            
