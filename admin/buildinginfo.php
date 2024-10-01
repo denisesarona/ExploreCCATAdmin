@@ -1,6 +1,7 @@
 <?php 
 include('includes/header.php');
 include('../functions/queries.php');
+include('../middleware/adminMiddleware.php');
 $positionresultSet = getData("positiontb");
 $departmentresultSet = getData("departmenttb");
 ?>
@@ -85,5 +86,4 @@ $departmentresultSet = getData("departmenttb");
     </div>
 </div>
 <!--------------- FOOTER --------------->
-
 <?php include('includes/footer.php');?>

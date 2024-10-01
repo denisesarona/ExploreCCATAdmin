@@ -1,6 +1,7 @@
 <?php 
 include('includes/header.php');
 include('../functions/queries.php');
+include('../middleware/adminMiddleware.php');
 $positionresultSet = getData("positiontb");
 $departmentresultSet = getData("departmenttb");
 ?>

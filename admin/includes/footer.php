@@ -27,3 +27,6 @@
     }
 </style>
 </html>
+<?php
+ob_end_flush(); // Flush the output buffer and turn off output buffering
+?>

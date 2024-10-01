@@ -1,3 +1,4 @@
+<?php ob_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -45,4 +46,3 @@
     <div class="wrapper">
         <?php include 'sidebar.php'; ?>
         <div class="main p-1">
-            

@@ -2,6 +2,7 @@
     include('includes/header.php');
     include('../config/dbconnect.php');
     include('../functions/queries.php');
+    include('../middleware/adminMiddleware.php');
 
     $totalAdmin = countItem($con, 'users'); 
     $totalFaculty = countItem($con, 'facultytb'); 

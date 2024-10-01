@@ -1,6 +1,7 @@
 <?php
 include('includes/header.php'); // Include header or any other necessary files
 include('../functions/queries.php');
+include('../middleware/adminMiddleware.php');
 
 // Check if a department ID is provided
 if (isset($_GET['id'])) {

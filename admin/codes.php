@@ -4,6 +4,7 @@ include('../config/dbconnect.php');
 include('../functions/queries.php');
 
 ob_start();
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
@@ -447,11 +448,14 @@ if(isset($_POST['addAdmin_button'])){
     // Execute update
     if ($stmt->execute()) {
         $_SESSION['success'] = "✔ Building Details updated successfully!";
+        header("Location: buildings.php");
+        exit();
     } else {
         $_SESSION['error'] = "Updating Building Details failed! Error: " . $stmt->error;
+        header("Location: buildings.php");
+        exit();
     }
-
-
-    header("Location: buildings.php");
-    exit();
 }
+
+ob_end_flush();
+?>
