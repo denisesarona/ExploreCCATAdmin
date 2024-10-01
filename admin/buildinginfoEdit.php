@@ -34,9 +34,9 @@ $departmentresultSet = getData("departmenttb");
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Department</label>
-                                            <select class="form-control" name="department" id="department" onchange="updateDeptId()">
+                                            <select class="form-control" name="department_name" id="department" onchange="updateDeptId()">
                                                 <?php
-                                                $current_department = $data['department'];
+                                                $current_department = $data['department_name'];
                                                 ?>
                                                 <option value='<?=$current_department?>' selected><?=$current_department?></option>
                                                 <?php
@@ -79,8 +79,22 @@ $departmentresultSet = getData("departmenttb");
                                             <input type="text" value="<?=$data['amenities_name']; ?>" class="form-control" placeholder="Enter Amenities" name="amenities_name">
                                         </div>
                                     </div>
+                                    <div class="col-md-3 mb-3"> 
+                                        <div class="form-group">
+                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
+                                            <label for="">Independent Amenity</label>
+                                            <input type="checkbox" <?= $data['is_amenities'] ? "checked":""?> class="form-check-input" name="is_amenities">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3"> 
+                                        <div class="form-group">
+                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
+                                            <label for="">Department Affiliation</label>
+                                            <input type="checkbox" <?= $data['is_department'] ? "checked":""?> class="form-check-input" name="is_department">
+                                        </div>
+                                    </div>
                                     <!--------------- SAVE BUTTON --------------->
-                                    <div class="col-md-6 text-end">
+                                    <div class="col-md-6">
                                         <button type="submit" class="btn BlueBtn mt-2" name="editBldginfo_button">Update</button>
                                     </div>
                                 </div>

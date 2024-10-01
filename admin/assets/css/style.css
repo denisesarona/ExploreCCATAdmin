@@ -24,6 +24,10 @@ h3 {
     text-align: center;
 }
 
+.form-check-input:checked {
+    background-color: #064A18!important; /* Background color when checked */
+}
+
 /* Responsive adjustments */
 @media (max-width: 1000px) {
     nav {

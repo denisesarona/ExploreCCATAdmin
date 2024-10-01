@@ -156,7 +156,7 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: addAdmin.php");
         exit();
     }
-} else if (isset($_SESSION['registration_data'])) {
+} else if(isset($_SESSION['registration_data'])) {
     $registration_data = $_SESSION['registration_data'];
     $code_id = $_SESSION['code_id'];
     $name = $registration_data["name"];
@@ -256,7 +256,7 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: admin.php");
         exit();
     }
-} else if (isset($_POST['addFaculty_button'])) {
+} else if(isset($_POST['addFaculty_button'])) {
     // Sanitize inputs to prevent SQL Injection
     $name = mysqli_real_escape_string($con, $_POST['name']);
     $position = mysqli_real_escape_string($con, $_POST['position']);
@@ -286,7 +286,7 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect back to the faculty member page
     header("Location: facultyMember.php");
     exit();
-} else if (isset($_POST['editFaculty_button'])) {
+} else if(isset($_POST['editFaculty_button'])) {
     $faculty_id = $_POST['faculty_id'];
     $name = $_POST['name'];
     $position = $_POST['position'];
@@ -329,7 +329,7 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect back to the faculty member page
     header("Location: facultyMember.php");
     exit();
-} else if (isset($_POST['deleteFaculty_button'])) {
+} else if(isset($_POST['deleteFaculty_button'])) {
     $faculty_id = $_POST['faculty_id'];
 
     // Delete the faculty member from the facultytb
@@ -382,7 +382,7 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: faculty_position.php");
         exit();
     }
-} if (isset($_POST['addDepartment_button'])) {
+} else if(isset($_POST['addDepartment_button'])) {
     $department = $_POST['dept_name'];
 
     // Prepare to insert the new department
@@ -404,7 +404,7 @@ if(isset($_POST['addAdmin_button'])){
     } else {
         echo "Error preparing statement: " . $con->error . "<br>";
     }
-} else if (isset($_POST['deleteDepartment_button'])) {
+} else if(isset($_POST['deleteDepartment_button'])) {
     $dept_id = $_POST['dept_id']; 
 
     // Delete the department from the departmenttb
@@ -419,5 +419,39 @@ if(isset($_POST['addAdmin_button'])){
 
     // Redirect to the department page
     header("Location: department.php");
+    exit();
+} else if(isset($_POST['editBldginfo_button'])){
+    $building_id = $_POST['building_id'];
+    $building_name = $_POST['building_name'];
+    $building_description = $_POST['building_description'];
+    $new_department_id = $_POST['dept_id'];
+    $department_name = $_POST['department_name'];
+    $is_department = isset($_POST['is_department']) ? '1':'0'; 
+    $amenities_name = $_POST['amenities_name'];
+    $is_amenities = isset($_POST['is_amenities']) ? '1':'0'; 
+    $key_features = $_POST['key_features'];
+    $no_floors = $_POST['no_floors'];
+    $building_id = $_POST['building_id']; // Assuming you get this from the form
+
+    // Prepare the SQL update query
+    $update_query = "UPDATE buildingtbl SET building_name=?, building_description=?, dept_id=?, department_name=?, is_department=?, amenities_name=?, is_amenities=?, key_features=?, no_floors=? WHERE building_id=?";
+    $stmt = $con->prepare($update_query);
+
+    if (!$stmt) {
+        die("Prepare failed: (" . $con->errno . ") " . $con->error);
+    }
+
+    // Bind parameters
+    $stmt->bind_param("ssisisisii", $building_name, $building_description, $new_department_id, $department_name, $is_department, $amenities_name, $is_amenities, $key_features, $no_floors, $building_id);
+
+    // Execute update
+    if ($stmt->execute()) {
+        $_SESSION['success'] = "✔ Building Details updated successfully!";
+    } else {
+        $_SESSION['error'] = "Updating Building Details failed! Error: " . $stmt->error;
+    }
+
+
+    header("Location: buildings.php");
     exit();
 }

@@ -24,44 +24,50 @@ $departmentresultSet = getData("departmenttb");
                                 <div class="row" style="font-family: 'Poppins', sans-serif;">
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">Building Name</label>
                                             <input type="text" value="<?=$data['building_name']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">Department</label>
                                             <input type="text" value="<?=$data['department_name']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">Building Description</label>
                                             <textarea class="form-control" disabled><?= htmlspecialchars($data['building_description']); ?></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">No. of Floors</label>
                                             <input type="number" value="<?=$data['no_floors']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">Key Features</label>
                                             <input type="text" value="<?=$data['key_features']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">Amenities</label>
                                             <input type="text" value="<?=$data['amenities_name']; ?>" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3"> 
+                                        <div class="form-group">
+                                            <label for="">Independent Amenity</label>
+                                            <input type="checkbox" <?= $data['is_amenities'] ? "checked":""?> class="form-check-input" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3"> 
+                                        <div class="form-group">
+                                            <label for="">Department Affiliation</label>
+                                            <input type="checkbox" <?= $data['is_department'] ? "checked":""?> class="form-check-input" disabled>
                                         </div>
                                     </div>
                                 </div>
