@@ -16,6 +16,7 @@
                             <tr style="text-align: center; vertical-align: middle;">
                                 <th class="d-table-cell d-lg-table-cell">Name</th>
                                 <th class="d-table-cell d-lg-table-cell">View</th>
+                                <th class="d-none d-lg-table-cell">Edit</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -28,6 +29,9 @@
                                             <td><?= $item['building_name']; ?></td>
                                             <td>
                                                 <a href="buildinginfo.php?id=<?= $item['building_id']; ?>" style="margin-top: 10px;" class="btn BlueBtn">View Details</a>
+                                            </td>
+                                            <td>
+                                                <a href="buildinginfoEdit.php?id=<?= $item['building_id']; ?>" style="margin-top: 10px;" class="btn BlueBtn">Edit Details</a>
                                             </td>
                                         </tr>
                                 <?php
