@@ -27,9 +27,8 @@ $departmentresultSet = getData("departmenttb");
                                 <div class="row" style="font-family: 'Poppins', sans-serif;">
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">Building Name</label>
-                                            <input type="text" value="<?=$data['building_name']; ?>" class="form-control" placeholder="Enter Name" name="building_name" id="name">
+                                            <input type="text" value="<?=$data['building_name']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
@@ -63,7 +62,7 @@ $departmentresultSet = getData("departmenttb");
                                         <div class="form-group">
                                             <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">No. of Floors</label>
-                                            <input type="number" value="<?=$data['no_floors']; ?>" class="form-control" placeholder="Enter No. of Floors" name="no_floors">
+                                            <input type="number" value="<?=$data['num_floors']; ?>" class="form-control" placeholder="Enter No. of Floors" name="num_floors">
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 

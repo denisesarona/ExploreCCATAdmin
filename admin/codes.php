@@ -422,8 +422,6 @@ if(isset($_POST['addAdmin_button'])){
     header("Location: department.php");
     exit();
 } else if(isset($_POST['editBldginfo_button'])){
-    $building_id = $_POST['building_id'];
-    $building_name = $_POST['building_name'];
     $building_description = $_POST['building_description'];
     $new_department_id = $_POST['dept_id'];
     $department_name = $_POST['department_name'];
@@ -431,11 +429,11 @@ if(isset($_POST['addAdmin_button'])){
     $amenities_name = $_POST['amenities_name'];
     $is_amenities = isset($_POST['is_amenities']) ? '1':'0'; 
     $key_features = $_POST['key_features'];
-    $no_floors = $_POST['no_floors'];
+    $num_floors = $_POST['num_floors'];
     $building_id = $_POST['building_id']; // Assuming you get this from the form
 
     // Prepare the SQL update query
-    $update_query = "UPDATE buildingtbl SET building_name=?, building_description=?, dept_id=?, department_name=?, is_department=?, amenities_name=?, is_amenities=?, key_features=?, no_floors=? WHERE building_id=?";
+    $update_query = "UPDATE buildingtbl SET building_description=?, dept_id=?, department_name=?, is_department=?, amenities_name=?, is_amenities=?, key_features=?, num_floors=? WHERE building_id=?";
     $stmt = $con->prepare($update_query);
 
     if (!$stmt) {
@@ -443,7 +441,7 @@ if(isset($_POST['addAdmin_button'])){
     }
 
     // Bind parameters
-    $stmt->bind_param("ssisisisii", $building_name, $building_description, $new_department_id, $department_name, $is_department, $amenities_name, $is_amenities, $key_features, $no_floors, $building_id);
+    $stmt->bind_param("sisisisii", $building_description, $new_department_id, $department_name, $is_department, $amenities_name, $is_amenities, $key_features, $num_floors, $building_id);
 
     // Execute update
     if ($stmt->execute()) {

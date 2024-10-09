@@ -44,7 +44,7 @@ $departmentresultSet = getData("departmenttb");
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
                                             <label for="">No. of Floors</label>
-                                            <input type="number" value="<?=$data['no_floors']; ?>" class="form-control" disabled>
+                                            <input type="number" value="<?=$data['num_floors']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
