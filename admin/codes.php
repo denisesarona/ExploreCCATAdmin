@@ -222,7 +222,7 @@ if(isset($_POST['addAdmin_button'])){
                     // UNSET THE USER ID AND REGISTRATION DATA SESSION VARIABLES AFTER SUCCESSFUL REGISTRATION
                     unset($_SESSION['registration_data']);
                     $_SESSION['success'] = "Registered Successfully!";
-                    header("Location: faculty_position.php");
+                    header("Location: admin.php");
                     exit();
                 }
             } else {
