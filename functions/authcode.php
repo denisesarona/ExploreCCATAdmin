@@ -72,7 +72,7 @@
             $stored_password = $userdata['password']; // Get stored password
     
             // Verify password
-            if(password_verify($password, $stored_password)) {
+            if($password == $stored_password) {
                 // Set session variables for authenticated user
                 $_SESSION['auth'] = true;
                 $_SESSION['user_id'] = $userdata['user_id']; // Ensure that user_id is set in the session
@@ -96,7 +96,7 @@
                 }
             } else {
                 // Set error message for incorrect password
-                $_SESSION['error'] = "Incorrect Password!";
+                $_SESSION['error'] = "Incorrect Password! $password";
                 header("Location: ../index.php");
                 exit();
             }
