@@ -453,7 +453,23 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: buildings.php");
         exit();
     }
-}
+} else if(isset($_POST['deleteFeedback_button'])) {
+    $fid = $_POST['fid']; 
+
+    // Delete the department from the departmenttb
+    $delete_query = "DELETE FROM feedbacktbl WHERE fid='$fid'";
+    $delete_query_run = mysqli_query($con, $delete_query);
+
+    if ($delete_query_run) {
+        $_SESSION['success'] = "✔ Feedback deleted successfully!";
+    } else {
+        $_SESSION['error'] = "Deleting feedback failed!";
+    }
+
+    // Redirect to the department page
+    header("Location: userfeedback.php");
+    exit();
+} 
 
 ob_end_flush();
 ?>

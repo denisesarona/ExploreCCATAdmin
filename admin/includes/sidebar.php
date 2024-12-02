@@ -62,6 +62,12 @@
                 <span class="sidebar-txt">BUILDING INFORMATION</span>
             </a>
         </li>
+        <li class="sidebar-item">
+            <a href="userfeedback.php" class="sidebar-link">
+            <i class='bx bxs-chat'></i>
+                <span class="sidebar-txt">USER FEEDBACK</span>
+            </a>
+        </li>
     </ul>
     <div class="sidebar-footer">
         <a href="logout.php" class="sidebar-link">
