@@ -298,48 +298,27 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect back to the faculty member page
     header("Location: facultyMember.php");
     exit();
-} else if(isset($_POST['editFaculty_button'])) {
+} else if (isset($_POST['editFaculty_button'])) {
     $faculty_id = $_POST['faculty_id'];
-    $name = $_POST['name'];
-    $position = $_POST['position'];
-    $new_department_id = $_POST['dept_id'];
-    $department = $_POST['department'];
-    $new_image = $_FILES['image']['name'];
-    $old_image = $_POST['old_image'];
+    $positions = $_POST['positions'];
+    $departments = $_POST['departments'];
 
-    // Set the update filename
-    $update_filename = $new_image ? time() . '.' . pathinfo($new_image, PATHINFO_EXTENSION) : $old_image;
+    // Delete old assignments
+    $deleteQuery = "DELETE FROM dept_pos_facultytb WHERE faculty_id = $faculty_id";
+    mysqli_query($con, $deleteQuery);
 
-    $path = "../uploads";
-
-    // Update faculty details
-    $update_query = "UPDATE facultytb SET name=?, position=?, dept_id=?, department=?, img=? WHERE faculty_id=?";
-    $stmt = $con->prepare($update_query);
-    
-    if (!$stmt) {
-        die("Prepare failed: (" . $con->errno . ") " . $con->error);
-    }
-
-    // Bind parameters
-    $stmt->bind_param("ssissi", $name, $position, $new_department_id, $department, $update_filename, $faculty_id);
-
-    // Execute update
-    if ($stmt->execute()) {
-        // Handle image upload
-        if ($new_image) {
-            move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $update_filename);
-            if (file_exists("../uploads/" . $old_image)) {
-                unlink("../uploads/" . $old_image);
-            }
+    // Insert updated assignments
+    for ($i = 0; $i < count($positions); $i++) {
+        if (!empty($positions[$i]) && !empty($departments[$i])) {
+            $insertQuery = "INSERT INTO dept_pos_facultytb (faculty_id, position_id, dept_id) 
+                            VALUES ($faculty_id, {$positions[$i]}, {$departments[$i]})";
+            mysqli_query($con, $insertQuery);
+            $_SESSION['success'] = "✔ Faculty details updated successfully!";
+        } else{
+            $_SESSION['error'] = "Updating Faculty details failed: " . mysqli_error($con);
         }
-
-        $_SESSION['success'] = "✔ Faculty Member Details updated successfully!";
-    } else {
-        $_SESSION['error'] = "Updating Faculty Member Details failed! Error: " . $stmt->error;
     }
-
-    // Redirect back to the faculty member page
-    header("Location: facultyMember.php");
+    header("Location: facultyDetails.php?id=$faculty_id&status=updated");
     exit();
 } else if(isset($_POST['deleteFaculty_button'])) {
     $faculty_id = $_POST['faculty_id'];
@@ -480,7 +459,23 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect to the department page
     header("Location: userfeedback.php");
     exit();
-} 
+} else if(isset($_POST['deleteFacultyInfo_button'])){
+    $info_id = $_POST['info_id']; 
+
+    // Delete the department from the departmenttb
+    $delete_query = "DELETE FROM dept_pos_facultytb WHERE faculty_dept_id='$info_id'";
+    $delete_query_run = mysqli_query($con, $delete_query);
+
+    if ($delete_query_run) {
+        $_SESSION['success'] = "✔ Faculty department and position deleted successfully!";
+    } else {
+        $_SESSION['error'] = "Deleting Faculty department and position failed!";
+    }
+
+    // Redirect to the department page
+    header("Location: facultyMember.php");
+    exit();
+}
 
 ob_end_flush();
 ?>
