@@ -58,3 +58,8 @@ h3 {
         width: 73px;
     }
 }
+
+.selected-option {
+    background-color: #e80000; /* Light gray background */
+    color: #000; /* Black text color */
+}
