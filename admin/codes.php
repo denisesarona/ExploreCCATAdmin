@@ -329,9 +329,17 @@ if(isset($_POST['addAdmin_button'])){
     $delete_stmt->bind_param("i", $faculty_id);
 
     if ($delete_stmt->execute()) {
-        $_SESSION['success'] = "✔ Faculty Member deleted successfully!";
+        $delete_info_query = "DELETE FROM dept_pos_facultytb WHERE faculty_id=?";
+        $delete_stmt = $con->prepare($delete_info_query);
+        $delete_stmt->bind_param("i", $faculty_id);
+        
+        if ($delete_stmt->execute()) {
+            $_SESSION['success'] = "✔ Faculty Member deleted successfully!";
+        } else {
+            $_SESSION['error'] = "Deleting Faculty Member information failed: " . $delete_stmt->error;
+        }
     } else {
-        $_SESSION['error'] = "Deleting faculty member from facultytb failed: " . $delete_stmt->error;
+        $_SESSION['error'] = "Deleting Faculty Member failed: " . $delete_stmt->error;
     }
 
     // Redirect to faculty member page
