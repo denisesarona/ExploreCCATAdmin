@@ -56,22 +56,25 @@ $departmentresultSet = getData("departmenttb");
 
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <label for="">Department</label>
-                                            <select class="form-control" name="department" id="department" onchange="updateDeptId()">
+                                            <label for="department">Departments</label>
+                                            <!-- Add the "multiple" attribute for multi-selection -->
+                                            <select class="form-control" name="departments[]" id="department" multiple onchange="updateDeptIds()">
                                                 <?php
-                                                $current_department = $data['department'];
+                                                $current_department = $data['department']; // Example for pre-selected department
                                                 ?>
+                                                <!-- Pre-select current department -->
                                                 <option value='<?=$current_department?>' selected><?=$current_department?></option>
                                                 <?php
                                                     while ($rows = $departmentresultSet->fetch_assoc()) {
                                                         $department_name = $rows['name'];
                                                         $dept_id = $rows['dept_id'];
                                                         // Set the option value to dept_id but display department name
-                                                        echo "<option value='$department_name' data-dept-id='$dept_id'>$department_name</option>";
+                                                        echo "<option value='$dept_id'>$department_name</option>";
                                                     }
                                                 ?>
                                             </select>
-                                            <input type="hidden" name="dept_id" id="dept_id">
+                                            <!-- Hidden input to store selected department IDs -->
+                                            <input type="hidden" name="dept_ids" id="dept_ids">
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
