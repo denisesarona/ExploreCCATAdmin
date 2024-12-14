@@ -1,10 +1,7 @@
 <aside id="sidebar">
     <div class="d-flex">
-        <button class="toggle-btn" type="button">
-            <i class='bx bxs-dashboard' ></i>
-        </button>
         <div class="sidebar-logo">
-            <a href="#">CvSU CCAT</a>
+            <a href="#" class="sidebar-logo">CvSU CCAT</a>
         </div>
     </div>
     <ul class="sidebar-nav">

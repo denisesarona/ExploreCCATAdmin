@@ -6,8 +6,9 @@
     margin: 0;
     padding: 0;
 }
+
 .large-icon {
-    font-size: 30px; /* Adjust this value as needed */
+    font-size: 30px;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 10px;
@@ -28,84 +29,76 @@ h1 {
 
 body {
     font-family: 'Poppins', sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .wrapper {
     display: flex;
+    width: 100%;
 }
 
 .main {
     min-height: 100vh;
     width: 100%;
     overflow: hidden;
-    transition: all 0.35s ease-in-out;
     background-color: #fafbfe;
 }
 
+.sidebar-logo{
+    font-size: 30px !important;
+    padding-left: 40px;
+    padding-top: 20px;
+}
+/* Sticky Sidebar */
 #sidebar {
-    width: 80px;
-    min-width: 100px;
+    width: 350px; /* Full width by default */
+    min-width: 350px;
     z-index: 1000;
-    transition: all .25s ease-in-out;
     background-color: #064918;
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh; /* Ensures full height */
+    overflow-y: auto; /* Scrollable content if needed */
+    overflow-x: hidden !important; /* Remove horizontal scrollbar from the sidebar */
+    transition: all 0.25s ease-in-out;
 }
 
-#sidebar.expand {
-    width: 500px;
-    min-width: 260px;
-}
-
-.toggle-btn {
-    background-color: transparent;
-    cursor: pointer;
-    border: 0;
-    padding: 1rem 1.5rem;
-}
-
-.toggle-btn i {
-    margin-left: 10px;
-    font-size: 35px;
-    color: #FFF;
-}
-
-.sidebar-logo {
+/* Sidebar Content */
+#sidebar .sidebar-logo {
     margin: auto 0;
 }
 
-.sidebar-logo a {
+#sidebar .sidebar-logo a {
     color: #FFF;
     font-size: 1.15rem;
     font-weight: 600;
 }
 
-#sidebar:not(.expand) .sidebar-logo,
-#sidebar:not(.expand) a.sidebar-link span {
-    display: none;
-}
-
 .sidebar-nav {
     padding: 2rem 0;
     flex: 1 1 auto;
+    overflow-y: auto; /* Scrollable content inside the sidebar */
 }
 
-
-/* Style the sidebar links */
+/* Sidebar Links */
 .sidebar-nav .sidebar-link {
     display: flex;
     margin-left: 20px;
-    align-items: center; /* Align icon and text vertically */
-    color: #064918; /* Light color for text */
-    font-size: 1rem; /* Adjust font size as needed */
+    align-items: center;
+    color: #064918;
+    font-size: 1rem;
 }
+
 .sidebar-footer .sidebar-link {
     display: flex;
     margin-left: 20px;
-    align-items: center; /* Align icon and text vertically */
-    color: #064918; /* Light color for text */
-    font-size: 1rem; /* Adjust font size as needed */
+    align-items: center;
+    color: #064918;
+    font-size: 1rem;
 }
+
 a.sidebar-link {
     padding: 9px 10px;
     background-color: white;
@@ -115,18 +108,18 @@ a.sidebar-link {
     margin-right: 15px;
     color: #064918;
     display: block;
-    font-size: 18px;
+    font-size: 12px;
     text-align: center;
-    transition: background-color 0.3s, color 0.3s; /* Add transition for smooth effect */
+    transition: background-color 0.3s, color 0.3s;
 }
 
 a.sidebar-link:hover {
-    background-color: #598D66 !important; /* Change background color on hover */
-    color: white !important; /* Change text color on hover */
+    background-color: #598D66 !important;
+    color: white !important;
 }
 
 .sidebar-link i {
-    font-size: 26px;
+    font-size: 22px;
     margin-left: 10px;
     margin-right: .75rem;
 }
@@ -135,42 +128,19 @@ a.sidebar-link:hover {
     position: relative;
 }
 
-a.sidebar-link:hover .sidebar-txt,
-a.sidebar-link:hover i {
-    color: white; /* Change both text and icon color on hover */
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+    #sidebar {
+        width: 80px; /* Minimized width on smaller screens */
+        min-width: 80px;
+    }
 
-#sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
-    position: absolute;
-    top: 0;
-    left: 70px;
-    background-color: #0e2238;
-    padding: 0;
-    min-width: 15rem;
-    display: none;
-}
+    #sidebar .sidebar-logo a,
+    #sidebar .sidebar-link span {
+        display: none; /* Hide text content */
+    }
 
-#sidebar:not(.expand) .sidebar-item:hover .has-dropdown+.sidebar-dropdown {
-    display: block;
-    max-height: 15em;
-    width: 100%;
-    opacity: 1;
-}
-
-#sidebar.expand .sidebar-link[data-bs-toggle="collapse"]::after {
-    border: solid;
-    border-width: 0 .075rem .075rem 0;
-    content: "";
-    display: inline-block;
-    padding: 2px;
-    position: absolute;
-    right: 1.5rem;
-    top: 1.4rem;
-    transform: rotate(-135deg);
-    transition: all .2s ease-out;
-}
-
-#sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
-    transform: rotate(45deg);
-    transition: all .2s ease-out;
+    #sidebar .sidebar-link i {
+        margin: 0 auto; /* Center icons */
+    }
 }
