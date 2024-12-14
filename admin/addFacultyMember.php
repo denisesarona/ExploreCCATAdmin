@@ -18,7 +18,7 @@ $departmentresultSet = getData("departmenttb");
                     <form action="codes.php" method="POST" enctype="multipart/form-data">
                         <div class="row" style="font-family: 'Poppins', sans-serif;">
                             <!-- Faculty Name -->
-                            <div class="col-md-6 mb-3"> 
+                            <div class="col-md-12 mb-3"> 
                                 <div class="form-group">
                                     <label for="name" class="form-label">Name</label>
                                     <input type="text" class="form-control" placeholder="Enter Faculty Member's Name" name="name" id="name" required>

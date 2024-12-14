@@ -18,7 +18,7 @@
                             <div class="col-md-10"> 
                                 <div class="form-group">
                                     <label for="position" class="form-label">Faculty Position</label>
-                                    <input type="text" class="form-control" placeholder="Enter Position" name="name" required>
+                                    <input type="text" class="form-control" placeholder="Enter Faculty Position" name="name" required>
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-end"> 

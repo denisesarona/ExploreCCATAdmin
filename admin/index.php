@@ -64,7 +64,7 @@
                                 </div>
                                 <hr class="horizontal my-0 dark">
                                 <div class="card-footer p-3">
-                                    <p class="mb-0"><span class="text-muted text-sm">Total Registered Admin in the Database</span></p>
+                                    <p class="mb-0"><span class="text-muted text-sm">Total Faculty Members in the Campus</span></p>
                                 </div>
                             </div>
                         </div>
@@ -121,22 +121,50 @@
     // Use the PHP-generated chart data
     const chartData = <?php echo $chartDataJson; ?>;
 
+    // Calculate total ratings count
+    const totalRatings = chartData.reduce((sum, count) => sum + count, 0);
+
+    // If there are no ratings, set percentages to zero
+    const percentages = chartData.map(count => totalRatings === 0 ? 0 : (count / totalRatings) * 100);
+
+    // Define custom colors for each rating
+    const ratingColors = [
+        'rgba(255, 99, 132, 0.2)', // Rating 1 - Bad (redish)
+        'rgba(255, 159, 64, 0.2)', // Rating 2 - Poor (orange)
+        'rgba(255, 205, 86, 0.2)', // Rating 3 - Average (yellow)
+        'rgba(75, 192, 192, 0.2)', // Rating 4 - Good (greenish)
+        'rgba(54, 162, 235, 0.2)'  // Rating 5 - Great (blue)
+    ];
+
     new Chart(ctx, {
-        type: 'pie',
+        type: 'bar',
         data: {
             labels: ['1 - Bad', '2 - Poor', '3 - Average', '4 - Good', '5 - Great'],
             hoverOffset: 4,
             datasets: [{
-                label: '# of Ratings',
-                data: chartData,  // Use the dynamically generated data
+                label: 'Percentage of Ratings',
+                data: percentages,  // Use the percentage data
+                backgroundColor: ratingColors,  // Set custom background colors
+                borderColor: ratingColors.map(color => color.replace('0.2', '1')),  // Set border color to match background color
                 borderWidth: 1
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        // Custom tooltip to display percentage
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw.toFixed(2) + '%'; // Format to two decimal places
+                        }
+                    }
+                }
+            }
         }
     });
 </script>
+
  
 
 <!--------------- ALERTIFY JS ---------------> 

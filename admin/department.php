@@ -10,15 +10,15 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
-                <h3>DEPARTMENTS</h3>
+                <h3>DEPARTMENTS/OFFICES</h3>
                 <div class="card-body">
                     <!--------------- DEPARTMENT TABLE --------------->
                     <form action="codes.php" method="POST">
                         <div class="row mb-3"> 
                             <div class="col-md-10"> 
                                 <div class="form-group">
-                                    <label for="department" class="form-label">Department Name</label>
-                                    <input type="text" class="form-control" placeholder="Enter Department Name" name="dept_name" required>
+                                    <label for="department" class="form-label">Department/Office Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter Department/Office Name" name="dept_name" required>
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-end"> 
