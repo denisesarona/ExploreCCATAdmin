@@ -32,11 +32,26 @@ function getDepartmentsByID($table, $id) {
 }
 
 function getFacultyByDepartment($con, $dept_id) {
-    // Prepare the SQL statement
-    $sql = "SELECT faculty_id AS id, name, position AS position, img AS img, department, pid 
-            FROM facultytb 
-            WHERE dept_id = ? ORDER BY pid ASC"; // Assuming 'department' is the ID
-
+    // Prepare the SQL statement with a JOIN
+    $sql = "
+        SELECT 
+            f.faculty_id AS id, 
+            f.name, 
+            f.img AS img, 
+            dpf.position_id AS position, 
+            dpf.dept_id AS department, 
+            f.pid 
+        FROM 
+            facultytb AS f
+        INNER JOIN 
+            dept_pos_facultytb AS dpf 
+        ON 
+            f.faculty_id = dpf.faculty_id
+        WHERE 
+            dpf.dept_id = ? 
+        ORDER BY 
+            f.pid ASC";
+    
     // Prepare the statement
     $stmt = $con->prepare($sql);
     
