@@ -38,7 +38,7 @@
         <li class="sidebar-item">
             <a href="department.php" class="sidebar-link">
             <i class='bx bxs-building-house'></i>
-                <span class="sidebar-txt">DEPARTMENTS</span>
+                <span class="sidebar-txt">DEPARTMENT/OFFICES</span>
             </a>
         </li>
         <li class="sidebar-item">

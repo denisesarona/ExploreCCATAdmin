@@ -33,7 +33,7 @@ $departmentresultSet = getData("departmenttb");
                                     </div>
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <label for="">Department</label>
+                                            <label for="">Department/Office</label>
                                             <select class="form-control" name="department_name" id="department" onchange="updateDeptId()">
                                                 <?php
                                                 $current_department = $data['department_name'];
