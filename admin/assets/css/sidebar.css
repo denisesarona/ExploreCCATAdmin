@@ -24,7 +24,7 @@ li {
 
 h1 {
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1rem;
 }
 
 body {
@@ -44,6 +44,9 @@ body {
     background-color: #fafbfe;
 }
 
+.sidebar-txt{
+    font-size: 16px;
+}
 .sidebar-logo{
     font-size: 30px !important;
     padding-left: 40px;
@@ -51,8 +54,8 @@ body {
 }
 /* Sticky Sidebar */
 #sidebar {
-    width: 350px; /* Full width by default */
-    min-width: 350px;
+    width: 310px; /* Full width by default */
+    min-width: 310px;
     z-index: 1000;
     background-color: #064918;
     display: flex;
