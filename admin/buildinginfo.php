@@ -23,16 +23,10 @@ $departmentresultSet = getData("departmenttb");
                         <h3>BUILDING DETAILS</h3>
                         <div class="card-body">
                                 <div class="row" style="font-family: 'Poppins', sans-serif;">
-                                    <div class="col-md-6 mb-3"> 
+                                    <div class="col-md-12 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Building Name</label>
                                             <input type="text" value="<?=$data['building_name']; ?>" class="form-control" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Department</label>
-                                            <input type="text" value="<?=$data['department_name']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
@@ -43,32 +37,32 @@ $departmentresultSet = getData("departmenttb");
                                     </div>
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <label for="">No. of Floors</label>
-                                            <input type="number" value="<?=$data['num_floors']; ?>" class="form-control" disabled>
+                                            <label for="">Department/Office (For Organizational Chart)</label>
+                                            <input type="text" value="<?=$data['department_name']; ?>" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Key Features</label>
-                                            <input type="text" value="<?=$data['key_features']; ?>" class="form-control" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Amenities</label>
-                                            <input type="text" value="<?=$data['amenities_name']; ?>" class="form-control" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Independent Amenity</label>
                                             <input type="checkbox" <?= $data['is_amenities'] ? "checked":""?> class="form-check-input" disabled>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Department Affiliation</label>
-                                            <input type="checkbox" <?= $data['is_department'] ? "checked":""?> class="form-check-input" disabled>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="">Offices</label>
+                                        <div class="row">
+                                            <?php 
+                                            // Split the office names by comma
+                                            $offices = explode(",", $data['key_features']);
+
+                                            foreach ($offices as $office): 
+                                                $officeName = htmlspecialchars(trim($office)); // Clean and trim the office name
+                                            ?>
+                                            <div class="col-md-12 mb-2">
+                                                <div class="form-control" style="background-color: #e9ecef; border: 1px solid #ced4da; color: #495057; opacity: 1; padding: 10px;">
+                                                    <?= $officeName; ?>
+                                                </div>
+                                            </div>
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
                                 </div>

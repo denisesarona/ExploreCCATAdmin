@@ -25,30 +25,10 @@ $departmentresultSet = getData("departmenttb");
                             <!--------------- FORM --------------->
                             <form action="codes.php" method="POST" enctype="multipart/form-data">
                                 <div class="row" style="font-family: 'Poppins', sans-serif;">
-                                    <div class="col-md-6 mb-3"> 
+                                    <div class="col-md-12 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Building Name</label>
                                             <input type="text" value="<?=$data['building_name']; ?>" class="form-control" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Department/Office</label>
-                                            <select class="form-control" name="department_name" id="department" onchange="updateDeptId()">
-                                                <?php
-                                                $current_department = $data['department_name'];
-                                                ?>
-                                                <option value='<?=$current_department?>' selected><?=$current_department?></option>
-                                                <?php
-                                                    while ($rows = $departmentresultSet->fetch_assoc()) {
-                                                        $department_name = $rows['name'];
-                                                        $dept_id = $rows['dept_id'];
-                                                        // Set the option value to dept_id but display department name
-                                                        echo "<option value='$department_name' data-dept-id='$dept_id'>$department_name</option>";
-                                                    }
-                                                ?>
-                                            </select>
-                                            <input type="hidden" name="dept_id" id="dept_id">
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
@@ -60,23 +40,21 @@ $departmentresultSet = getData("departmenttb");
                                     </div>
                                     <div class="col-md-6 mb-3"> 
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
-                                            <label for="">No. of Floors</label>
-                                            <input type="number" value="<?=$data['num_floors']; ?>" class="form-control" placeholder="Enter No. of Floors" name="num_floors">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3"> 
-                                        <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
-                                            <label for="">Key Features</label>
-                                            <input type="text" value="<?=$data['key_features']; ?>" class="form-control" placeholder="Enter Key Features" name="key_features">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3"> 
-                                        <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
-                                            <label for="">Amenities</label>
-                                            <input type="text" value="<?=$data['amenities_name']; ?>" class="form-control" placeholder="Enter Amenities" name="amenities_name">
+                                            <label for="">Department/Office (For Organizational Chart)</label>
+                                            <select class="form-control" name="department_name" id="department" onchange="updateDeptId()">
+                                                <?php
+                                                $current_department = $data['department_name'];
+                                                ?>
+                                                <option value='<?=$current_department?>' selected><?=$current_department?></option>
+                                                <?php
+                                                    while ($rows = $departmentresultSet->fetch_assoc()) {
+                                                        $department_name = $rows['name'];
+                                                        $dept_id = $rows['dept_id'];                                             // Set the option value to dept_id but display department name
+                                                        echo "<option value='$department_name' data-dept-id='$dept_id'>$department_name</option>";
+                                                    }
+                                                ?>
+                                            </select>
+                                            <input type="hidden" name="dept_id" id="dept_id">
                                         </div>
                                     </div>
                                     <div class="col-md-3 mb-3"> 
@@ -86,11 +64,47 @@ $departmentresultSet = getData("departmenttb");
                                             <input type="checkbox" <?= $data['is_amenities'] ? "checked":""?> class="form-check-input" name="is_amenities">
                                         </div>
                                     </div>
-                                    <div class="col-md-3 mb-3"> 
+                                    <div class="col-md-12 mb-3">
                                         <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
-                                            <label for="">Department Affiliation</label>
-                                            <input type="checkbox" <?= $data['is_department'] ? "checked":""?> class="form-check-input" name="is_department">
+                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Hidden building ID -->
+                                            
+                                            <label for="">Offices</label>
+                                            
+                                            <!-- Wrapper for input and button -->
+                                            <div class="input-group">
+                                                <input 
+                                                    type="text" 
+                                                    id="officeInput" 
+                                                    class="form-control" 
+                                                    placeholder="Enter Office Name">
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-success" 
+                                                    onclick="addOffice()">Add Office</button>
+                                            </div>
+
+                                            <!-- Display added offices dynamically -->
+                                            <ul id="officeList" class="list-group mt-3">
+                                                <?php
+                                                // Pre-fill the list with existing data from the database
+                                                $offices = explode(',', $data['key_features']); // Assuming 'key_features' contains comma-separated values
+                                                foreach ($offices as $office) {
+                                                    if (!empty(trim($office))) {
+                                                        echo "<li class='list-group-item d-flex justify-content-between align-items-center'>
+                                                                $office 
+                                                                <button type='button' class='btn btn-sm btn-danger' onclick='removeOffice(this)'>Remove</button>
+                                                            </li>";
+                                                    }
+                                                }
+                                                ?>
+                                            </ul>
+
+                                            <!-- Hidden input to store the list of offices -->
+                                            <input 
+                                                type="hidden" 
+                                                id="offices" 
+                                                name="key_features" 
+                                                value="<?= htmlspecialchars($data['key_features']); ?>">
                                         </div>
                                     </div>
                                     <!--------------- SAVE BUTTON --------------->
@@ -118,6 +132,41 @@ function updateDeptId() {
     var deptIdInput = document.getElementById('dept_id');
     var selectedOption = departmentSelect.options[departmentSelect.selectedIndex];
     deptIdInput.value = selectedOption.getAttribute('data-dept-id'); // Get the dept ID from data attribute
+}
+</script>
+<script>
+function addOffice() {
+    const officeInput = document.getElementById("officeInput");
+    const officeList = document.getElementById("officeList");
+    const hiddenInput = document.getElementById("offices");
+
+    const officeName = officeInput.value.trim();
+    if (officeName) {
+        const listItem = document.createElement("li");
+        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        listItem.innerHTML = `
+            ${officeName} 
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeOffice(this)">Remove</button>
+        `;
+        officeList.appendChild(listItem);
+        hiddenInput.value = hiddenInput.value ? hiddenInput.value + "," + officeName : officeName;
+        officeInput.value = "";
+    }
+}
+
+function removeOffice(button) {
+    const listItem = button.parentElement;
+    const officeList = document.getElementById("officeList");
+    const hiddenInput = document.getElementById("offices");
+
+    // Remove the list item from the list
+    officeList.removeChild(listItem);
+
+    // Update the hidden input value
+    const remainingOffices = Array.from(officeList.children).map(
+        li => li.firstChild.textContent.trim()
+    );
+    hiddenInput.value = remainingOffices.join(",");
 }
 </script>
 <!--------------- FOOTER --------------->
