@@ -35,7 +35,7 @@ $departmentresultSet = getData("departmenttb");
                                         <div class="form-group">
                                             <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
                                             <label for="">Building Description</label>
-                                            <textarea class="form-control" placeholder="Enter Building Description" name="building_description"><?= htmlspecialchars($data['building_description']); ?></textarea>
+                                            <textarea rows="5" class="form-control" placeholder="Enter Building Description" name="building_description"><?= htmlspecialchars($data['building_description']); ?></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
@@ -142,14 +142,21 @@ function addOffice() {
 
     const officeName = officeInput.value.trim();
     if (officeName) {
+        // Create a new list item
         const listItem = document.createElement("li");
-        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
         listItem.innerHTML = `
             ${officeName} 
             <button type="button" class="btn btn-sm btn-danger" onclick="removeOffice(this)">Remove</button>
         `;
+
+        // Add the list item to the list
         officeList.appendChild(listItem);
-        hiddenInput.value = hiddenInput.value ? hiddenInput.value + "," + officeName : officeName;
+
+        // Add the new office name to the hidden input (comma-separated)
+        const currentValue = hiddenInput.value;
+        hiddenInput.value = currentValue ? currentValue + "," + officeName : officeName;
+
+        // Clear the input field
         officeInput.value = "";
     }
 }

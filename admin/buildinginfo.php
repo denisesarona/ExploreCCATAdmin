@@ -32,7 +32,7 @@ $departmentresultSet = getData("departmenttb");
                                     <div class="col-md-12 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Building Description</label>
-                                            <textarea class="form-control" disabled><?= htmlspecialchars($data['building_description']); ?></textarea>
+                                            <textarea rows="5" class="form-control" disabled><?= htmlspecialchars($data['building_description']); ?></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3"> 
