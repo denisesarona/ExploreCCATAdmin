@@ -49,6 +49,33 @@ function checkPasswordStrength($password) {
     }
 }
 
+// Function to ensure the fields (Mission, Vision, Quality Policy) exist in the policies table
+function ensureDefaultFieldsExist($name, $defaultValue) {
+    global $con;
+
+    // Check if the field already exists in the 'policies' table
+    $sql = "SELECT * FROM policies WHERE name = ?";
+    $stmt = $con->prepare($sql);
+    $stmt->bind_param("s", $name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // If the field doesn't exist, insert it with the default value
+    if ($result->num_rows == 0) {
+        $insertSql = "INSERT INTO policies (name, pol_text, created_at) VALUES (?, ?, NOW())";
+        $insertStmt = $con->prepare($insertSql);
+        $insertStmt->bind_param("ss", $name, $defaultValue);
+        $insertStmt->execute();
+    }
+
+    $stmt->close();
+}
+
+// Ensure that Mission, Vision, and Quality Policy are present in the policies table
+ensureDefaultFieldsExist('Mission', 'This is the default Mission statement.');
+ensureDefaultFieldsExist('Vision', 'This is the default Vision statement.');
+ensureDefaultFieldsExist('Quality Policy', 'This is the default Quality Policy statement.');
+
 if(isset($_POST['addAdmin_button'])){   
     $name = $_POST['name'];
     $email = $_POST['email'];
@@ -480,9 +507,17 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect to the department page
     header("Location: facultyMember.php");
     exit();
-} else if(isset($_POST['editPolinfo_button'])){
+} else if (isset($_POST['editPolinfo_button'])) {
+    // Get the policy text and ID from the form submission
     $pol_text = $_POST['pol_text'];
-    $pol_id = $_POST['pol_id']; 
+    $pol_id = $_POST['pol_id'];
+
+    // Validate policy text
+    if (empty($pol_text)) {
+        $_SESSION['error'] = "Policy text cannot be empty!";
+        header("Location: policies.php");
+        exit();
+    }
 
     // Prepare the SQL update query
     $update_query = "UPDATE policies SET pol_text=? WHERE pol_id=?";
@@ -506,6 +541,7 @@ if(isset($_POST['addAdmin_button'])){
         exit();
     }
 }
+
 
 ob_end_flush();
 ?>
