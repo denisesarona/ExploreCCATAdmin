@@ -47,7 +47,7 @@ $departmentresultSet = getData("departmenttb");
                                     <div class="col-md-6"> 
                                         <div class="form-group">
                                             <label for="department" class="form-label">Department</label>
-                                            <select class="form-control" name="departments[]" required>
+                                            <select class="form-control" name="departments[]">
                                                 <option value="">Select Department</option>
                                                 <?php
                                                     $departmentresultSet->data_seek(0); // Reset department result set
