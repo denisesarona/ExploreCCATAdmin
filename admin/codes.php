@@ -480,6 +480,31 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect to the department page
     header("Location: facultyMember.php");
     exit();
+} else if(isset($_POST['editPolinfo_button'])){
+    $pol_text = $_POST['pol_text'];
+    $pol_id = $_POST['pol_id']; 
+
+    // Prepare the SQL update query
+    $update_query = "UPDATE policies SET pol_text=? WHERE pol_id=?";
+    $stmt = $con->prepare($update_query);
+
+    if (!$stmt) {
+        die("Prepare failed: (" . $con->errno . ") " . $con->error);
+    }
+
+    // Bind parameters
+    $stmt->bind_param("si", $pol_text, $pol_id);
+
+    // Execute update
+    if ($stmt->execute()) {
+        $_SESSION['success'] = "✔ Policies & Vision Details updated successfully!";
+        header("Location: policies.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Updating Policies & Vision Details failed! Error: " . $stmt->error;
+        header("Location: policies.php");
+        exit();
+    }
 }
 
 ob_end_flush();

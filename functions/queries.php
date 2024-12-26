@@ -164,7 +164,6 @@
 
         
     }
-
         /*--------------- GET ALL DATA FROM TABLE BY ID ---------------*/
         function getBldgByID($table, $id) {
             global $con;
@@ -173,5 +172,14 @@
             $stmt->execute();
             return $stmt->get_result();
         }
+
+    /*--------------- GET ALL DATA FROM TABLE BY ID ---------------*/
+    function getPolByID($table, $id) {
+        global $con;
+        $stmt = $con->prepare("SELECT * FROM $table WHERE pol_id = ?"); 
+        $stmt->bind_param("i", $id); 
+        $stmt->execute();
+        return $stmt->get_result();
+    }
 
 ?>

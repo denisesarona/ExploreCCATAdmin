@@ -24,18 +24,6 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="facultyMember.php" class="sidebar-link">
-            <i class='bx bxs-group'></i>
-                <span class="sidebar-txt">FACULTY MEMBERS</span>
-            </a>
-        </li>
-        <li class="sidebar-item">
-            <a href="addFacultyMember.php" class="sidebar-link">
-            <i class='bx bx-plus'></i>
-                <span class="sidebar-txt">ADD FACULTY MEMBERS</span>
-            </a>
-        </li>
-        <li class="sidebar-item">
             <a href="department.php" class="sidebar-link">
             <i class='bx bxs-building-house'></i>
                 <span class="sidebar-txt">DEPARTMENT/OFFICES</span>
@@ -48,9 +36,21 @@
             </a>
         </li>
         <li class="sidebar-item">
+            <a href="facultyMember.php" class="sidebar-link">
+            <i class='bx bxs-group'></i>
+                <span class="sidebar-txt">FACULTY MEMBERS</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="addFacultyMember.php" class="sidebar-link">
+            <i class='bx bx-plus'></i>
+                <span class="sidebar-txt">ADD FACULTY MEMBERS</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
             <a href="orgChart.php" class="sidebar-link">
             <i class='bx bx-git-repo-forked'></i>
-                <span class="sidebar-txt">ORGANIZATIONAL CHARTS</span>
+                <span class="sidebar-txt">ORGANIZATIONAL CHART</span>
             </a>
         </li>
         <li class="sidebar-item">
@@ -63,6 +63,12 @@
             <a href="userfeedback.php" class="sidebar-link">
             <i class='bx bxs-chat'></i>
                 <span class="sidebar-txt">USER FEEDBACK</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a href="policies.php" class="sidebar-link">
+            <i class='bx bxs-check-shield'></i>
+                <span class="sidebar-txt">POLICIES & VISION</span>
             </a>
         </li>
     </ul>
