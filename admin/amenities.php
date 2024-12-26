@@ -16,10 +16,10 @@
                         <div class="card rounded-3 p-1 text-center" style="border:none; overflow:hidden;">
                             <div class="row align-items-center options">
                             <div class="links col-md-6 mt-2">
-                                <a class="main-link active" href="buildings.php">Building Information</a>
+                                <a class="main-link" href="buildings.php">Building Information</a>
                             </div>
                             <div class="links col-md-6 mt-2">
-                                <a class="main-link" href="amenities.php">Amenities Information</a>
+                                <a class="main-link active" href="amenities.php">Amenities Information</a>
                             </div>
 
                             </div>
@@ -28,24 +28,24 @@
                     <table class="table text-center">
                         <thead>
                             <tr>
-                                <th class="d-table-cell d-lg-table-cell">Building Name</th>
+                                <th class="d-table-cell d-lg-table-cell">Amenities Name</th>
                                 <th class="d-table-cell d-lg-table-cell">View Details</th>
                                 <th class="d-table-cell d-lg-table-cell">Edit Details</th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php
-                            $buildings = getData("buildingtbl"); // Fetch buildings from database
-                            if(mysqli_num_rows($buildings) > 0){
-                                foreach($buildings as $building){
+                            $amenitys = getData("amenities"); // Fetch buildings from database
+                            if(mysqli_num_rows($amenitys) > 0){
+                                foreach($amenitys as $amenity){
                         ?>
                                 <tr>
-                                    <td><?= $building['building_name']; ?></td>
+                                    <td><?= $amenity['amenities_name']; ?></td>
                                     <td>
-                                        <a href="buildinginfo.php?id=<?= $building['building_id']; ?>" class="btn BlueBtn">View</a>
+                                        <a href="amenitiesinfo.php?id=<?= $amenity['amenities_id']; ?>" class="btn BlueBtn">View</a>
                                     </td>
                                     <td>
-                                        <a href="buildinginfoEdit.php?id=<?= $building['building_id']; ?>" class="btn BlueBtn">Edit</a>
+                                        <a href="amenitiesinfoEdit.php?id=<?= $amenity['amenities_id']; ?>" class="btn BlueBtn">Edit</a>
                                     </td>
                                 </tr>
                         <?php
@@ -53,7 +53,7 @@
                             } else {
                         ?>
                                 <tr>
-                                    <td colspan="4">No building records found</td>
+                                    <td colspan="4">No amenities records found</td>
                                 </tr>
                         <?php
                             }

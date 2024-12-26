@@ -450,12 +450,11 @@ if(isset($_POST['addAdmin_button'])){
     $building_description = $_POST['building_description'];
     $new_department_id = $_POST['dept_id'];
     $department_name = $_POST['department_name'];
-    $is_amenities = isset($_POST['is_amenities']) ? '1':'0'; 
     $key_features = $_POST['key_features'];
     $building_id = $_POST['building_id']; // Assuming you get this from the form
 
     // Prepare the SQL update query
-    $update_query = "UPDATE buildingtbl SET building_description=?, dept_id=?, department_name=?, is_amenities=?, key_features=? WHERE building_id=?";
+    $update_query = "UPDATE buildingtbl SET building_description=?, dept_id=?, department_name=?, key_features=? WHERE building_id=?";
     $stmt = $con->prepare($update_query);
 
     if (!$stmt) {
@@ -463,7 +462,7 @@ if(isset($_POST['addAdmin_button'])){
     }
 
     // Bind parameters
-    $stmt->bind_param("sisisi", $building_description, $new_department_id, $department_name, $is_amenities, $key_features, $building_id);
+    $stmt->bind_param("sisisi", $building_description, $new_department_id, $department_name, $key_features, $building_id);
 
     // Execute update
     if ($stmt->execute()) {
@@ -507,7 +506,7 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect to the department page
     header("Location: facultyMember.php");
     exit();
-} else if (isset($_POST['editPolinfo_button'])) {
+} else if(isset($_POST['editPolinfo_button'])) {
     // Get the policy text and ID from the form submission
     $pol_text = $_POST['pol_text'];
     $pol_id = $_POST['pol_id'];
@@ -538,6 +537,31 @@ if(isset($_POST['addAdmin_button'])){
     } else {
         $_SESSION['error'] = "Updating Policies & Vision Details failed! Error: " . $stmt->error;
         header("Location: policies.php");
+        exit();
+    }
+} else if(isset($_POST['editAmenityinfo_button'])){
+    $amenities_description = $_POST['amenities_description'];
+    $amenities_id = $_POST['amenities_id']; // Assuming you get this from the form
+
+    // Prepare the SQL update query
+    $update_query = "UPDATE amenities SET amenities_description=? WHERE amenities_id=?";
+    $stmt = $con->prepare($update_query);
+
+    if (!$stmt) {
+        die("Prepare failed: (" . $con->errno . ") " . $con->error);
+    }
+
+    // Bind parameters
+    $stmt->bind_param("si", $amenities_description, $amenities_id);
+
+    // Execute update
+    if ($stmt->execute()) {
+        $_SESSION['success'] = "✔ Amenity Details updated successfully!";
+        header("Location: amenities.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Updating Amenity Details failed! Error: " . $stmt->error;
+        header("Location: amenities.php");
         exit();
     }
 }

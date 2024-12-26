@@ -63,3 +63,41 @@ h3 {
     background-color: #e80000; /* Light gray background */
     color: #000; /* Black text color */
 }
+
+/* Default style for links */
+.main-link {
+    color: #064918; /* Make link text color black */
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none; /* Remove underline */
+    position: relative; /* For the underline animation */
+    display: inline-block; /* To make the underline fit the text */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+/* Underline animation */
+.main-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px; /* Thickness of the underline */
+    background-color: black; /* Color of the underline */
+    transition: width 0.3s ease; /* Smooth transition for the underline */
+}
+
+/* Hover effect */
+.main-link:hover {
+    color: black; /* Keep the text color black */
+}
+
+.main-link:hover::after {
+    width: 100%; /* Expand the underline */
+}
+
+
+.main-link.active{
+    text-decoration: underline;
+    text-underline-offset: 8px;
+}

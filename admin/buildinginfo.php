@@ -35,16 +35,10 @@ $departmentresultSet = getData("departmenttb");
                                             <textarea rows="5" class="form-control" disabled><?= htmlspecialchars($data['building_description']); ?></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-3"> 
+                                    <div class="col-md-12 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Department/Office (For Organizational Chart)</label>
                                             <input type="text" value="<?=$data['department_name']; ?>" class="form-control" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Independent Amenity</label>
-                                            <input type="checkbox" <?= $data['is_amenities'] ? "checked":""?> class="form-check-input" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3">

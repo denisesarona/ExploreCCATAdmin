@@ -56,7 +56,7 @@
         <li class="sidebar-item">
             <a href="buildings.php" class="sidebar-link">
             <i class='bx bxs-buildings' ></i>
-                <span class="sidebar-txt">BUILDING INFORMATION</span>
+                <span class="sidebar-txt">BUILDINGS & AMENITIES</span>
             </a>
         </li>
         <li class="sidebar-item">

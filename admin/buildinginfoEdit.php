@@ -38,7 +38,7 @@ $departmentresultSet = getData("departmenttb");
                                             <textarea rows="5" class="form-control" placeholder="Enter Building Description" name="building_description"><?= htmlspecialchars($data['building_description']); ?></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-3"> 
+                                    <div class="col-md-12 mb-3"> 
                                         <div class="form-group">
                                             <label for="">Department/Office (For Organizational Chart)</label>
                                             <select class="form-control" name="department_name" id="department" onchange="updateDeptId()">
@@ -55,13 +55,6 @@ $departmentresultSet = getData("departmenttb");
                                                 ?>
                                             </select>
                                             <input type="hidden" name="dept_id" id="dept_id">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mb-3"> 
-                                        <div class="form-group">
-                                            <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Use the correct column name -->
-                                            <label for="">Independent Amenity</label>
-                                            <input type="checkbox" <?= $data['is_amenities'] ? "checked":""?> class="form-check-input" name="is_amenities">
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3">
