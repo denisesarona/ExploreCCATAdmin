@@ -462,7 +462,7 @@ if(isset($_POST['addAdmin_button'])){
     }
 
     // Bind parameters
-    $stmt->bind_param("sisisi", $building_description, $new_department_id, $department_name, $key_features, $building_id);
+    $stmt->bind_param("sissi", $building_description, $new_department_id, $department_name, $key_features, $building_id);
 
     // Execute update
     if ($stmt->execute()) {
