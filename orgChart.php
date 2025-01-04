@@ -1,21 +1,20 @@
 <?php
-session_start(); // Start the session
-include('includes/header.php'); // Include header or any other necessary files
-include('config/dbconnect.php'); // Include the database connection
+session_start();
+include('includes/header.php');
+include('config/dbconnect.php');
 
-function getDepartmentsByID($table, $id) {
-    global $con; // Use the existing database connection
+// Function to fetch department details by Name
+function getDepartmentsByName($table, $name) {
+    global $con;
 
     // Prepare the SQL statement
-    $stmt = $con->prepare("SELECT * FROM $table WHERE dept_id = ?");
-    
-    // Check if preparation was successful
+    $stmt = $con->prepare("SELECT * FROM $table WHERE name = ?");
     if ($stmt === false) {
         die("Error preparing statement: " . $con->error);
     }
 
     // Bind the parameters
-    $stmt->bind_param("i", $id); // Assuming dept_id is an integer
+    $stmt->bind_param("s", $name);
 
     // Execute the statement
     if (!$stmt->execute()) {
@@ -28,11 +27,11 @@ function getDepartmentsByID($table, $id) {
     // Close the statement
     $stmt->close();
 
-    return $result; // Return the result set
+    return $result;
 }
 
+// Function to fetch faculty details based on department ID
 function getFacultyByDepartment($con, $dept_id) {
-    // Prepare the SQL statement with a JOIN
     $sql = "
         SELECT 
             f.faculty_id AS id, 
@@ -52,63 +51,50 @@ function getFacultyByDepartment($con, $dept_id) {
         ORDER BY 
             f.pid ASC";
     
-    // Prepare the statement
     $stmt = $con->prepare($sql);
-    
-    // Check if preparation was successful
     if ($stmt === false) {
         die("Error preparing statement: " . $con->error);
     }
-    
-    // Bind the department ID
+
     $stmt->bind_param("i", $dept_id);
-    
-    // Execute the statement
     if (!$stmt->execute()) {
         die("Error executing statement: " . $stmt->error);
     }
-    
-    // Get the result
+
     $result = $stmt->get_result();
-    
-    // Initialize an array for nodes
     $nodes = [];
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            // Adjust the image path if necessary
-            $row['img'] = '../uploads/' . $row['img'];
+            $row['img'] = '../uploads/' . $row['img']; // Adjust the image path
             $nodes[] = $row;
         }
     }
-    
-    // Close the statement
     $stmt->close();
-    
-    return $nodes; // Return the array of nodes
+    return $nodes;
 }
 
 // Initialize variables
-$dept_name = "Department not found."; // Default value
-$nodes = []; // Initialize nodes as an empty array
+$dept_name = "Department not found."; 
+$nodes = [];
 
-// Check if a department ID is provided
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']); // Capture the ID from the URL
+// Check if a department name is provided
+if (isset($_GET['name'])) {
+    $name = htmlspecialchars($_GET['name']); // Sanitize input
 
-    // Fetch department details
-    $dept = getDepartmentsByID('departmenttb', $id);
-    
+    // Fetch department details by name
+    $dept = getDepartmentsByName('departmenttb', $name);
+
     if ($dept && mysqli_num_rows($dept) > 0) {
         $data = mysqli_fetch_array($dept);
         $dept_name = htmlspecialchars($data['name']);
-        $dept_id = intval($data['dept_id']); // Assuming 'id' is the column for department ID
+        $dept_id = intval($data['dept_id']); // Get the department ID
 
         // Fetch faculty nodes based on department ID
-        $nodes = getFacultyByDepartment($con, $dept_id); // Pass the correct department ID
+        $nodes = getFacultyByDepartment($con, $dept_id);
     }
 }
-
 ?>
+
 
 <link rel="stylesheet" href="assets/css/orgChart.css">
 <div class="container">
