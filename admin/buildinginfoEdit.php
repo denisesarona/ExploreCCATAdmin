@@ -9,8 +9,13 @@ $departmentresultSet = getData("departmenttb");
 <!--------------- EDIT BUILDING INFORMATION DETAILS PAGE --------------->
 
 <div class="container">
+                <!-- Hidden alert for duplicate department -->
+                <div id="alertDuplicate" class="alert alert-danger alert-dismissible fade show" role="alert" style="display: none;">
+                <strong>Warning!</strong> This department is already added.
+            </div>
     <div class="row">
         <div class="col-md-12">
+
             <?php
             if (isset($_GET['id'])) {
                 $id = $_GET['id']; // Capture the ID from the URL
@@ -162,17 +167,27 @@ function addDepartment() {
     const departmentList = document.getElementById("departmentList");
     const hiddenDepartments = document.getElementById("departments");
     const hiddenDeptIds = document.getElementById("dept_ids");
+    const alertDuplicate = document.getElementById("alertDuplicate");
 
     const selectedOption = departmentSelect.options[departmentSelect.selectedIndex];
     const departmentName = selectedOption.value;
     const deptId = selectedOption.getAttribute("data-dept-id");
+
+    // Hide the alert whenever a department is selected or added
+    alertDuplicate.style.display = 'none';
 
     if (departmentName && deptId) {
         // Prevent duplicate entries
         const existingDepartments = hiddenDepartments.value.split(",").map(d => d.trim());
         const existingDeptIds = hiddenDeptIds.value.split(",").map(id => id.trim());
         if (existingDepartments.includes(departmentName)) {
-            alert("This department is already added.");
+            // Show the alert if duplicate is found
+            alertDuplicate.style.display = 'block';
+
+            // Automatically hide the alert after 3 seconds
+            setTimeout(function () {
+                alertDuplicate.style.display = 'none';
+            }, 3000);
             return;
         }
 
@@ -194,6 +209,7 @@ function addDepartment() {
         departmentSelect.selectedIndex = 0;
     }
 }
+
 
 function removeDepartment(button) {
     const listItem = button.parentElement;

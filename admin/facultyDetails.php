@@ -28,7 +28,6 @@ if ($faculty_id > 0) {
         $positions[] = $row; // Store department-position pairs
     }
 }
-
 // Handle faculty member form submission for updating
 if (isset($_POST['editFaculty_button'])) {
     // Sanitize inputs to prevent SQL Injection
@@ -50,12 +49,19 @@ if (isset($_POST['editFaculty_button'])) {
         $imageUpdateQuery = ""; // No new image uploaded, keep the old one
     }
 
+    // Check for duplicate departments in the submitted form
+    $departments = $_POST['departments']; // Array of selected department IDs
+    if (count($departments) !== count(array_unique($departments))) {
+        $_SESSION['error'] = "Duplicate departments are not allowed!";
+        header("Location: facultyDetails.php?id=$faculty_id");
+        exit();
+    }
+
     // Update faculty data in the database
     $updateFacultyQuery = "UPDATE facultytb SET name = '$name' $imageUpdateQuery WHERE faculty_id = $faculty_id";
 
     if (mysqli_query($con, $updateFacultyQuery)) {
         // Handle updating department and position relationships
-        $departments = $_POST['departments']; // Array of selected department IDs
         $positions = $_POST['positions'];    // Array of selected position IDs
 
         // Remove existing department-position pairs
@@ -75,17 +81,31 @@ if (isset($_POST['editFaculty_button'])) {
         }
 
         $_SESSION['success'] = "✔ Faculty member updated successfully!";
-        header("Location: facultyDetails.php?id=$faculty_id");
+        header("Location: facultyMember.php?id=$faculty_id");
         exit();
     } else {
         $_SESSION['error'] = "Updating Faculty member failed: " . mysqli_error($con);
-        header("Location: facultyDetails.php?id=$faculty_id");
+        header("Location: facultyMember.php?id=$faculty_id");
         exit();
     }
 }
+
 ?>
 
 <link rel="stylesheet" href="assets/css/style.css">
+
+<!-- Error Alert -->
+<?php if (isset($_SESSION['error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show right-alert" id="error-alert" role="alert">
+        <strong>Error!</strong> <?= $_SESSION['error']; ?>
+    </div>
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+
+<!-- Alert for Duplicate Department -->
+<div id="duplicate-dept-alert" class="alert alert-danger alert-dismissible fade show right-alert" style="display: none;" role="alert">
+    <strong>Warning!</strong> This department has already been selected!
+</div>
 
 <div class="container">
     <div class="row">
@@ -169,14 +189,14 @@ if (isset($_POST['editFaculty_button'])) {
                             </div>
                             <!-- Upload Image -->
                             <div class="col-md-12 mb-3">
-                                    <div class="form-group">
-                                        <label for="">Upload Image</label>
-                                        <input type="file" class="form-control" name="img">
-                                        <label for="">Current Image</label>
-                                        <input type="hidden" name="old_image" value="<?= $facultyData['img']; ?>">
-                                        <img src="../uploads/<?= $facultyData['img']; ?>" height="50px" width="50px" alt="">
-                                    </div>
+                                <div class="form-group">
+                                    <label for="">Upload Image</label>
+                                    <input type="file" class="form-control" name="img">
+                                    <label for="">Current Image</label>
+                                    <input type="hidden" name="old_image" value="<?= $facultyData['img']; ?>">
+                                    <img src="../uploads/<?= $facultyData['img']; ?>" height="50px" width="50px" alt="">
                                 </div>
+                            </div>
 
                             <!-- Save Button -->
                             <div class="col-md-6">
@@ -265,44 +285,63 @@ document.addEventListener("change", function (event) {
         var deptId = event.target.value;
         var positionDropdown = event.target.closest(".position-department-set").querySelector('.form-control[name="positions[]"]');
         fetchPositions(deptId, positionDropdown);
+
+        // Prevent selecting duplicate department
+        var departmentDropdowns = document.getElementsByClassName("department-dropdown");
+        var departmentIds = [];
+        var duplicateFound = false;
+
+        for (var i = 0; i < departmentDropdowns.length; i++) {
+            var selectedDept = departmentDropdowns[i].value;
+            if (selectedDept && departmentIds.includes(selectedDept)) {
+                duplicateFound = true;
+                break;
+            }
+            departmentIds.push(selectedDept);
+        }
+
+        if (duplicateFound) {
+            // Show the duplicate department alert
+            document.getElementById('duplicate-dept-alert').style.display = 'block';
+            event.target.value = ""; // Clear the duplicate selection
+        } else {
+            // Hide the alert if no duplicate is found
+            document.getElementById('duplicate-dept-alert').style.display = 'none';
+        }
     }
 });
 
-function fetchPositions(departmentId, positionDropdown) {
-    if (!departmentId) {
+function fetchPositions(deptId, positionDropdown) {
+    if (deptId) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "get_positions.php?dept_id=" + deptId, true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var positions = JSON.parse(xhr.responseText);
+                positionDropdown.innerHTML = '<option value="">Select Position</option>';
+                positions.forEach(function(position) {
+                    var option = document.createElement("option");
+                    option.value = position.position_id;
+                    option.textContent = position.position_name;
+                    positionDropdown.appendChild(option);
+                });
+            }
+        };
+        xhr.send();
+    } else {
         positionDropdown.innerHTML = '<option value="">Select Position</option>';
-        return;
     }
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "fetch_positions.php?dept_id=" + departmentId, true);
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            var positions = JSON.parse(xhr.responseText);
-            var currentValue = positionDropdown.value;
-
-            positionDropdown.innerHTML = '<option value="">Select Position</option>';
-            positions.forEach(function (position) {
-                positionDropdown.innerHTML += `<option value="${position.position_id}">${position.position_name}</option>`;
-            });
-
-            positionDropdown.value = currentValue;
-        }
-    };
-    xhr.send();
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    var departmentDropdowns = document.querySelectorAll(".department-dropdown");
-
-    departmentDropdowns.forEach(function (dropdown) {
-        var selectedDeptId = dropdown.value;
-        var positionDropdown = dropdown.closest(".position-department-set").querySelector('.form-control[name="positions[]"]');
-        fetchPositions(selectedDeptId, positionDropdown);
-    });
-});
-
-
+// Show alert for 3 seconds and hide it
+window.onload = function() {
+    var alert = document.getElementById("error-alert");
+    if (alert) {
+        setTimeout(function() {
+            alert.style.display = "none";
+        }, 3000); // Hide after 3 seconds
+    }
+};
 </script>
 
 <?php include('includes/footer.php'); ?>

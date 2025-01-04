@@ -101,3 +101,19 @@ h3 {
     text-decoration: underline;
     text-underline-offset: 8px;
 }
+
+.right-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    width: auto;
+}
+/* You can customize the alert style as per your needs */
+#alertDuplicate {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    width: auto;
+}
