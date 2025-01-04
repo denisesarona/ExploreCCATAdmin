@@ -372,40 +372,45 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect to faculty member page
     header("Location: facultyMember.php");
     exit();
+    
 } else if(isset($_POST['addPosition_button'])){
-    $position = $_POST['name'];
-
-    $position_query = "INSERT INTO positiontb(name) VALUES ('$position')";
+    $position = $_POST['position_name'];  // Position name
+    $dept_id = $_POST['dept_id'];  // Department ID
+    
+    // Insert position with the corresponding department ID
+    $position_query = "INSERT INTO positiontb (position_name, dept_id) VALUES ('$position', '$dept_id')";
 
     $position_query_run = mysqli_query($con, $position_query);
 
     if($position_query_run){
         $_SESSION['success'] = "✔ Position added successfully!";
-        header("Location: faculty_position.php");
+        header("Location: faculty_position.php?dept_id=$dept_id");  // Redirect back to the positions page with dept_id
         exit();
     } else {
-        $_SESSION['error'] = "Adding Position failed!";
-        header("Location: faculty_position.php");
+        $_SESSION['error'] = "Adding position failed!";
+        header("Location: faculty_position.php?dept_id=$dept_id");
         exit();
     }
 } else if(isset($_POST['deletePosition_button'])){
     $position_id = $_POST['position_id']; 
 
+    // Select the position data to check the department it belongs to
     $position_query = "SELECT * FROM positiontb WHERE position_id='$position_id'";
     $position_query_run = mysqli_query($con, $position_query);
-    $positiont_data = mysqli_fetch_array($position_query_run);
+    $position_data = mysqli_fetch_array($position_query_run);
+    $dept_id = $position_data['dept_id'];  // Get the department ID related to the position
 
-    // DELETE DEPARTMENT
+    // Delete the position
     $delete_query = "DELETE FROM positiontb WHERE position_id='$position_id'";
     $delete_query_run = mysqli_query($con, $delete_query);
 
     if($delete_query_run){
         $_SESSION['success'] = "✔ Position deleted successfully!";
-        header("Location: faculty_position.php");
+        header("Location: faculty_position.php?dept_id=$dept_id");  // Redirect back to the department's positions page
         exit();
     } else {
         $_SESSION['error'] = "Deleting position failed!";
-        header("Location: faculty_position.php");
+        header("Location: faculty_position.php?dept_id=$dept_id");
         exit();
     }
 } else if(isset($_POST['addDepartment_button'])) {
@@ -422,13 +427,14 @@ if(isset($_POST['addAdmin_button'])){
             $_SESSION['success'] = "✔ Department added successfully!";
             header("Location: department.php");
         } else {
-            $_SESSION['error'] = "Adding Department failed: " . $stmt->error;
+            $_SESSION['error'] = "Adding Department failed! ";
             header("Location: department.php");
         }
 
         $stmt->close();
     } else {
-        echo "Error preparing statement: " . $con->error . "<br>";
+        $_SESSION['error'] = "Special Characters is not allowed!";
+            header("Location: department.php");
     }
 } else if(isset($_POST['deleteDepartment_button'])) {
     $dept_id = $_POST['dept_id']; 

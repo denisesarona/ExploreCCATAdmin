@@ -30,12 +30,6 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="faculty_position.php" class="sidebar-link">
-            <i class='bx bxs-user-detail'></i>
-                <span class="sidebar-txt">FACULTY POSITIONS</span>
-            </a>
-        </li>
-        <li class="sidebar-item">
             <a href="facultyMember.php" class="sidebar-link">
             <i class='bx bxs-group'></i>
                 <span class="sidebar-txt">FACULTY MEMBERS</span>
