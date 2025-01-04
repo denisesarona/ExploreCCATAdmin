@@ -66,7 +66,7 @@ if (isset($_POST['addFaculty_button'])) {
         }
 
         $_SESSION['success'] = "✔ Faculty member added successfully!";
-        header("Location: facultyMember.php");
+        header("Location: addFacultyMember.php");
         exit();
     } else {
         $_SESSION['error'] = "Adding Faculty member failed: " . mysqli_error($con);
@@ -74,18 +74,22 @@ if (isset($_POST['addFaculty_button'])) {
         exit();
     }
 }
-
 ?>
 
 <link rel="stylesheet" href="assets/css/style.css">
 
 <div class="container">
+    <!-- Alert for Duplicate Department -->
+<div id="duplicate-dept-alert" class="alert alert-danger alert-dismissible fade show right-alert" style="display: none;" role="alert">
+    <strong>Warning!</strong> This department has already been selected!
+</div>
+
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
                 <h3>ADD FACULTY MEMBERS</h3>
                 <div class="card-body">
-                    <form action="addFacultyMember.php" method="POST" enctype="multipart/form-data">
+                    <form action="addFacultyMember.php" method="POST" enctype="multipart/form-data" onsubmit="return validateDepartments();">
                         <div class="row" style="font-family: 'Poppins', sans-serif;">
                             <!-- Faculty Name -->
                             <div class="col-md-12 mb-3"> 
@@ -180,6 +184,47 @@ if (isset($_POST['addFaculty_button'])) {
     </div>
 </div>
 
+<!-- Custom Alert Box -->
+<div id="alertBox" class="alert-box" style="display: none;">
+    <span id="alertMessage"></span>
+</div>
+
 <!--------------- FOOTER --------------->
 
 <?php include('includes/footer.php'); ?>
+
+<script>
+function validateDepartments() {
+    var departments = document.getElementsByName('departments[]');
+    var selectedDepts = [];
+
+    // Check if any department is selected multiple times
+    for (var i = 0; i < departments.length; i++) {
+        var deptId = departments[i].value;
+        if (deptId !== "" && selectedDepts.indexOf(deptId) !== -1) {
+            showDuplicateDeptAlert(); // Show alert if duplicate is found
+            return false; // Prevent form submission
+        }
+        selectedDepts.push(deptId);
+    }
+
+    return true; // Allow form submission
+}
+
+// Show duplicate department alert
+function showDuplicateDeptAlert() {
+    var alertBox = document.getElementById("duplicate-dept-alert");
+    alertBox.style.display = "block"; // Show the alert
+
+    // Automatically hide the alert after 5 seconds
+    setTimeout(function() {
+        alertBox.style.display = "none"; // Hide the alert
+    }, 5000);
+}
+
+</script>
+
+ 
+
+<!--------------- ALERTIFY JS ---------------> 
+<?php include('includes/footer.php');?>

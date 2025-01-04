@@ -17,6 +17,26 @@
         return $stmt->get_result();
     }
 
+    function getDataFromQuery($query) {
+        global $con; // Your database connection variable
+
+        // Execute the query
+        $result = mysqli_query($con, $query);
+        
+        // Check if query was successful
+        if (!$result) {
+            die("Query Failed: " . mysqli_error($con));
+        }
+        
+        return $result; // Return mysqli_result object
+    }
+
+    // Example function for fetching data from a table
+    function getDatas($table) {
+        global $con;
+        $query = "SELECT * FROM $table";
+        return getDataFromQuery($query);
+    }
     /*--------------- COUNT ALL DATA IN A TABLE ---------------*/
     function countItem($con, $table) {
         $query = "SELECT COUNT(*) AS total_item FROM $table";

@@ -284,32 +284,6 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: admin.php");
         exit();
     }
-} else if(isset($_POST['deleteFaculty_button'])) {
-    $faculty_id = $_POST['faculty_id'];
-
-    // Delete the faculty member from the facultytb
-    $delete_query = "DELETE FROM facultytb WHERE faculty_id=?";
-    $delete_stmt = $con->prepare($delete_query);
-    $delete_stmt->bind_param("i", $faculty_id);
-
-    if ($delete_stmt->execute()) {
-        $delete_info_query = "DELETE FROM dept_pos_facultytb WHERE faculty_id=?";
-        $delete_stmt = $con->prepare($delete_info_query);
-        $delete_stmt->bind_param("i", $faculty_id);
-        
-        if ($delete_stmt->execute()) {
-            $_SESSION['success'] = "✔ Faculty Member deleted successfully!";
-        } else {
-            $_SESSION['error'] = "Deleting Faculty Member information failed: " . $delete_stmt->error;
-        }
-    } else {
-        $_SESSION['error'] = "Deleting Faculty Member failed: " . $delete_stmt->error;
-    }
-
-    // Redirect to faculty member page
-    header("Location: facultyMember.php");
-    exit();
-    
 } else if(isset($_POST['addPosition_button'])){
     $position = $_POST['position_name'];  // Position name
     $dept_id = $_POST['dept_id'];  // Department ID
