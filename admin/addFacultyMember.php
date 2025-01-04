@@ -6,21 +6,17 @@ include('../middleware/adminMiddleware.php');
 // Fetch all departments
 $departmentresultSet = getData("departmenttb");
 
-// Initialize variables for positions and departments
 $positions = [];
 $deptPositionCount = 0;
 
 if (isset($_POST['number_of_depts'])) {
-    // Get number of departments to display
     $deptPositionCount = (int)$_POST['number_of_depts'];
 }
 
 if (isset($_POST['departments']) && $deptPositionCount > 0) {
-    // Fetch positions only when a department is selected
     for ($i = 0; $i < $deptPositionCount; $i++) {
         $selectedDeptId = $_POST['departments'][$i] ?? '';
         $positions[$i] = [];
-        // Fetch positions based on the selected department
         if ($selectedDeptId) {
             $positionsQuery = "SELECT * FROM positiontb WHERE dept_id = $selectedDeptId";
             $result = mysqli_query($con, $positionsQuery);
@@ -28,6 +24,54 @@ if (isset($_POST['departments']) && $deptPositionCount > 0) {
                 $positions[$i][] = $row;
             }
         }
+    }
+}
+
+// Handle faculty member form submission
+if (isset($_POST['addFaculty_button'])) {
+    // Sanitize inputs to prevent SQL Injection
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+    $image = $_FILES['img']['name'];
+    $path = "../uploads";
+    $image_ext = pathinfo($image, PATHINFO_EXTENSION);
+    $filename = time() . '.' . $image_ext;
+
+    // Insert faculty data into the facultytb table
+    $addFaculty_query = "INSERT INTO facultytb (name, img) VALUES ('$name', '$filename')";
+    
+    if (mysqli_query($con, $addFaculty_query)) {
+        $faculty_id = mysqli_insert_id($con); // Get the last inserted faculty ID
+
+        // Handle image upload
+        if (!move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
+            $_SESSION['error'] = "Image upload failed!";
+            header("Location: facultyMember.php");
+            exit();
+        }
+
+        // Handle multiple departments and positions
+        $departments = $_POST['departments'];  // Array of selected department IDs
+        $positions = $_POST['positions'];     // Array of selected position IDs
+
+        foreach ($departments as $index => $dept_id) {
+            $position_id = $positions[$index];  // Position ID selected for this department
+            // Insert each department-position pair for the faculty member into the faculty_departmenttable
+            $addDepartment_query = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
+                                    VALUES ('$faculty_id', '$dept_id', '$position_id')";
+            if (!mysqli_query($con, $addDepartment_query)) {
+                $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
+                header("Location: facultyMember.php");
+                exit();
+            }
+        }
+
+        $_SESSION['success'] = "✔ Faculty member added successfully!";
+        header("Location: facultyMember.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Adding Faculty member failed: " . mysqli_error($con);
+        header("Location: facultyMember.php");
+        exit();
     }
 }
 

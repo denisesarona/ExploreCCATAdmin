@@ -284,69 +284,6 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: admin.php");
         exit();
     }
-} else if (isset($_POST['addFaculty_button'])) {
-    // Sanitize inputs to prevent SQL Injection
-    $name = mysqli_real_escape_string($con, $_POST['name']);
-    $image = $_FILES['img']['name'];
-    $path = "../uploads";
-    $image_ext = pathinfo($image, PATHINFO_EXTENSION);
-    $filename = time() . '.' . $image_ext;
-
-    // Insert faculty data into the facultytb table
-    $addFaculty_query = "INSERT INTO facultytb (name, img) VALUES ('$name', '$filename')";
-    
-    if (mysqli_query($con, $addFaculty_query)) {
-        $faculty_id = mysqli_insert_id($con); // Get the last inserted faculty ID
-
-        // Handle image upload
-        if (!move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
-            $_SESSION['error'] = "Image upload failed!";
-        }
-
-        // Handle multiple departments and positions
-        $departments = $_POST['departments'];  // Array of selected department IDs
-        $positions = $_POST['positions'];     // Array of selected position IDs
-
-        foreach ($departments as $index => $dept_id) {
-            $position_id = $positions[$index];  // Position ID selected for this department
-            // Insert each department-position pair for the faculty member into the faculty_departmenttable
-            $addDepartment_query = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
-                                    VALUES ('$faculty_id', '$dept_id', '$position_id')";
-            if (!mysqli_query($con, $addDepartment_query)) {
-                $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
-            }
-        }
-
-        $_SESSION['success'] = "✔ Faculty member added successfully!";
-    } else {
-        $_SESSION['error'] = "Adding Faculty member failed: " . mysqli_error($con);
-    }
-
-    // Redirect back to the faculty member page
-    header("Location: facultyMember.php");
-    exit();
-} else if (isset($_POST['editFaculty_button'])) {
-    $faculty_id = $_POST['faculty_id'];
-    $positions = $_POST['positions'];
-    $departments = $_POST['departments'];
-
-    // Delete old assignments
-    $deleteQuery = "DELETE FROM dept_pos_facultytb WHERE faculty_id = $faculty_id";
-    mysqli_query($con, $deleteQuery);
-
-    // Insert updated assignments
-    for ($i = 0; $i < count($positions); $i++) {
-        if (!empty($positions[$i]) && !empty($departments[$i])) {
-            $insertQuery = "INSERT INTO dept_pos_facultytb (faculty_id, position_id, dept_id) 
-                            VALUES ($faculty_id, {$positions[$i]}, {$departments[$i]})";
-            mysqli_query($con, $insertQuery);
-            $_SESSION['success'] = "✔ Faculty details updated successfully!";
-        } else{
-            $_SESSION['error'] = "Updating Faculty details failed: " . mysqli_error($con);
-        }
-    }
-    header("Location: facultyDetails.php?id=$faculty_id&status=updated");
-    exit();
 } else if(isset($_POST['deleteFaculty_button'])) {
     $faculty_id = $_POST['faculty_id'];
 
@@ -480,8 +417,7 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: buildings.php");
         exit();
     }
-}
- else if(isset($_POST['deleteFeedback_button'])) {
+} else if(isset($_POST['deleteFeedback_button'])) {
     $fid = $_POST['fid']; 
 
     // Delete the department from the departmenttb
