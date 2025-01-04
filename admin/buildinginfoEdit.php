@@ -39,24 +39,61 @@ $departmentresultSet = getData("departmenttb");
                                         </div>
                                     </div>
                                     <div class="col-md-12 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Department/Office (For Organizational Chart)</label>
-                                            <select class="form-control" name="department_name" id="department" onchange="updateDeptId()">
-                                                <?php
-                                                $current_department = $data['department_name'];
-                                                ?>
-                                                <option value='<?=$current_department?>' selected><?=$current_department?></option>
-                                                <?php
-                                                    while ($rows = $departmentresultSet->fetch_assoc()) {
-                                                        $department_name = $rows['name'];
-                                                        $dept_id = $rows['dept_id'];                                             // Set the option value to dept_id but display department name
-                                                        echo "<option value='$department_name' data-dept-id='$dept_id'>$department_name</option>";
-                                                    }
-                                                ?>
-                                            </select>
-                                            <input type="hidden" name="dept_id" id="dept_id">
-                                        </div>
-                                    </div>
+<!-- Departments/Offices (For Organizational Chart) -->
+<div class="col-md-12 mb-3"> 
+    <div class="form-group">
+        <label for="">Departments/Offices (For Organizational Chart)</label>
+        
+        <!-- Wrapper for input and button -->
+        <div class="input-group">
+            <select id="departmentSelect" class="form-control">
+                <option value="" disabled selected>Select a Department</option>
+                <?php
+                while ($rows = $departmentresultSet->fetch_assoc()) {
+                    $department_name = $rows['name'];
+                    $dept_id = $rows['dept_id'];
+                    echo "<option value='$department_name' data-dept-id='$dept_id'>$department_name</option>";
+                }
+                ?>
+            </select>
+            <button type="button" class="btn btn-success" onclick="addDepartment()">Add</button>
+        </div>
+        
+        <!-- Display added departments dynamically -->
+        <ul id="departmentList" class="list-group mt-3">
+            <?php
+            // Pre-fill the list with existing data from the database
+            $departments = explode(',', $data['department_name']); // Assuming 'department_name' contains comma-separated values
+            $dept_ids = explode(',', $data['dept_id']); // Assuming 'dept_id' contains comma-separated values
+            for ($i = 0; $i < count($departments); $i++) {
+                $department = trim($departments[$i]);
+                $dept_id = trim($dept_ids[$i]);
+                if (!empty($department)) {
+                    echo "<li class='list-group-item d-flex justify-content-between align-items-center'>
+                            <span data-dept-id='$dept_id'>$department</span>
+                            <button type='button' class='btn btn-sm btn-danger' onclick='removeDepartment(this)'>Remove</button>
+                        </li>";
+                }
+            }
+            ?>
+        </ul>
+        
+        <!-- Hidden inputs to store the list of department names and IDs -->
+        <input 
+            type="hidden" 
+            id="departments" 
+            name="department_name" 
+            value="<?= htmlspecialchars($data['department_name']); ?>">
+        <input 
+            type="hidden" 
+            id="dept_ids" 
+            name="dept_id" 
+            value="<?= htmlspecialchars($data['dept_id']); ?>">
+    </div>
+</div>
+
+
+
                                     <div class="col-md-12 mb-3">
                                         <div class="form-group">
                                             <input type="hidden" name="building_id" value="<?=$data['building_id']; ?>"> <!-- Hidden building ID -->
@@ -120,14 +157,77 @@ $departmentresultSet = getData("departmenttb");
     </div>
 </div>
 <script>
-function updateDeptId() {
-    var departmentSelect = document.getElementById('department');
-    var deptIdInput = document.getElementById('dept_id');
-    var selectedOption = departmentSelect.options[departmentSelect.selectedIndex];
-    deptIdInput.value = selectedOption.getAttribute('data-dept-id'); // Get the dept ID from data attribute
+function addDepartment() {
+    const departmentSelect = document.getElementById("departmentSelect");
+    const departmentList = document.getElementById("departmentList");
+    const hiddenDepartments = document.getElementById("departments");
+    const hiddenDeptIds = document.getElementById("dept_ids");
+
+    const selectedOption = departmentSelect.options[departmentSelect.selectedIndex];
+    const departmentName = selectedOption.value;
+    const deptId = selectedOption.getAttribute("data-dept-id");
+
+    if (departmentName && deptId) {
+        // Prevent duplicate entries
+        const existingDepartments = hiddenDepartments.value.split(",").map(d => d.trim());
+        const existingDeptIds = hiddenDeptIds.value.split(",").map(id => id.trim());
+        if (existingDepartments.includes(departmentName)) {
+            alert("This department is already added.");
+            return;
+        }
+
+        // Create a new list item
+        const listItem = document.createElement("li");
+        listItem.innerHTML = ` 
+            <span data-dept-id="${deptId}">${departmentName}</span>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeDepartment(this)">Remove</button>
+        `;
+
+        // Add the list item to the list
+        departmentList.appendChild(listItem);
+
+        // Add the new department name and ID to the hidden inputs
+        hiddenDepartments.value = existingDepartments.concat(departmentName).join(",");
+        hiddenDeptIds.value = existingDeptIds.concat(deptId).join(",");
+
+        // Reset the select dropdown
+        departmentSelect.selectedIndex = 0;
+    }
 }
+
+function removeDepartment(button) {
+    const listItem = button.parentElement;
+    const departmentList = document.getElementById("departmentList");
+    const hiddenDepartments = document.getElementById("departments");
+    const hiddenDeptIds = document.getElementById("dept_ids");
+
+    const departmentName = listItem.querySelector("span").textContent.trim();
+    const deptId = listItem.querySelector("span").getAttribute("data-dept-id");
+
+    // Remove the list item from the list
+    departmentList.removeChild(listItem);
+
+    // Update the hidden inputs
+    const remainingDepartments = Array.from(departmentList.children).map(
+        li => li.querySelector("span").textContent.trim()
+    );
+    const remainingDeptIds = Array.from(departmentList.children).map(
+        li => li.querySelector("span").getAttribute("data-dept-id")
+    );
+
+    hiddenDepartments.value = remainingDepartments.join(",");
+    hiddenDeptIds.value = remainingDeptIds.join(",");
+}
+
+
 </script>
 <script>
+    function updateDeptIds() {
+    const selectedOptions = Array.from(document.getElementById('department').selectedOptions);
+    const deptIds = selectedOptions.map(option => option.value).join(',');
+    document.getElementById('dept_ids').value = deptIds;
+}
+
 function addOffice() {
     const officeInput = document.getElementById("officeInput");
     const officeList = document.getElementById("officeList");

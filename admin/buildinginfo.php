@@ -35,12 +35,29 @@ $departmentresultSet = getData("departmenttb");
                                             <textarea rows="5" class="form-control" disabled><?= htmlspecialchars($data['building_description']); ?></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 mb-3"> 
-                                        <div class="form-group">
-                                            <label for="">Department/Office (For Organizational Chart)</label>
-                                            <input type="text" value="<?=$data['department_name']; ?>" class="form-control" disabled>
+                                    <div class="col-md-12 mb-3">
+                                        <label for="">Department/Office (For Organizational Chart)</label>
+                                        <div class="row">
+                                            <?php 
+                                            // Split the department names by comma
+                                            $depts = explode(",", $data['department_name']);
+
+                                            // Check if the first entry is blank and skip it
+                                            foreach ($depts as $dept): 
+                                                $deptName = htmlspecialchars(trim($dept)); // Clean and trim the department name
+
+                                                // Skip blank entries
+                                                if (empty($deptName)) continue;
+                                            ?>
+                                            <div class="col-md-12 mb-2">
+                                                <div class="form-control" style="background-color: #e9ecef; border: 1px solid #ced4da; color: #495057; opacity: 1; padding: 10px;">
+                                                    <?= $deptName; ?>
+                                                </div>
+                                            </div>
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
+
                                     <div class="col-md-12 mb-3">
                                         <label for="">Offices</label>
                                         <div class="row">

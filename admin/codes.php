@@ -446,12 +446,12 @@ if(isset($_POST['addAdmin_button'])){
     // Redirect to the department page
     header("Location: department.php");
     exit();
-} else if(isset($_POST['editBldginfo_button'])){
+} else if (isset($_POST['editBldginfo_button'])) {
     $building_description = $_POST['building_description'];
-    $new_department_id = $_POST['dept_id'];
-    $department_name = $_POST['department_name'];
+    $department_ids = $_POST['dept_id']; // Comma-separated dept_id values
+    $department_name = $_POST['department_name']; // Comma-separated department names
     $key_features = $_POST['key_features'];
-    $building_id = $_POST['building_id']; // Assuming you get this from the form
+    $building_id = $_POST['building_id'];
 
     // Prepare the SQL update query
     $update_query = "UPDATE buildingtbl SET building_description=?, dept_id=?, department_name=?, key_features=? WHERE building_id=?";
@@ -462,11 +462,11 @@ if(isset($_POST['addAdmin_button'])){
     }
 
     // Bind parameters
-    $stmt->bind_param("sissi", $building_description, $new_department_id, $department_name, $key_features, $building_id);
+    $stmt->bind_param("ssssi", $building_description, $department_ids, $department_name, $key_features, $building_id);
 
     // Execute update
     if ($stmt->execute()) {
-        $_SESSION['success'] = "✔ Building Details updated successfully!";
+        $_SESSION['success'] = "✔ Building Details updated successfully! " . htmlspecialchars($department_ids);
         header("Location: buildings.php");
         exit();
     } else {
@@ -474,7 +474,8 @@ if(isset($_POST['addAdmin_button'])){
         header("Location: buildings.php");
         exit();
     }
-} else if(isset($_POST['deleteFeedback_button'])) {
+}
+ else if(isset($_POST['deleteFeedback_button'])) {
     $fid = $_POST['fid']; 
 
     // Delete the department from the departmenttb
