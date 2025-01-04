@@ -3,6 +3,56 @@ session_start();
 include('includes/header.php');
 include('config/dbconnect.php');
 
+// Fetching faculty details based on department ID
+// Fetching faculty details based on department ID
+function getFacultyByDepartment($con, $dept_id) {
+    $sql = "
+        SELECT 
+            f.faculty_id AS id, 
+            f.name, 
+            f.img AS img, 
+            p.position_name AS position,  -- Fetch the position name from the 'position' table
+            dpf.dept_id AS department, 
+            f.pid 
+        FROM 
+            facultytb AS f
+        INNER JOIN 
+            dept_pos_facultytb AS dpf 
+        ON 
+            f.faculty_id = dpf.faculty_id
+        INNER JOIN 
+            positiontb AS p  -- Assuming you have a table 'positiontb' that stores the position names
+        ON 
+            dpf.position_id = p.position_id  -- Joining to get the actual position name
+        WHERE 
+            dpf.dept_id = ? 
+        ORDER BY 
+            f.pid ASC";
+    
+    $stmt = $con->prepare($sql);
+    if ($stmt === false) {
+        die("Error preparing statement: " . $con->error);
+    }
+
+    $stmt->bind_param("i", $dept_id);
+    if (!$stmt->execute()) {
+        die("Error executing statement: " . $stmt->error);
+    }
+
+    $result = $stmt->get_result();
+    $nodes = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            // Adjust image path
+            $row['img'] = 'uploads/' . $row['img']; 
+            $nodes[] = $row;
+        }
+    }
+    $stmt->close();
+    return $nodes;
+}
+
+
 // Function to fetch department details by Name
 function getDepartmentsByName($table, $name) {
     global $con;
@@ -28,49 +78,6 @@ function getDepartmentsByName($table, $name) {
     $stmt->close();
 
     return $result;
-}
-
-// Function to fetch faculty details based on department ID
-function getFacultyByDepartment($con, $dept_id) {
-    $sql = "
-        SELECT 
-            f.faculty_id AS id, 
-            f.name, 
-            f.img AS img, 
-            dpf.position_id AS position, 
-            dpf.dept_id AS department, 
-            f.pid 
-        FROM 
-            facultytb AS f
-        INNER JOIN 
-            dept_pos_facultytb AS dpf 
-        ON 
-            f.faculty_id = dpf.faculty_id
-        WHERE 
-            dpf.dept_id = ? 
-        ORDER BY 
-            f.pid ASC";
-    
-    $stmt = $con->prepare($sql);
-    if ($stmt === false) {
-        die("Error preparing statement: " . $con->error);
-    }
-
-    $stmt->bind_param("i", $dept_id);
-    if (!$stmt->execute()) {
-        die("Error executing statement: " . $stmt->error);
-    }
-
-    $result = $stmt->get_result();
-    $nodes = [];
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $row['img'] = '../uploads/' . $row['img']; // Adjust the image path
-            $nodes[] = $row;
-        }
-    }
-    $stmt->close();
-    return $nodes;
 }
 
 // Initialize variables
