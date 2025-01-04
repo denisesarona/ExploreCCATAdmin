@@ -466,7 +466,7 @@ if(isset($_POST['addAdmin_button'])){
 
     // Execute update
     if ($stmt->execute()) {
-        $_SESSION['success'] = "✔ Building Details updated successfully! " . htmlspecialchars($department_ids);
+        $_SESSION['success'] = "✔ Building Details updated successfully!";
         header("Location: buildings.php");
         exit();
     } else {
