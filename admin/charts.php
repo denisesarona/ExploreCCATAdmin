@@ -4,15 +4,16 @@ include('../functions/queries.php');
 include('../middleware/adminMiddleware.php');
 
 // Function to fetch faculty members by department
+// Function to fetch faculty members by department
 function getFacultyByDepartment($con, $dept_id) {
     $sql = "
         SELECT 
-            f.faculty_id AS id, 
+            dpf.faculty_dept_id AS id,  -- Use faculty_dept_id instead of faculty_id
             f.name, 
             f.img AS img, 
             p.position_name AS position, 
             dpf.dept_id AS department, 
-            f.pid 
+            dpf.pid  -- Get the parent node ID from dept_pos_facultytb
         FROM 
             facultytb AS f
         INNER JOIN 
@@ -50,6 +51,7 @@ function getFacultyByDepartment($con, $dept_id) {
     $stmt->close();
     return $nodes;
 }
+
 
 // Fetch department details
 $dept_name = "Department not found.";
@@ -94,6 +96,7 @@ if (isset($_GET['id'])) {
             <div class="card-body">
                 <form id="updateForm" action="update_nodes.php" method="POST">
                     <div class="row mb-3"> 
+                        <!-- In the form where you input the nodeId and pid -->
                         <div class="col-md-6 mt-4"> 
                             <div class="form-group">
                                 <label for="nodeId">Node ID:</label>
@@ -107,6 +110,7 @@ if (isset($_GET['id'])) {
                             </div>
                             <input type="hidden" name="dept_id" value="<?php echo $dept_id; ?>">
                         </div>
+
                         <div class="col-md-2 d-flex align-items-end mt-3"> 
                             <div class="form-group w-100">
                                 <button type="submit" class="btn btn-success btn-block" id="saveChanges">Save Changes</button>
