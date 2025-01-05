@@ -174,7 +174,7 @@ OrgChart.LINK_ROUNDED_CORNERS = 10;
 OrgChart.templates.myTemplate = OrgChart.templates.olivia;
 
 // Then set the fields
-OrgChart.templates.myTemplate.size = [350, 120];
+OrgChart.templates.myTemplate.size = [400, 120];
 OrgChart.templates.myTemplate.field_0 = 
     `<text style="font-size: 14px;" font-weight="bold" fill="#FFFFFFFF" x="100" y="60" text-anchor="right">{val}</text>`;
 

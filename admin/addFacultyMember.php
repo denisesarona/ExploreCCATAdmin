@@ -64,9 +64,11 @@ if (isset($_POST['addFaculty_button'])) {
 
         foreach ($departments as $index => $dept_id) {
             $position_id = $positions[$index];  // Position ID selected for this department
-            // Insert each department-position pair for the faculty member into the faculty_departmenttable
-            $addDepartment_query = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
-                                    VALUES ('$faculty_id', '$dept_id', '$position_id')";
+            $pid = isset($_POST['pid']) ? $_POST['pid'] : 0; // Use the pid from the form submission (default to 0 if not provided)
+
+            $addDepartment_query = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id, pid) 
+                                    VALUES ('$faculty_id', '$dept_id', '$position_id', '$pid')";
+            
             if (!mysqli_query($con, $addDepartment_query)) {
                 $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
                 header("Location: facultyMember.php");
@@ -89,10 +91,13 @@ if (isset($_POST['addFaculty_button'])) {
 <link rel="stylesheet" href="assets/css/style.css">
 
 <div class="container">
-    <!-- Alert for Duplicate Department -->
-<div id="duplicate-dept-alert" class="alert alert-danger alert-dismissible fade show right-alert" style="display: none;" role="alert">
-    <strong>Warning!</strong> This department has already been selected!
-</div>
+    <div id="confirm-duplicate-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <p>This department has already been selected. Do you want to continue and allow duplication?</p>
+                <button id="confirm-yes">Yes</button>
+                <button id="confirm-no">No</button>
+            </div>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
@@ -205,21 +210,40 @@ if (isset($_POST['addFaculty_button'])) {
 
 <script>
 function validateDepartments() {
-    var departments = document.getElementsByName('departments[]');
-    var selectedDepts = [];
+    const departments = document.getElementsByName('departments[]');
+    const selectedDepts = [];
+    let duplicateDetected = false;
 
-    // Check if any department is selected multiple times
-    for (var i = 0; i < departments.length; i++) {
-        var deptId = departments[i].value;
-        if (deptId !== "" && selectedDepts.indexOf(deptId) !== -1) {
-            showDuplicateDeptAlert(); // Show alert if duplicate is found
-            return false; // Prevent form submission
+    for (let i = 0; i < departments.length; i++) {
+        const deptId = departments[i].value;
+        if (deptId !== "" && selectedDepts.includes(deptId)) {
+            duplicateDetected = true;
+            break;
         }
         selectedDepts.push(deptId);
     }
 
-    return true; // Allow form submission
+    if (duplicateDetected) {
+        // Show the modal
+        const modal = document.getElementById('confirm-duplicate-modal');
+        modal.style.display = 'flex'; // Display the modal
+
+        // Block form submission until user interacts with the modal
+        return false; // Temporarily block form submission
+    }
+
+    return true; // Allow form submission if no duplicates
 }
+
+// Attach event listeners for modal buttons
+document.getElementById('confirm-yes').onclick = function () {
+    document.getElementById('confirm-duplicate-modal').style.display = 'none';
+    document.querySelector('form').submit(); // Manually submit the form
+};
+
+document.getElementById('confirm-no').onclick = function () {
+    document.getElementById('confirm-duplicate-modal').style.display = 'none';
+};
 
 // Show duplicate department alert
 function showDuplicateDeptAlert() {

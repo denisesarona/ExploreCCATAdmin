@@ -117,3 +117,44 @@ h3 {
     z-index: 1050;
     width: auto;
 }
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    width: 30%; /* Modal width */
+    height: auto; /* Adjust height based on content */
+    transform: translate(-50%, -50%); /* Center the modal */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px; /* Optional for rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow effect */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button#confirm-yes {
+    background-color: #4caf50;
+    color: white;
+}
+
+button#confirm-no {
+    background-color: #f44336;
+    color: white;
+}

@@ -28,7 +28,7 @@ if ($faculty_id > 0) {
         $positions[] = $row; // Store department-position pairs
     }
 }
-// Handle faculty member form submission for updating
+
 // Handle faculty member form submission for updating
 if (isset($_POST['editFaculty_button'])) {
     // Sanitize inputs to prevent SQL Injection
@@ -50,20 +50,18 @@ if (isset($_POST['editFaculty_button'])) {
         $imageUpdateQuery = ""; // No new image uploaded, keep the old one
     }
 
-    // Check for duplicate departments in the submitted form
-    $departments = $_POST['departments']; // Array of selected department IDs
-    if (count($departments) !== count(array_unique($departments))) {
-        $_SESSION['error'] = "Duplicate departments are not allowed!";
-        header("Location: facultyDetails.php?id=$faculty_id");
-        exit();
-    }
+    // Initialize $departments safely
+    $departments = isset($_POST['departments']) ? $_POST['departments'] : [];
+
+
 
     // Update faculty data in the database
     $updateFacultyQuery = "UPDATE facultytb SET name = '$name' $imageUpdateQuery WHERE faculty_id = $faculty_id";
 
     if (mysqli_query($con, $updateFacultyQuery)) {
-        // Handle updating department and position relationships
-        $positions = $_POST['positions'];    // Array of selected position IDs
+        // Initialize the $positions array safely
+        $positions = isset($_POST['positions']) ? $_POST['positions'] : [];
+
 
         // Fetch existing department-position pairs for the selected faculty
         $existingPositionsQuery = "SELECT dept_id, position_id FROM dept_pos_facultytb WHERE faculty_id = $faculty_id";
@@ -73,20 +71,30 @@ if (isset($_POST['editFaculty_button'])) {
             $existingPairs[] = ['dept_id' => $row['dept_id'], 'position_id' => $row['position_id']];
         }
 
-        // Insert new department-position pairs that do not exist
+        // Insert new department-position pairs (allow duplicates)
         foreach ($departments as $index => $dept_id) {
             $position_id = $positions[$index]; // Position ID selected for this department
 
-            // Check if this department-position pair already exists
-            if (!in_array(['dept_id' => $dept_id, 'position_id' => $position_id], $existingPairs)) {
-                // Insert the new department-position pair if it doesn't exist
-                $addDepartmentQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
-                                       VALUES ('$faculty_id', '$dept_id', '$position_id')";
-                if (!mysqli_query($con, $addDepartmentQuery)) {
-                    $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
-                    header("Location: facultyDetails.php?id=$faculty_id");
-                    exit();
-                }
+            // Directly insert the department-position pair into the database, even if it already exists
+            $addDepartmentQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
+                                VALUES ('$faculty_id', '$dept_id', '$position_id')";
+            if (!mysqli_query($con, $addDepartmentQuery)) {
+                $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
+                header("Location: facultyDetails.php?id=$faculty_id");
+                exit();
+            }
+        }
+
+        // Remove any department-position pairs that were removed from the form (if any)
+        $newPairs = array_map(function($dept, $pos) {
+            return ['dept_id' => $dept, 'position_id' => $pos];
+        }, $departments, $positions);
+
+        // Loop through existing pairs and remove those that are no longer in the form
+        foreach ($existingPairs as $existing) {
+            if (!in_array($existing, $newPairs)) {
+                $removeQuery = "DELETE FROM dept_pos_facultytb WHERE faculty_id = $faculty_id AND dept_id = {$existing['dept_id']} AND position_id = {$existing['position_id']}";
+                mysqli_query($con, $removeQuery);
             }
         }
 
@@ -101,24 +109,19 @@ if (isset($_POST['editFaculty_button'])) {
 }
 
 
+
 ?>
 
 <link rel="stylesheet" href="assets/css/style.css">
 
-<!-- Error Alert -->
-<?php if (isset($_SESSION['error'])): ?>
-    <div class="alert alert-danger alert-dismissible fade show right-alert" id="error-alert" role="alert">
-        <strong>Error!</strong> <?= $_SESSION['error']; ?>
-    </div>
-    <?php unset($_SESSION['error']); ?>
-<?php endif; ?>
-
-<!-- Alert for Duplicate Department -->
-<div id="duplicate-dept-alert" class="alert alert-danger alert-dismissible fade show right-alert" style="display: none;" role="alert">
-    <strong>Warning!</strong> This department has already been selected!
-</div>
-
 <div class="container">
+    <div id="confirm-duplicate-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <p>This department has already been selected. Do you want to continue and allow duplication?</p>
+            <button id="confirm-yes">Yes</button>
+            <button id="confirm-no">No</button>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
@@ -148,56 +151,62 @@ if (isset($_POST['editFaculty_button'])) {
                             </div>
 
                             <!-- Department and Position -->
-                            <div id="position-department-container">
-                                <?php
-                                // Render department-position sets based on the existing data
-                                foreach ($positions as $i => $positionData) {
-                                    $selectedDeptId = $positionData['dept_id'];
-                                    $selectedPositionId = $positionData['position_id'];
-                                ?>
-                                    <div class="row mb-3 position-department-set">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="department" class="form-label">Department</label>
-                                                <select class="form-control department-dropdown" name="departments[]" disabled>
-                                                    <option value="">Select Department</option>
-                                                    <?php
-                                                    $departmentresultSet->data_seek(0);
-                                                    while ($rows = $departmentresultSet->fetch_assoc()) {
-                                                        $department_name = $rows['name'];
-                                                        $department_id = $rows['dept_id'];
-                                                        $selected = ($department_id == $selectedDeptId) ? 'selected' : ''; // Mark selected department
-                                                        echo "<option value='$department_id' $selected>$department_name</option>";
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                        </div>
+<div id="position-department-container">
+    <?php
+    // Render department-position sets based on the existing data
+    foreach ($positions as $i => $positionData) {
+        $selectedDeptId = $positionData['dept_id'];
+        $selectedPositionId = $positionData['position_id'];
+    ?>
+        <div class="row mb-3 position-department-set">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="department" class="form-label">Department</label>
+                    <select class="form-control department-dropdown" name="departments[]" disabled>
+                        <option value="">Select Department</option>
+                        <?php
+                        $departmentresultSet->data_seek(0);
+                        while ($rows = $departmentresultSet->fetch_assoc()) {
+                            $department_name = $rows['name'];
+                            $department_id = $rows['dept_id'];
+                            $selected = ($department_id == $selectedDeptId) ? 'selected' : ''; // Mark selected department
+                            echo "<option value='$department_id' $selected>$department_name</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
 
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="position" class="form-label">Position</label>
-                                                <select class="form-control" name="positions[]" disabled>
-                                                    <option value="">Select Position</option>
-                                                    <?php
-                                                    // Populate positions dropdown
-                                                    if ($selectedDeptId) {
-                                                        $positionsQuery = "SELECT * FROM positiontb WHERE dept_id = $selectedDeptId";
-                                                        $result = mysqli_query($con, $positionsQuery);
-                                                        while ($position = mysqli_fetch_assoc($result)) {
-                                                            $position_id = $position['position_id'];
-                                                            $position_name = $position['position_name'];
-                                                            $selectedPosition = ($position_id == $selectedPositionId) ? 'selected' : '';
-                                                            echo "<option value='$position_id' $selectedPosition>$position_name</option>";
-                                                        }
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php } ?>
-                            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="position" class="form-label">Position</label>
+                    <select class="form-control" name="positions[]" disabled>
+                        <option value="">Select Position</option>
+                        <?php
+                        // Populate positions dropdown
+                        if ($selectedDeptId) {
+                            $positionsQuery = "SELECT * FROM positiontb WHERE dept_id = $selectedDeptId";
+                            $result = mysqli_query($con, $positionsQuery);
+                            while ($position = mysqli_fetch_assoc($result)) {
+                                $position_id = $position['position_id'];
+                                $position_name = $position['position_name'];
+                                $selectedPosition = ($position_id == $selectedPositionId) ? 'selected' : '';
+                                echo "<option value='$position_id' $selectedPosition>$position_name</option>";
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Remove Button -->
+            <div class="col-md-12">
+                <button type="button" class="btn btn-danger removeDeptBtn" onclick="removeDepartment(this)">Remove</button>
+            </div>
+        </div>
+    <?php } ?>
+</div>
+
                             <!-- Upload Image -->
                             <div class="col-md-12 mb-3">
                                 <div class="form-group">
@@ -295,15 +304,13 @@ function populateDepartments() {
         }
     }
 }
-
-// Fetch positions when the department dropdown changes
+// Event listener for department change
 document.addEventListener("change", function (event) {
     if (event.target.classList.contains("department-dropdown")) {
         var deptId = event.target.value;
         var positionDropdown = event.target.closest(".position-department-set").querySelector('.position-dropdown');
         fetchPositions(deptId, positionDropdown);
 
-        // Prevent selecting duplicate department
         var departmentDropdowns = document.getElementsByClassName("department-dropdown");
         var departmentIds = [];
         var duplicateFound = false;
@@ -318,15 +325,31 @@ document.addEventListener("change", function (event) {
         }
 
         if (duplicateFound) {
-            // Show the duplicate department alert
-            document.getElementById('duplicate-dept-alert').style.display = 'block';
-            event.target.value = ""; // Clear the duplicate selection
+            var modal = document.getElementById('confirm-duplicate-modal');
+            modal.style.display = 'flex';
+
+            document.getElementById('confirm-yes').onclick = function () {
+                modal.style.display = 'none';
+                document.getElementById('duplicate-dept-alert').style.display = 'none';
+            };
+
+            document.getElementById('confirm-no').onclick = function () {
+                modal.style.display = 'none';
+                event.target.value = ""; // Reset the selection
+            };
         } else {
-            // Hide the alert if no duplicate is found
             document.getElementById('duplicate-dept-alert').style.display = 'none';
         }
     }
 });
+
+window.onclick = function (event) {
+    var modal = document.getElementById('confirm-duplicate-modal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+};
+
 
 function fetchPositions(deptId, positionDropdown) {
     if (deptId) {
@@ -349,6 +372,13 @@ function fetchPositions(deptId, positionDropdown) {
         positionDropdown.innerHTML = '<option value="">Select Position</option>';
     }
 }
+function removeDepartment(button) {
+    var deptPosSet = button.closest('.position-department-set');
+    deptPosSet.remove(); // Remove the department-position set
+
+    // Update the department and positions arrays in the form (you can add additional logic here to update the hidden input or handle database updates if needed)
+}
+
 
 
 // Show alert for 3 seconds and hide it
