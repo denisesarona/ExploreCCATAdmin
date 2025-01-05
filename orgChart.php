@@ -126,13 +126,19 @@ OrgChart.LINK_ROUNDED_CORNERS = 10;
 // Define the template first
 OrgChart.templates.myTemplate = OrgChart.templates.olivia;
 
+
 // Then set the fields
-OrgChart.templates.myTemplate.size = [350, 120];
+OrgChart.templates.myTemplate.size = [400, 120];
 OrgChart.templates.myTemplate.field_0 = 
     `<text style="font-size: 14px;" font-weight="bold" fill="#FFFFFFFF" x="100" y="60" text-anchor="right">{val}</text>`;
 
-OrgChart.templates.myTemplate.field_1 = 
-    `<text style="font-size: 12px;" fill="#FFFFFFFF" x="100" y="80" text-anchor="right">{val}</text>`;
+    OrgChart.templates.myTemplate.field_1 = 
+    `<foreignObject x="100" y="65" width="290" height="50">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-size: 12px;line-height: 1; color: white; text-align: left; word-wrap: break-word; white-space: normal;">
+            {val}
+        </div>
+    </foreignObject>`;
+
     
 OrgChart.templates.myTemplate.field_2 = 
     `<text style="font-size: 12px;" fill="#FFFFFFFF" x="280" y="20" text-anchor="right">Node ID {val}</text>`;
