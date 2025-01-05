@@ -65,64 +65,6 @@
     
         return $nodes;
     }
-
-    function getFacultyByDepartment($con, $dept_id) {
-        // Prepare the SQL statement with a JOIN
-        $sql = "
-            SELECT 
-                f.faculty_id AS id, 
-                f.name, 
-                f.img AS img, 
-                dpf.position_id AS position, 
-                dpf.dept_id AS department, 
-                f.pid 
-            FROM 
-                facultytb AS f
-            INNER JOIN 
-                dept_pos_facultytb AS dpf 
-            ON 
-                f.faculty_id = dpf.faculty_id
-            WHERE 
-                dpf.dept_id = ? 
-            ORDER BY 
-                f.pid ASC";
-        
-        // Prepare the statement
-        $stmt = $con->prepare($sql);
-        
-        // Check if preparation was successful
-        if ($stmt === false) {
-            die("Error preparing statement: " . $con->error);
-        }
-        
-        // Bind the department ID
-        $stmt->bind_param("i", $dept_id);
-        
-        // Execute the statement
-        if (!$stmt->execute()) {
-            die("Error executing statement: " . $stmt->error);
-        }
-        
-        // Get the result
-        $result = $stmt->get_result();
-        
-        // Initialize an array for nodes
-        $nodes = [];
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                // Adjust the image path if necessary
-                $row['img'] = '../uploads/' . $row['img'];
-                $nodes[] = $row;
-            }
-        }
-        
-        // Close the statement
-        $stmt->close();
-        
-        return $nodes; // Return the array of nodes
-    }
-    
-    
     
     function getDepartments($con) {
         $sql = "SELECT DISTINCT department AS name FROM facultytb";
