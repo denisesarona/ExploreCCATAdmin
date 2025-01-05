@@ -28,8 +28,6 @@ if ($faculty_id > 0) {
         $positions[] = $row; // Store department-position pairs
     }
 }
-
-// Handle faculty member form submission for updating
 if (isset($_POST['editFaculty_button'])) {
     // Sanitize inputs to prevent SQL Injection
     $name = mysqli_real_escape_string($con, $_POST['name']);
@@ -53,8 +51,6 @@ if (isset($_POST['editFaculty_button'])) {
     // Initialize $departments safely
     $departments = isset($_POST['departments']) ? $_POST['departments'] : [];
 
-
-
     // Update faculty data in the database
     $updateFacultyQuery = "UPDATE facultytb SET name = '$name' $imageUpdateQuery WHERE faculty_id = $faculty_id";
 
@@ -62,22 +58,29 @@ if (isset($_POST['editFaculty_button'])) {
         // Initialize the $positions array safely
         $positions = isset($_POST['positions']) ? $_POST['positions'] : [];
 
-
-        // Fetch existing department-position pairs for the selected faculty
-        $existingPositionsQuery = "SELECT dept_id, position_id FROM dept_pos_facultytb WHERE faculty_id = $faculty_id";
-        $existingPositionsResult = mysqli_query($con, $existingPositionsQuery);
-        $existingPairs = [];
-        while ($row = mysqli_fetch_assoc($existingPositionsResult)) {
-            $existingPairs[] = ['dept_id' => $row['dept_id'], 'position_id' => $row['position_id']];
+        // Remove the departments that were marked for removal
+        if (isset($_POST['removed_depts']) && is_array($_POST['removed_depts']) && count($_POST['removed_depts']) > 0) {
+            $removed_depts = $_POST['removed_depts'];
+            foreach ($removed_depts as $removed_dept_id) {
+                $removed_dept_id = intval($removed_dept_id); // Ensure it's an integer to prevent SQL Injection
+                if ($removed_dept_id > 0) {
+                    $removeDeptQuery = "DELETE FROM dept_pos_facultytb WHERE faculty_id = $faculty_id AND dept_id = $removed_dept_id";
+                    if (!mysqli_query($con, $removeDeptQuery)) {
+                        $_SESSION['error'] = "Failed to remove department: " . mysqli_error($con);
+                        header("Location: facultyDetails.php?id=$faculty_id");
+                        exit();
+                    }
+                }
+            }
         }
 
-        // Insert new department-position pairs (allow duplicates)
+        // Add new department-position pairs
         foreach ($departments as $index => $dept_id) {
             $position_id = $positions[$index]; // Position ID selected for this department
 
-            // Directly insert the department-position pair into the database, even if it already exists
+            // Insert new department-position pair
             $addDepartmentQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
-                                VALUES ('$faculty_id', '$dept_id', '$position_id')";
+                                    VALUES ('$faculty_id', '$dept_id', '$position_id')";
             if (!mysqli_query($con, $addDepartmentQuery)) {
                 $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
                 header("Location: facultyDetails.php?id=$faculty_id");
@@ -85,30 +88,16 @@ if (isset($_POST['editFaculty_button'])) {
             }
         }
 
-        // Remove any department-position pairs that were removed from the form (if any)
-        $newPairs = array_map(function($dept, $pos) {
-            return ['dept_id' => $dept, 'position_id' => $pos];
-        }, $departments, $positions);
-
-        // Loop through existing pairs and remove those that are no longer in the form
-        foreach ($existingPairs as $existing) {
-            if (!in_array($existing, $newPairs)) {
-                $removeQuery = "DELETE FROM dept_pos_facultytb WHERE faculty_id = $faculty_id AND dept_id = {$existing['dept_id']} AND position_id = {$existing['position_id']}";
-                mysqli_query($con, $removeQuery);
-            }
-        }
-
         $_SESSION['success'] = "✔ Faculty member updated successfully!";
         header("Location: facultyMember.php?id=$faculty_id");
         exit();
+
     } else {
         $_SESSION['error'] = "Updating Faculty member failed: " . mysqli_error($con);
         header("Location: facultyMember.php?id=$faculty_id");
         exit();
     }
 }
-
-
 
 ?>
 
@@ -159,7 +148,7 @@ if (isset($_POST['editFaculty_button'])) {
         $selectedPositionId = $positionData['position_id'];
     ?>
         <div class="row mb-3 position-department-set">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="form-group">
                     <label for="department" class="form-label">Department</label>
                     <select class="form-control department-dropdown" name="departments[]" disabled>
@@ -177,7 +166,7 @@ if (isset($_POST['editFaculty_button'])) {
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="form-group">
                     <label for="position" class="form-label">Position</label>
                     <select class="form-control" name="positions[]" disabled>
@@ -200,7 +189,7 @@ if (isset($_POST['editFaculty_button'])) {
             </div>
 
             <!-- Remove Button -->
-            <div class="col-md-12">
+            <div class="col-md-2 mt-4">
                 <button type="button" class="btn btn-danger removeDeptBtn" onclick="removeDepartment(this)">Remove</button>
             </div>
         </div>
@@ -374,9 +363,19 @@ function fetchPositions(deptId, positionDropdown) {
 }
 function removeDepartment(button) {
     var deptPosSet = button.closest('.position-department-set');
-    deptPosSet.remove(); // Remove the department-position set
+    var deptId = deptPosSet.querySelector('.department-dropdown').value;
+    
+    // Add the removed department id to a hidden input field
+    var removedDeptsInput = document.getElementById('removed-depts');
+    if (!removedDeptsInput) {
+        removedDeptsInput = document.createElement('input');
+        removedDeptsInput.type = 'hidden';
+        removedDeptsInput.name = 'removed_depts[]';
+        document.querySelector('form').appendChild(removedDeptsInput);
+    }
+    removedDeptsInput.value += deptId + ','; // Append the department ID to be removed
 
-    // Update the department and positions arrays in the form (you can add additional logic here to update the hidden input or handle database updates if needed)
+    deptPosSet.remove(); // Remove the department-position set
 }
 
 

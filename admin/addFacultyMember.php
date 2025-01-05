@@ -45,37 +45,36 @@ if (isset($_POST['addFaculty_button'])) {
         exit();
     }
 
-    // Insert faculty data into the facultytb table
-    $addFaculty_query = "INSERT INTO facultytb (name, img) VALUES ('$name', '$filename')";
+    if (!move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
+        $_SESSION['error'] = "Please upload an image!";
+        header("Location: addFacultyMember.php");
+        exit(); // Exit to prevent data from being inserted
+    }
     
+    // Insert faculty data into the facultytb table after image is uploaded successfully
+    $addFaculty_query = "INSERT INTO facultytb (name, img) VALUES ('$name', '$filename')";
     if (mysqli_query($con, $addFaculty_query)) {
         $faculty_id = mysqli_insert_id($con); // Get the last inserted faculty ID
-
-        // Handle image upload
-        if (!move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
-            $_SESSION['error'] = "Image upload failed!";
-            header("Location: facultyMember.php");
-            exit();
-        }
-
+    
         // Handle multiple departments and positions
         $departments = $_POST['departments'];  // Array of selected department IDs
         $positions = $_POST['positions'];     // Array of selected position IDs
-
+    
         foreach ($departments as $index => $dept_id) {
             $position_id = $positions[$index];  // Position ID selected for this department
             $pid = isset($_POST['pid']) ? $_POST['pid'] : 0; // Use the pid from the form submission (default to 0 if not provided)
-
+        
+            // Insert faculty to department position link (allow duplicates)
             $addDepartment_query = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id, pid) 
                                     VALUES ('$faculty_id', '$dept_id', '$position_id', '$pid')";
-            
+        
             if (!mysqli_query($con, $addDepartment_query)) {
                 $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
                 header("Location: facultyMember.php");
                 exit();
             }
         }
-
+    
         $_SESSION['success'] = "✔ Faculty member added successfully!";
         header("Location: addFacultyMember.php");
         exit();
@@ -91,26 +90,18 @@ if (isset($_POST['addFaculty_button'])) {
 <link rel="stylesheet" href="assets/css/style.css">
 
 <div class="container">
-    <div id="confirm-duplicate-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <p>This department has already been selected. Do you want to continue and allow duplication?</p>
-                <button id="confirm-yes">Yes</button>
-                <button id="confirm-no">No</button>
-            </div>
-    </div>
-
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
                 <h3>ADD FACULTY MEMBERS</h3>
                 <div class="card-body">
-                    <form action="addFacultyMember.php" method="POST" enctype="multipart/form-data" onsubmit="return validateDepartments();">
+                <form id="facultyForm" action="addFacultyMember.php" method="POST" enctype="multipart/form-data">
                         <div class="row" style="font-family: 'Poppins', sans-serif;">
                             <!-- Faculty Name -->
                             <div class="col-md-12 mb-3"> 
                                 <div class="form-group">
                                     <label for="name" class="form-label">Name</label>
-                                    <input type="text" class="form-control" placeholder="Enter Faculty Member's Name" name="name" id="name" value="<?= isset($_POST['name']) ? $_POST['name'] : '' ?>">
+                                    <input type="text" class="form-control" placeholder="Enter Faculty Member's Name" name="name" id="name" value="<?= isset($_POST['name']) ? $_POST['name'] : '' ?>" required>
                                 </div>
                             </div>
 
@@ -224,36 +215,32 @@ function validateDepartments() {
     }
 
     if (duplicateDetected) {
-        // Show the modal
+        // Show the modal for duplicate department confirmation
         const modal = document.getElementById('confirm-duplicate-modal');
-        modal.style.display = 'flex'; // Display the modal
+        modal.style.display = 'flex'; // Show modal
 
-        // Block form submission until user interacts with the modal
-        return false; // Temporarily block form submission
+        // Return false to halt form submission until modal decision
+        return new Promise((resolve) => {
+            document.getElementById('confirm-yes').onclick = function () {
+                modal.style.display = 'none';
+                resolve(true); // User chose "Yes"
+            };
+            document.getElementById('confirm-no').onclick = function () {
+                modal.style.display = 'none';
+                resolve(false); // User chose "No"
+            };
+        }).then((continueInsertion) => {
+            // If user confirms, allow the form to submit
+            if (continueInsertion) {
+                return true; // Proceed with form submission
+            } else {
+                return false; // Do not submit the form
+            }
+        });
     }
 
-    return true; // Allow form submission if no duplicates
-}
-
-// Attach event listeners for modal buttons
-document.getElementById('confirm-yes').onclick = function () {
-    document.getElementById('confirm-duplicate-modal').style.display = 'none';
-    document.querySelector('form').submit(); // Manually submit the form
-};
-
-document.getElementById('confirm-no').onclick = function () {
-    document.getElementById('confirm-duplicate-modal').style.display = 'none';
-};
-
-// Show duplicate department alert
-function showDuplicateDeptAlert() {
-    var alertBox = document.getElementById("duplicate-dept-alert");
-    alertBox.style.display = "block"; // Show the alert
-
-    // Automatically hide the alert after 5 seconds
-    setTimeout(function() {
-        alertBox.style.display = "none"; // Hide the alert
-    }, 5000);
+    // If no duplicates, proceed with form submission
+    return true;
 }
 
 </script>
