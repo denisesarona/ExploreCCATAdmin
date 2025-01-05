@@ -3,17 +3,16 @@ session_start();
 include('includes/header.php');
 include('config/dbconnect.php');
 
-// Fetching faculty details based on department ID
-// Fetching faculty details based on department ID
+// Function to fetch faculty members by department
 function getFacultyByDepartment($con, $dept_id) {
     $sql = "
         SELECT 
-            f.faculty_id AS id, 
+            dpf.faculty_dept_id AS id,  -- Use faculty_dept_id instead of faculty_id
             f.name, 
             f.img AS img, 
-            p.position_name AS position,  -- Fetch the position name from the 'position' table
+            p.position_name AS position, 
             dpf.dept_id AS department, 
-            f.pid 
+            dpf.pid  -- Get the parent node ID from dept_pos_facultytb
         FROM 
             facultytb AS f
         INNER JOIN 
@@ -21,13 +20,13 @@ function getFacultyByDepartment($con, $dept_id) {
         ON 
             f.faculty_id = dpf.faculty_id
         INNER JOIN 
-            positiontb AS p  -- Assuming you have a table 'positiontb' that stores the position names
+            positiontb AS p 
         ON 
-            dpf.position_id = p.position_id  -- Joining to get the actual position name
+            dpf.position_id = p.position_id
         WHERE 
             dpf.dept_id = ? 
         ORDER BY 
-            f.pid ASC";
+            dpf.pid ASC";
     
     $stmt = $con->prepare($sql);
     if ($stmt === false) {

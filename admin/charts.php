@@ -4,7 +4,6 @@ include('../functions/queries.php');
 include('../middleware/adminMiddleware.php');
 
 // Function to fetch faculty members by department
-// Function to fetch faculty members by department
 function getFacultyByDepartment($con, $dept_id) {
     $sql = "
         SELECT 
@@ -27,7 +26,7 @@ function getFacultyByDepartment($con, $dept_id) {
         WHERE 
             dpf.dept_id = ? 
         ORDER BY 
-            f.pid ASC";
+            dpf.pid ASC";
     
     $stmt = $con->prepare($sql);
     if ($stmt === false) {
