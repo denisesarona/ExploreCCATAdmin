@@ -27,7 +27,6 @@ if (isset($_POST['departments']) && $deptPositionCount > 0) {
     }
 }
 
-// Handle faculty member form submission
 if (isset($_POST['addFaculty_button'])) {
     // Sanitize inputs to prevent SQL Injection
     $name = mysqli_real_escape_string($con, $_POST['name']);
@@ -35,6 +34,16 @@ if (isset($_POST['addFaculty_button'])) {
     $path = "../uploads";
     $image_ext = pathinfo($image, PATHINFO_EXTENSION);
     $filename = time() . '.' . $image_ext;
+
+    // Check if the faculty member already exists
+    $checkQuery = "SELECT * FROM facultytb WHERE name = '$name'";
+    $checkResult = mysqli_query($con, $checkQuery);
+
+    if (mysqli_num_rows($checkResult) > 0) {
+        $_SESSION['error'] = "A faculty member with this name already exists!";
+        header("Location: facultyMember.php");
+        exit();
+    }
 
     // Insert faculty data into the facultytb table
     $addFaculty_query = "INSERT INTO facultytb (name, img) VALUES ('$name', '$filename')";
@@ -74,6 +83,7 @@ if (isset($_POST['addFaculty_button'])) {
         exit();
     }
 }
+
 ?>
 
 <link rel="stylesheet" href="assets/css/style.css">
