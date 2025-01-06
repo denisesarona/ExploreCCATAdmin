@@ -3,6 +3,66 @@
     include('../functions/queries.php');
     include('../middleware/adminMiddleware.php');
 ?>
+<?php
+// Handle faculty deletion if delete button is pressed
+if (isset($_POST['deleteFaculty_button'])) {
+    $faculty_id = $_POST['faculty_id']; // Get faculty_id from form
+    $dept_id = isset($_POST['dept_id']) ? $_POST['dept_id'] : null; // Get dept_id from form if set
+
+    if ($dept_id) {
+        // Case 1: Remove faculty from the selected department
+        $delete_query = "DELETE FROM dept_pos_facultytb WHERE faculty_id = ? AND dept_id = ?";
+        $delete_stmt = $con->prepare($delete_query);
+        $delete_stmt->bind_param("ii", $faculty_id, $dept_id); // Bind the faculty_id and dept_id
+
+        if ($delete_stmt->execute()) {
+            $_SESSION['success'] = "✔ Faculty Member removed from department successfully!";
+        } else {
+            $_SESSION['error'] = "Failed to remove faculty member from department: " . $delete_stmt->error;
+        }
+    } else {
+        // Case 2: Completely delete faculty from all tables
+        // Delete associated records (e.g., dept_pos_facultytb, facultytb, and any associated images)
+
+        // Step 1: Delete image (if exists)
+        $image_query = "SELECT img FROM facultytb WHERE faculty_id = ?";
+        $image_stmt = $con->prepare($image_query);
+        $image_stmt->bind_param("i", $faculty_id);
+        $image_stmt->execute();
+        $image_result = $image_stmt->get_result();
+
+        if ($image_result->num_rows > 0) {
+            $image_row = $image_result->fetch_assoc();
+            $image_path = "../uploads/" . $image_row['img'];
+            if (file_exists($image_path)) {
+                unlink($image_path); // Delete the image
+            }
+        }
+
+        // Step 2: Delete from dept_pos_facultytb
+        $delete_dept_query = "DELETE FROM dept_pos_facultytb WHERE faculty_id = ?";
+        $delete_dept_stmt = $con->prepare($delete_dept_query);
+        $delete_dept_stmt->bind_param("i", $faculty_id);
+        $delete_dept_stmt->execute();
+
+        // Step 3: Delete from facultytb
+        $delete_faculty_query = "DELETE FROM facultytb WHERE faculty_id = ?";
+        $delete_faculty_stmt = $con->prepare($delete_faculty_query);
+        $delete_faculty_stmt->bind_param("i", $faculty_id);
+
+        if ($delete_faculty_stmt->execute()) {
+            $_SESSION['success'] = "✔ Faculty Member deleted completely!";
+        } else {
+            $_SESSION['error'] = "Failed to delete faculty member: " . $delete_faculty_stmt->error;
+        }
+    }
+
+    // Redirect after deletion
+    $redirect_url = $dept_id ? "facultyMember.php?department_id=$dept_id" : "facultyMember.php";
+    header("Location: $redirect_url");
+    exit();
+}
+?>
 
 <link rel="stylesheet" href="assets/css/style.css">
 
@@ -18,12 +78,14 @@
                         <div class="col-md-12">
                             <h4>Filter by Department/Offices: </h4>
                             <div class="btn-group" style="display: flex; overflow-x: auto; white-space: nowrap; padding: 10px 0;">
+                                <a href="facultyMember.php" class="btn BlueBtn" style="margin-right: 10px;">All Faculty</a>
                                 <?php
                                     // Fetch departments from the departmenttb table
                                     $departments = getDatas("departmenttb");
                                     if(mysqli_num_rows($departments) > 0) {
                                         while($department = mysqli_fetch_assoc($departments)) {
-                                            echo "<a href='facultyMember.php?department_id=" . $department['dept_id'] . "' class='btn BlueBtn' style='margin-right: 10px;'>" . $department['name'] . "</a>";
+                                            $activeClass = isset($_GET['department_id']) && $_GET['department_id'] == $department['dept_id'] ? 'btn-primary' : 'btn-secondary';
+                                            echo "<a href='facultyMember.php?department_id=" . $department['dept_id'] . "' class='btn BlueBtn $activeClass' style='margin-right: 10px;'>" . $department['name'] . "</a>";
                                         }
                                     } else {
                                         echo "No departments available";
@@ -68,87 +130,24 @@
                             <?php
                                 // Handle faculty deletion if delete button is pressed
                                 if (isset($_POST['deleteFaculty_button'])) {
-                                    $faculty_id = $_POST['faculty_id'];  // Get faculty_id from form
-                                    $dept_id = $_POST['dept_id'];  // Get dept_id from form
-
-                                    // Check if the faculty member is assigned to any department
-                                    $check_query = "SELECT * FROM dept_pos_facultytb WHERE faculty_id = ?";
-                                    $check_stmt = $con->prepare($check_query);
-                                    $check_stmt->bind_param("i", $faculty_id);
-                                    $check_stmt->execute();
-                                    $check_result = $check_stmt->get_result();
-
-                                    // If the faculty member is not assigned to any department, allow deletion of the faculty member entirely
-                                    if ($check_result->num_rows === 0) {
-                                        // Before deleting the faculty, delete the associated image (if any)
-                                        $image_query = "SELECT img FROM facultytb WHERE faculty_id = ?";
-                                        $image_stmt = $con->prepare($image_query);
-                                        $image_stmt->bind_param("i", $faculty_id);
-                                        $image_stmt->execute();
-                                        $image_result = $image_stmt->get_result();
-
-                                        if ($image_result->num_rows > 0) {
-                                            $image_row = $image_result->fetch_assoc();
-                                            $image_filename = $image_row['img'];
-                                            $image_path = "../uploads/" . $image_filename;
-
-                                            // Check if the image exists and delete it
-                                            if (file_exists($image_path)) {
-                                                unlink($image_path);  // Delete the image
-                                            }
-                                        }
-
-                                        // Delete the entire faculty member from facultytb
-                                        $delete_faculty_query = "DELETE FROM facultytb WHERE faculty_id = ?";
-                                        $delete_faculty_stmt = $con->prepare($delete_faculty_query);
-                                        $delete_faculty_stmt->bind_param("i", $faculty_id);
-
-                                        if ($delete_faculty_stmt->execute()) {
-                                            $_SESSION['success'] = "✔ Faculty Member deleted completely!";
-                                        } else {
-                                            $_SESSION['error'] = "Failed to delete faculty member: " . $delete_faculty_stmt->error;
-                                        }
-                                    } else {
-                                        // If faculty member is associated with a department, remove department association
-                                        $delete_query = "DELETE FROM dept_pos_facultytb WHERE faculty_id = ? AND dept_id = ?";
-                                        $delete_stmt = $con->prepare($delete_query);
-                                        $delete_stmt->bind_param("ii", $faculty_id, $dept_id);  // "ii" for two integers
-
-                                        if ($delete_stmt->execute()) {
-                                            $_SESSION['success'] = "✔ Faculty Member deleted from department successfully!";
-                                        } else {
-                                            $_SESSION['error'] = "Deleting Faculty Member from department failed: " . $delete_stmt->error;
-                                        }
-                                    }
-                                    // Redirect after deletion
-                                    header("Location: facultyMember.php?department_id=$dept_id");
-                                    exit();
+                                    // Handle deletion logic here...
                                 }
 
-                                // SQL query to filter faculty members based on the selected department_id or show those with no department
+                                // SQL query to fetch faculty members based on the selected department or show all faculty members
                                 if ($department_id) {
-                                    // Faculty members assigned to a department
-                                    $sql = "SELECT f.faculty_id, f.name, dp.dept_id 
-                                            FROM facultytb f
-                                            JOIN dept_pos_facultytb dp ON f.faculty_id = dp.faculty_id
-                                            WHERE dp.dept_id = $department_id";  // Filter by department_id
-                                    $facultymembers = getDataFromQuery($sql); // Custom function to execute query
-                                } else {
-                                    // Faculty members not assigned to any department
+                                    // Faculty members assigned to a specific department
                                     $sql = "SELECT f.faculty_id, f.name 
                                             FROM facultytb f
-                                            LEFT JOIN dept_pos_facultytb dp ON f.faculty_id = dp.faculty_id
-                                            WHERE dp.dept_id IS NULL";  // Filter faculty with no department
-                                    $facultymembers = getDataFromQuery($sql); // Custom function to execute query
+                                            JOIN dept_pos_facultytb dp ON f.faculty_id = dp.faculty_id
+                                            WHERE dp.dept_id = $department_id";
+                                } else {
+                                    // Show all faculty members
+                                    $sql = "SELECT faculty_id, name FROM facultytb";
                                 }
-                            
+
+                                $facultymembers = getDataFromQuery($sql);
+
                                 if (mysqli_num_rows($facultymembers) > 0) {
-                                    // Check if we are showing faculty with no department
-                                    if (!$department_id) { 
-                                        echo '<br><h5 style="text-align: center;">Faculty with No Department/Offices</h5>'; // Display "No Department" header
-                                    }
-                            
-                                    // Loop through the faculty members and display them
                                     while ($item = mysqli_fetch_assoc($facultymembers)) {
                             ?>
                                         <tr style="text-align: center; vertical-align: middle;">
@@ -158,9 +157,9 @@
                                             </td>
                                             <td class="d-none d-lg-table-cell">
                                                 <form action="facultyMember.php" method="POST">
-                                                    <input type="hidden" name="faculty_id" value="<?= $item['faculty_id'];?>">
-                                                    <input type="hidden" name="dept_id" value="<?= $department_id ? $department_id : 0; ?>"> <!-- Pass the department_id -->
-                                                    <button type="submit" class="btn RedBtn" style="margin-top: 10px;" name="deleteFaculty_button">Delete</button>
+                                                    <input type="hidden" name="faculty_id" value="<?= $item['faculty_id']; ?>">
+                                                    <input type="hidden" name="dept_id" value="<?= $department_id ? $department_id : ''; ?>"> <!-- Pass the dept_id if filtering -->
+                                                    <button type="submit" class="btn RedBtn" style="margin-top: 10px;" name="deleteFaculty_button">Remove</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -169,7 +168,7 @@
                                 } else {
                             ?>
                                     <tr>
-                                        <td colspan="5"><br>No records found</td>
+                                        <td colspan="3"><br>No records found</td>
                                     </tr>
                             <?php
                                 }
