@@ -233,7 +233,7 @@ document.getElementById("addDeptBtn").addEventListener("click", function () {
 
             // Department Dropdown
             var deptDiv = document.createElement("div");
-            deptDiv.classList.add("col-md-6");
+            deptDiv.classList.add("col-md-5");
             deptDiv.innerHTML = `
                 <div class="form-group">
                     <label for="department" class="form-label">Department</label>
@@ -246,7 +246,7 @@ document.getElementById("addDeptBtn").addEventListener("click", function () {
 
             // Position Dropdown
             var posDiv = document.createElement("div");
-            posDiv.classList.add("col-md-6");
+            posDiv.classList.add("col-md-5");
             posDiv.innerHTML = `
                 <div class="form-group">
                     <label for="position" class="form-label">Position</label>
@@ -257,9 +257,19 @@ document.getElementById("addDeptBtn").addEventListener("click", function () {
             `;
             deptPosDiv.appendChild(posDiv);
 
-            container.appendChild(deptPosDiv);
+            // Remove Button
+            var removeDiv = document.createElement("div");
+            removeDiv.classList.add("col-md-2", "mt-4");
+            removeDiv.innerHTML = `
+                <button type="button" class="btn btn-danger removeDeptBtn" onclick="removeDepartment(this)">Remove</button>
+            `;
+            deptPosDiv.appendChild(removeDiv);
+
+            // Prepend the new row to the container
+            container.prepend(deptPosDiv);
         }
-        populateDepartments();  // Populate the department dropdowns
+
+        populateDepartments(); // Populate the department dropdowns
     } else if (numDepts < currentDeptCount) {
         // Remove extra fields if number is reduced
         for (var i = currentDeptCount - 1; i >= numDepts; i--) {
