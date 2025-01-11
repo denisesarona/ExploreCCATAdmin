@@ -66,8 +66,6 @@ if (isset($_POST['deleteFaculty_button'])) {
 
 <link rel="stylesheet" href="assets/css/style.css">
 
-<!--------------- ADMINS PAGE --------------->
-
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -77,21 +75,26 @@ if (isset($_POST['deleteFaculty_button'])) {
                     <div class="row">
                         <div class="col-md-12">
                             <h4>Filter by Department/Offices: </h4>
-                            <div class="btn-group" style="display: flex; overflow-x: auto; white-space: nowrap; padding: 10px 0;">
-                                <a href="facultyMember.php" class="btn BlueBtn" style="margin-right: 10px;">All Faculty</a>
-                                <?php
-                                    // Fetch departments from the departmenttb table
-                                    $departments = getDatas("departmenttb");
-                                    if(mysqli_num_rows($departments) > 0) {
-                                        while($department = mysqli_fetch_assoc($departments)) {
-                                            $activeClass = isset($_GET['department_id']) && $_GET['department_id'] == $department['dept_id'] ? 'btn-primary' : 'btn-secondary';
-                                            echo "<a href='facultyMember.php?department_id=" . $department['dept_id'] . "' class='btn BlueBtn $activeClass' style='margin-right: 10px;'>" . $department['name'] . "</a>";
+                            <!-- Dropdown for Department Filter -->
+                            <form action="facultyMember.php" method="GET" id="filterForm">
+                                <div class="form-group">
+                                    <select name="department_id" class="form-control" onchange="document.getElementById('filterForm').submit();">
+                                        <option value="">All Faculty</option>
+                                        <?php
+                                        // Fetch departments from the departmenttb table
+                                        $departments = getDatas("departmenttb");
+                                        if (mysqli_num_rows($departments) > 0) {
+                                            while ($department = mysqli_fetch_assoc($departments)) {
+                                                $selected = isset($_GET['department_id']) && $_GET['department_id'] == $department['dept_id'] ? "selected" : "";
+                                                echo "<option value='" . $department['dept_id'] . "' $selected>" . $department['name'] . "</option>";
+                                            }
+                                        } else {
+                                            echo "<option value=''>No departments available</option>";
                                         }
-                                    } else {
-                                        echo "No departments available";
-                                    }
-                                ?>
-                            </div>
+                                        ?>
+                                    </select>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -99,25 +102,24 @@ if (isset($_POST['deleteFaculty_button'])) {
                     <div class="row">
                         <div class="col-md-12" style="text-align: center;">
                             <?php
-                                // Get department_id from the URL
-                                $department_id = isset($_GET['department_id']) ? $_GET['department_id'] : null;
+                            // Get department_id from the URL
+                            $department_id = isset($_GET['department_id']) ? $_GET['department_id'] : null;
 
-                                if ($department_id) {
-                                    // Fetch the name of the selected department
-                                    $sql = "SELECT name FROM departmenttb WHERE dept_id = $department_id";
-                                    $result = getDataFromQuery($sql);
+                            if ($department_id) {
+                                // Fetch the name of the selected department
+                                $sql = "SELECT name FROM departmenttb WHERE dept_id = $department_id";
+                                $result = getDataFromQuery($sql);
 
-                                    if (mysqli_num_rows($result) > 0) {
-                                        $department = mysqli_fetch_assoc($result);
-                                        echo "<h5><br>Department/Offices: " . $department['name'] . "</h5>";
-                                    }
+                                if (mysqli_num_rows($result) > 0) {
+                                    $department = mysqli_fetch_assoc($result);
+                                    echo "<h5><br>Department/Offices: " . $department['name'] . "</h5>";
                                 }
+                            }
                             ?>
                         </div>
                     </div>
 
                     <!--------------- ADMIN TABLE --------------->
-
                     <table class="table text-center">
                         <thead>
                             <tr style="text-align: center; vertical-align: middle;">
@@ -128,50 +130,45 @@ if (isset($_POST['deleteFaculty_button'])) {
                         </thead>
                         <tbody>
                             <?php
-                                // Handle faculty deletion if delete button is pressed
-                                if (isset($_POST['deleteFaculty_button'])) {
-                                    // Handle deletion logic here...
-                                }
+                            // SQL query to fetch faculty members based on the selected department or show all faculty members
+                            if ($department_id) {
+                                // Faculty members assigned to a specific department
+                                $sql = "SELECT f.faculty_id, f.name 
+                                        FROM facultytb f
+                                        JOIN dept_pos_facultytb dp ON f.faculty_id = dp.faculty_id
+                                        WHERE dp.dept_id = $department_id";
+                            } else {
+                                // Show all faculty members
+                                $sql = "SELECT faculty_id, name FROM facultytb";
+                            }
 
-                                // SQL query to fetch faculty members based on the selected department or show all faculty members
-                                if ($department_id) {
-                                    // Faculty members assigned to a specific department
-                                    $sql = "SELECT f.faculty_id, f.name 
-                                            FROM facultytb f
-                                            JOIN dept_pos_facultytb dp ON f.faculty_id = dp.faculty_id
-                                            WHERE dp.dept_id = $department_id";
-                                } else {
-                                    // Show all faculty members
-                                    $sql = "SELECT faculty_id, name FROM facultytb";
-                                }
+                            $facultymembers = getDataFromQuery($sql);
 
-                                $facultymembers = getDataFromQuery($sql);
-
-                                if (mysqli_num_rows($facultymembers) > 0) {
-                                    while ($item = mysqli_fetch_assoc($facultymembers)) {
+                            if (mysqli_num_rows($facultymembers) > 0) {
+                                while ($item = mysqli_fetch_assoc($facultymembers)) {
                             ?>
-                                        <tr style="text-align: center; vertical-align: middle;">
-                                            <td><?= $item['name']; ?></td>
-                                            <td>
-                                                <a href="facultyDetails.php?id=<?= $item['faculty_id']; ?>" style="margin-top: 10px;" class="btn BlueBtn">View Details</a>
-                                            </td>
-                                            <td class="d-none d-lg-table-cell">
-                                                <form action="facultyMember.php" method="POST">
-                                                    <input type="hidden" name="faculty_id" value="<?= $item['faculty_id']; ?>">
-                                                    <input type="hidden" name="dept_id" value="<?= $department_id ? $department_id : ''; ?>"> <!-- Pass the dept_id if filtering -->
-                                                    <button type="submit" class="btn RedBtn" style="margin-top: 10px;" name="deleteFaculty_button">Remove</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                            <?php
-                                    }
-                                } else {
-                            ?>
-                                    <tr>
-                                        <td colspan="3"><br>No records found</td>
+                                    <tr style="text-align: center; vertical-align: middle;">
+                                        <td><?= $item['name']; ?></td>
+                                        <td>
+                                            <a href="facultyDetails.php?id=<?= $item['faculty_id']; ?>" style="margin-top: 10px;" class="btn BlueBtn">View Details</a>
+                                        </td>
+                                        <td class="d-none d-lg-table-cell">
+                                            <form action="facultyMember.php" method="POST">
+                                                <input type="hidden" name="faculty_id" value="<?= $item['faculty_id']; ?>">
+                                                <input type="hidden" name="dept_id" value="<?= $department_id ? $department_id : ''; ?>"> <!-- Pass the dept_id if filtering -->
+                                                <button type="submit" class="btn RedBtn" style="margin-top: 10px;" name="deleteFaculty_button">Remove</button>
+                                            </form>
+                                        </td>
                                     </tr>
                             <?php
                                 }
+                            } else {
+                            ?>
+                                <tr>
+                                    <td colspan="3"><br>No records found</td>
+                                </tr>
+                            <?php
+                            }
                             ?>
                         </tbody>
                     </table>
@@ -182,5 +179,5 @@ if (isset($_POST['deleteFaculty_button'])) {
 </div>
 
 <!--------------- FOOTER --------------->
-
 <?php include('includes/footer.php'); ?>
+

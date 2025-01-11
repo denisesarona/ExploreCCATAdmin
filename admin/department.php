@@ -34,8 +34,8 @@
                         <thead>
                             <tr style="text-align: center; vertical-align: middle;">
                                 <th>Name</th>
-                                <th>Delete</th>
                                 <th>Manage Positions</th>
+                                <th>Delete</th>
                             </tr>
                         </thead>
                         <tbody>

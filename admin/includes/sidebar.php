@@ -18,12 +18,6 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="addAdmin.php" class="sidebar-link">
-            <i class='bx bx-plus'></i>
-                <span class="sidebar-txt">ADD ADMIN</span>
-            </a>
-        </li>
-        <li class="sidebar-item">
             <a href="department.php" class="sidebar-link">
             <i class='bx bxs-building-house'></i>
                 <span class="sidebar-txt">DEPARTMENT/OFFICES</span>
