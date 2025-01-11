@@ -63,7 +63,7 @@ include('../middleware/adminMiddleware.php');
             </div>
 
             <!--------------- ADMIN LIST SECTION --------------->
-            <div class="card mt-5">
+            <div class="card mt-3">
                 <h3 class="text-center">ADMINS</h3>
                 <div class="card-body">
                     <table class="table text-center">

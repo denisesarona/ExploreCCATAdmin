@@ -98,13 +98,13 @@ if (isset($_GET['id'])) {
                         <!-- In the form where you input the nodeId and pid -->
                         <div class="col-md-6 mt-4"> 
                             <div class="form-group">
-                                <label for="nodeId">Node ID:</label>
+                                <label for="nodeId">Faculty Reference ID:</label>
                                 <input type="text" class="form-control" id="nodeId" name="nodeId" required>
                             </div>
                         </div>
                         <div class="col-md-6 mt-4"> 
                             <div class="form-group">
-                                <label for="pid">Parent ID (Node it is connected to):</label>
+                                <label for="pid">Reports to/Supervisor:</label>
                                 <input type="text" class="form-control" id="pid" name="pid" required>
                             </div>
                             <input type="hidden" name="dept_id" value="<?php echo $dept_id; ?>">
