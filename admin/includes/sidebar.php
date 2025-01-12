@@ -1,7 +1,8 @@
 <aside id="sidebar">
     <div class="d-flex">
         <div class="sidebar-logo">
-            <a href="#" class="sidebar-logo">CvSU CCAT</a>
+            <img src="assets/images/PNGLOGOEXPLORE.png" alt="Explore CCAT Logo" width="70" height="auto" style="padding-left: 10px;">
+            <a href="#" class="sidebar-logo">Explore CCAT</a>
         </div>
     </div>
     <ul class="sidebar-nav">

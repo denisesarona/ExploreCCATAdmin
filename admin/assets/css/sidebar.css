@@ -7,13 +7,6 @@
     padding: 0;
 }
 
-.large-icon {
-    font-size: 30px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 10px;
-}
-
 a {
     text-decoration: none;
 }
@@ -49,13 +42,13 @@ body {
 }
 .sidebar-logo{
     font-size: 30px !important;
-    padding-left: 40px;
+    padding-left: 0px;
     padding-top: 20px;
 }
 /* Sticky Sidebar */
 #sidebar {
-    width: 310px; /* Full width by default */
-    min-width: 310px;
+    width: 320px; /* Full width by default */
+    min-width: 320px;
     z-index: 1000;
     background-color: #064918;
     display: flex;
