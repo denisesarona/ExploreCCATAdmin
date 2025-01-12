@@ -8,7 +8,7 @@
 
 <div class="wrapper">
     <form action="functions/authcode.php" method="POST">
-        <img src="admin/assets/images/PNGLOGOEXPLORE.png" alt="Explore CCAT Logo" width="80" height="auto" class="logo">
+        <img src="admin/assets/images/LOGO.png" alt="Explore CCAT Logo" width="80" height="auto" class="logo">
         <h1>ADMIN LOGIN</h1>
         <div class="input-box">
             <input type="text" placeholder="Email" name="email" required>

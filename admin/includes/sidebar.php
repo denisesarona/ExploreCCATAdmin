@@ -1,7 +1,7 @@
 <aside id="sidebar">
     <div class="d-flex">
         <div class="sidebar-logo">
-            <img src="assets/images/PNGLOGOEXPLORE.png" alt="Explore CCAT Logo" width="70" height="auto" style="padding-left: 10px;">
+            <img src="assets/images/LOGO.png" alt="Explore CCAT Logo" width="70" height="auto" style="padding-left: 10px;">
             <a href="#" class="sidebar-logo">Explore CCAT</a>
         </div>
     </div>

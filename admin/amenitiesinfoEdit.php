@@ -29,7 +29,7 @@ include('../middleware/adminMiddleware.php');
                     $data = mysqli_fetch_array($amenity);
             ?>  
                     <div class="card mt-5">
-                        <h3>EDIT BUILDING DETAILS</h3>
+                        <h3>EDIT AMENITIES DETAILS</h3>
                         <div class="card-body">
                             <!--------------- FORM --------------->
                             <form action="codes.php" method="POST" enctype="multipart/form-data">
