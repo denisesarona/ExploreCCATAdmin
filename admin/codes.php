@@ -87,14 +87,14 @@ if(isset($_POST['addAdmin_button'])){
     
     if ($passwordStrength === 'Weak') {
         $_SESSION['error'] = 'Password is too weak. Please choose a stronger password!';
-        header("Location: addAdmin.php");
+        header("Location: admin.php");
         exit();
     } 
     // VALIDATION
     if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
         // IF ANY FIELD IS EMPTY, SET ERROR MESSAGE AND REDIRECT TO REGISTER PAGE
         $_SESSION['error'] = "Please fill in all fields!";
-        header("Location: addAdmin.php");
+        header("Location: admin.php");
         exit();
     }
     
@@ -117,7 +117,7 @@ if(isset($_POST['addAdmin_button'])){
         if($email_check_sql->num_rows > 0){
             // IF EMAIL EXISTS, SET ERROR MESSAGE AND REDIRECT TO REGISTER PAGE
             $_SESSION['error'] = "Admin already exists!";
-            header("Location: addAdmin.php");
+            header("Location: admin.php");
             exit();
         }
         
@@ -181,7 +181,7 @@ if(isset($_POST['addAdmin_button'])){
         }
     } else {
         $_SESSION['error'] = "Password does not match!";
-        header("Location: addAdmin.php");
+        header("Location: admin.php");
         exit();
     }
 } else if(isset($_SESSION['registration_data'])) {
