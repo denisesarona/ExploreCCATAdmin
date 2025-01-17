@@ -74,7 +74,11 @@ if (isset($_POST['deleteFaculty_button'])) {
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <h4>Filter by Department/Offices: </h4>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4>Filter by Department/Offices:</h4>
+                                <a href="addFacultyMember.php" class="btn BlueBtn">+ Add Faculty Member</a>
+                            </div>
+                            
                             <!-- Dropdown for Department Filter -->
                             <form action="facultyMember.php" method="GET" id="filterForm">
                                 <div class="form-group">
@@ -96,6 +100,8 @@ if (isset($_POST['deleteFaculty_button'])) {
                                 </div>
                             </form>
                         </div>
+                    </div>
+
                     </div>
 
                     <!-- Display the active department name -->
