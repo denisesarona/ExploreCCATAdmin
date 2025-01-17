@@ -96,41 +96,28 @@ if (isset($_POST['addFaculty_button'])) {
                 <h3>ADD FACULTY MEMBERS</h3>
                 <div class="card-body">
                 <form id="facultyForm" action="addFacultyMember.php" method="POST" enctype="multipart/form-data">
-                        <div class="row" style="font-family: 'Poppins', sans-serif;">
-                            <!-- Faculty Name -->
-                            <div class="col-md-12 mb-3"> 
-                                <div class="form-group">
-                                    <label for="name" class="form-label">Name</label>
-                                    <input type="text" class="form-control" placeholder="Enter Faculty Member's Name" name="name" id="name" value="<?= isset($_POST['name']) ? $_POST['name'] : '' ?>" required>
-                                </div>
+                    <div class="row" style="font-family: 'Poppins', sans-serif;">
+                        <!-- Faculty Name -->
+                        <div class="col-md-12 mb-3"> 
+                            <div class="form-group">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Faculty Member's Name" name="name" id="name" value="<?= isset($_POST['name']) ? $_POST['name'] : '' ?>" required>
                             </div>
+                        </div>
 
-                            <!-- Number of Departments -->
-                            <div class="col-md-6 mb-3"> 
-                                <div class="form-group">
-                                    <label for="number_of_depts" class="form-label">Number of Departments Assigned</label>
-                                    <input type="number" class="form-control" placeholder="Enter number of departments" name="number_of_depts" id="number_of_depts" value="<?= $deptPositionCount ?>" min="1" required>
-                                </div>
-                            </div>
-
-                            <!-- Button to Set the Number of Departments -->
-                            <div class="col-md-6 mt-4 mb-3">
-                                <button type="submit" class="btn BlueBtn" name="setDeptNumber"><?= $deptPositionCount > 0 ? "Reselect Number of Departments" : "Set Number of Departments" ?></button>
-                            </div>
-
-                            <!-- Department and Position -->
-                            <div id="position-department-container">
-                                <?php
-                                // Render department-position sets based on the number of departments selected
-                                for ($i = 0; $i < $deptPositionCount; $i++) {
-                                    $selectedDeptId = $_POST['departments'][$i] ?? '';
-                                    $selectedPositionId = $_POST['positions'][$i] ?? '';
-                                ?>
+                        <!-- Department and Position -->
+                        <div id="position-department-container">
+                            <?php
+                            // Render department-position sets based on the number of departments selected dynamically
+                            if (isset($_POST['departments'])) {
+                                foreach ($_POST['departments'] as $index => $selectedDeptId) {
+                                    $selectedPositionId = $_POST['positions'][$index] ?? '';
+                                    ?>
                                     <div class="row mb-3 position-department-set">
                                         <div class="col-md-6"> 
                                             <div class="form-group">
                                                 <label for="department" class="form-label">Department</label>
-                                                <select class="form-control department-dropdown" name="departments[]" onchange="this.form.submit();">
+                                                <select class="form-control department-dropdown" name="departments[]">
                                                     <option value="">Select Department</option>
                                                     <?php
                                                         // Populate department dropdown
@@ -155,7 +142,7 @@ if (isset($_POST['addFaculty_button'])) {
                                                     <?php
                                                     // Populate positions dropdown based on the selected department
                                                     if ($selectedDeptId) {
-                                                        foreach ($positions[$i] as $position) {
+                                                        foreach ($positions[$index] as $position) {
                                                             $position_id = $position['position_id'];
                                                             $position_name = $position['position_name'];
                                                             $selectedPosition = ($position_id == $selectedPositionId) ? 'selected' : '';
@@ -167,23 +154,32 @@ if (isset($_POST['addFaculty_button'])) {
                                             </div>
                                         </div>
                                     </div>
-                                <?php } ?>
-                            </div>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </div>
 
-                            <!-- Upload Image -->
-                            <div class="col-md-12 mb-3"> 
-                                <div class="form-group">
-                                    <label for="image" class="form-label">Upload Image</label>
-                                    <input type="file" class="form-control" name="img" id="img">
-                                </div>
-                            </div>
+                        <!-- Add Department Button -->
+                        <div class="col-md-6 mb-3">
+                            <button type="button" class="btn BlueBtn" id="addDeptBtn">Add Department</button>
+                        </div>
 
-                            <!-- Save Button -->
-                            <div class="col-md-6">
-                                <button type="submit" class="btn BlueBtn mt-2" name="addFaculty_button">Save</button>
+                        <!-- Upload Image -->
+                        <div class="col-md-12 mb-3"> 
+                            <div class="form-group">
+                                <label for="image" class="form-label">Upload Image</label>
+                                <input type="file" class="form-control" name="img" id="img">
                             </div>
                         </div>
-                    </form>
+
+                        <!-- Save Button -->
+                        <div class="col-md-6">
+                            <button type="submit" class="btn BlueBtn mt-2" name="addFaculty_button">Save</button>
+                        </div>
+                    </div>
+                </form>
+
                 </div>
             </div>  
         </div>
@@ -200,48 +196,77 @@ if (isset($_POST['addFaculty_button'])) {
 <?php include('includes/footer.php'); ?>
 
 <script>
-function validateDepartments() {
-    const departments = document.getElementsByName('departments[]');
-    const selectedDepts = [];
-    let duplicateDetected = false;
+document.getElementById('addDeptBtn').addEventListener('click', function() {
+    const container = document.getElementById('position-department-container');
+    const departmentPositionSet = document.createElement('div');
+    departmentPositionSet.classList.add('row', 'mb-3', 'position-department-set');
+    
+    // Department Dropdown
+    departmentPositionSet.innerHTML = `
+        <div class="col-md-6"> 
+            <div class="form-group">
+                <label for="department" class="form-label">Department</label>
+                <select class="form-control department-dropdown" name="departments[]">
+                    <option value="">Select Department</option>
+                    <?php
+                        // Populate department dropdown
+                        $departmentresultSet->data_seek(0);
+                        while ($rows = $departmentresultSet->fetch_assoc()) {
+                            $department_name = $rows['name'];
+                            $department_id = $rows['dept_id'];
+                            echo "<option value='$department_id'>$department_name</option>";
+                        }
+                    ?>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Position Dropdown -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="position" class="form-label">Position</label>
+                <select class="form-control" name="positions[]">
+                    <option value="">Select Position</option>
+                    <!-- The options will be populated dynamically using JavaScript -->
+                </select>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(departmentPositionSet);
 
-    for (let i = 0; i < departments.length; i++) {
-        const deptId = departments[i].value;
-        if (deptId !== "" && selectedDepts.includes(deptId)) {
-            duplicateDetected = true;
-            break;
+    // Add event listener to the newly created department dropdown
+    const departmentDropdown = departmentPositionSet.querySelector('.department-dropdown');
+    departmentDropdown.addEventListener('change', function() {
+        const deptId = departmentDropdown.value;
+        const positionDropdown = departmentPositionSet.querySelector('select[name="positions[]"]');
+        
+        // Fetch positions for the selected department using AJAX
+        if (deptId) {
+            fetch(`fetch_addposition.php?dept_id=${deptId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing options
+                    positionDropdown.innerHTML = `<option value="">Select Position</option>`;
+                    
+                    // Populate new options
+                    data.positions.forEach(position => {
+                        const option = document.createElement('option');
+                        option.value = position.position_id;
+                        option.textContent = position.position_name;
+                        positionDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching positions:', error);
+                });
+        } else {
+            positionDropdown.innerHTML = `<option value="">Select Position</option>`;
         }
-        selectedDepts.push(deptId);
-    }
+    });
+});
 
-    if (duplicateDetected) {
-        // Show the modal for duplicate department confirmation
-        const modal = document.getElementById('confirm-duplicate-modal');
-        modal.style.display = 'flex'; // Show modal
 
-        // Return false to halt form submission until modal decision
-        return new Promise((resolve) => {
-            document.getElementById('confirm-yes').onclick = function () {
-                modal.style.display = 'none';
-                resolve(true); // User chose "Yes"
-            };
-            document.getElementById('confirm-no').onclick = function () {
-                modal.style.display = 'none';
-                resolve(false); // User chose "No"
-            };
-        }).then((continueInsertion) => {
-            // If user confirms, allow the form to submit
-            if (continueInsertion) {
-                return true; // Proceed with form submission
-            } else {
-                return false; // Do not submit the form
-            }
-        });
-    }
-
-    // If no duplicates, proceed with form submission
-    return true;
-}
 
 </script>
 
