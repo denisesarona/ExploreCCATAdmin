@@ -187,7 +187,7 @@ OrgChart.templates.myTemplate.field_0 =
 
 
 OrgChart.templates.myTemplate.field_2 = 
-    `<text style="font-size: 12px;" fill="#FFFFFFFF" x="280" y="20" text-anchor="right">Node ID {val}</text>`;
+    `<text style="font-size: 12px;" fill="#FFFFFFFF" x="280" y="20" text-anchor="right">Faculty ID {val}</text>`;
 
 // Initialize the OrgChart
 let chart = new OrgChart(document.getElementById("tree"), {

@@ -3,9 +3,10 @@
 include('includes/header.php');
 include('../functions/queries.php');
 include('../middleware/adminMiddleware.php');
-
 // Get the faculty ID from the URL parameter 'id'
 $faculty_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$positions = [];
+$departmentresultSet = getData("departmenttb");
 
 // Fetch the current data of the faculty from the database
 $facultyData = [];
@@ -16,11 +17,6 @@ if ($faculty_id > 0) {
         $facultyData = $facultyRow;
     }
 }
-
-// Fetch all departments for the dropdown options
-$departmentresultSet = getData("departmenttb");
-
-$positions = [];
 // Fetch current department-position pairs for the selected faculty
 if ($faculty_id > 0) {
     $positionsQuery = "SELECT * FROM dept_pos_facultytb WHERE faculty_id = $faculty_id";
@@ -61,11 +57,10 @@ if (isset($_POST['editFaculty_button'])) {
         // Initialize the $positions array safely
         $positions = isset($_POST['positions']) ? $_POST['positions'] : [];
 
-        // Remove the departments that were marked for removal
         if (isset($_POST['removed_depts']) && !empty($_POST['removed_depts'])) {
             $removed_depts = explode(',', $_POST['removed_depts']);
             foreach ($removed_depts as $removed_dept_id) {
-                $removed_dept_id = intval($removed_dept_id); // Ensure it's an integer
+                $removed_dept_id = intval($removed_dept_id);
                 if ($removed_dept_id > 0) {
                     $removeDeptQuery = $con->prepare("DELETE FROM dept_pos_facultytb WHERE faculty_id = ? AND dept_id = ?");
                     $removeDeptQuery->bind_param("ii", $faculty_id, $removed_dept_id);
@@ -77,9 +72,7 @@ if (isset($_POST['editFaculty_button'])) {
                 }
             }
         }
-                
-
-
+        
         // Add new department-position pairs to the database
         foreach ($departments as $index => $dept_id) {
             $position_id = isset($positions[$index]) ? $positions[$index] : null;
@@ -96,8 +89,6 @@ if (isset($_POST['editFaculty_button'])) {
                 }
             }
         }
-
-
         $_SESSION['success'] = "✔ Faculty member updated successfully!";
         header("Location: facultyMember.php?id=$faculty_id");
         exit(); // Exit after successful update
@@ -107,7 +98,6 @@ if (isset($_POST['editFaculty_button'])) {
         exit(); // Exit if faculty update fails
     }
 }
-
 ?>
 
 <link rel="stylesheet" href="assets/css/style.css">
@@ -135,90 +125,90 @@ if (isset($_POST['editFaculty_button'])) {
                                 </div>
                             </div>
             
-                            <div class="col-md-6 mt-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <button type="button" class="btn BlueBtn" id="addDeptBtn">Add Department</button>
                             </div>
 
-<!-- Department and Position -->
-<div id="position-department-container">
-    <?php
-    // Render existing department-position sets based on the current data
-    foreach ($positions as $i => $positionData) {
-        $selectedDeptId = $positionData['dept_id'];
-        $selectedPositionId = $positionData['position_id'];
-    ?>
-        <div class="row mb-3 position-department-set">
-            <div class="col-md-5">
-                <div class="form-group">
-                    <label for="department" class="form-label">Department</label>
-                    <select class="form-control department-dropdown" name="departments[]" disabled>
-                        <option value="">Select Department</option>
-                        <?php
-                        $departmentresultSet->data_seek(0); // Reset department result set pointer
-                        while ($rows = $departmentresultSet->fetch_assoc()) {
-                            $department_name = $rows['name'];
-                            $department_id = $rows['dept_id'];
-                            $selected = ($department_id == $selectedDeptId) ? 'selected' : ''; 
-                            echo "<option value='$department_id' $selected>$department_name</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-            </div>
+                        <!-- Department and Position -->
+                        <div id="position-department-container">
+                            <?php
+                            // Render existing department-position sets based on the current data
+                            foreach ($positions as $i => $positionData) {
+                                $selectedDeptId = $positionData['dept_id'];
+                                $selectedPositionId = $positionData['position_id'];
+                            ?>
+                                <div class="row mb-3 position-department-set">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="department" class="form-label">Department</label>
+                                            <select class="form-control department-dropdown" name="departments[]" disabled>
+                                                <option value="">Select Department</option>
+                                                <?php
+                                                $departmentresultSet->data_seek(0); // Reset department result set pointer
+                                                while ($rows = $departmentresultSet->fetch_assoc()) {
+                                                    $department_name = $rows['name'];
+                                                    $department_id = $rows['dept_id'];
+                                                    $selected = ($department_id == $selectedDeptId) ? 'selected' : ''; 
+                                                    echo "<option value='$department_id' $selected>$department_name</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
 
-            <div class="col-md-5">
-                <div class="form-group">
-                    <label for="position" class="form-label">Position</label>
-                    <select class="form-control" name="positions[]" disabled>
-                        <option value="">Select Position</option>
-                        <?php
-                        if ($selectedDeptId) {
-                            // Fetch positions for the selected department
-                            $positionsQuery = "SELECT * FROM positiontb WHERE dept_id = $selectedDeptId";
-                            $result = mysqli_query($con, $positionsQuery);
-                            while ($position = mysqli_fetch_assoc($result)) {
-                                $position_id = $position['position_id'];
-                                $position_name = $position['position_name'];
-                                $selectedPosition = ($position_id == $selectedPositionId) ? 'selected' : '';
-                                echo "<option value='$position_id' $selectedPosition>$position_name</option>";
-                            }
-                        }
-                        ?>
-                    </select>
-                </div>
-            </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="position" class="form-label">Position</label>
+                                            <select class="form-control" name="positions[]" disabled>
+                                                <option value="">Select Position</option>
+                                                <?php
+                                                if ($selectedDeptId) {
+                                                    // Fetch positions for the selected department
+                                                    $positionsQuery = "SELECT * FROM positiontb WHERE dept_id = $selectedDeptId";
+                                                    $result = mysqli_query($con, $positionsQuery);
+                                                    while ($position = mysqli_fetch_assoc($result)) {
+                                                        $position_id = $position['position_id'];
+                                                        $position_name = $position['position_name'];
+                                                        $selectedPosition = ($position_id == $selectedPositionId) ? 'selected' : '';
+                                                        echo "<option value='$position_id' $selectedPosition>$position_name</option>";
+                                                    }
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
 
-            <!-- Remove Button -->
-            <div class="col-md-2 mt-4">
-                <button type="button" class="btn btn-danger removeDeptBtn" onclick="removeDepartment(this)">Remove</button>
-            </div>
-        </div>
-    <?php } ?>
-</div>
-<!-- Hidden input to store removed department IDs -->
-<input type="hidden" id="removedDepts" name="removed_depts" value="">
-                            <!-- Upload Image -->
-                            <div class="col-md-12 mb-3">
-                                <div class="form-group">
-                                    <label for="">Upload Image</label>
-                                    <input type="file" class="form-control" name="img">
-                                    <label for="">Current Image</label>
-                                    <input type="hidden" name="old_image" value="<?= $facultyData['img']; ?>">
-                                    <img src="../uploads/<?= $facultyData['img']; ?>" height="50px" width="50px" alt="">
+                                    <!-- Remove Button -->
+                                    <div class="col-md-2 mt-4">
+                                        <button type="button" class="btn btn-danger removeDeptBtn" onclick="removeDepartment(this)">Remove</button>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </div>
+                        <!-- Hidden input to store removed department IDs -->
+                        <input type="hidden" id="removedDepts" name="removed_depts" value="">
+                                                    <!-- Upload Image -->
+                                                    <div class="col-md-12 mb-3">
+                                                        <div class="form-group">
+                                                            <label for="">Upload Image</label>
+                                                            <input type="file" class="form-control" name="img">
+                                                            <label for="">Current Image</label>
+                                                            <input type="hidden" name="old_image" value="<?= $facultyData['img']; ?>">
+                                                            <img src="../uploads/<?= $facultyData['img']; ?>" height="50px" width="50px" alt="">
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="col-md-6">
+                                                        <button type="submit" class="btn BlueBtn mt-2" name="editFaculty_button">Update</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
-
-                            <div class="col-md-6">
-                                <button type="submit" class="btn BlueBtn mt-2" name="editFaculty_button">Update</button>
-                            </div>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 document.getElementById("addDeptBtn").addEventListener("click", function () {
@@ -357,11 +347,22 @@ function removeDepartment(button) {
 }
 
 
-
 document.querySelector('form').addEventListener('submit', function () {
     var removedDeptsInput = document.getElementById('removedDepts');
     console.log('Removed Departments:', removedDeptsInput.value);
 });
+var removedDeptsInput = document.getElementById('removedDepts');
+if (departmentDropdown) {
+    var deptId = departmentDropdown.value;
+    if (deptId) {
+        var removedDepts = removedDeptsInput.value ? removedDeptsInput.value.split(',') : [];
+        if (!removedDepts.includes(deptId)) {
+            removedDepts.push(deptId);
+            removedDeptsInput.value = removedDepts.join(',');
+        }
+    }
+}
+
 
 </script>
 

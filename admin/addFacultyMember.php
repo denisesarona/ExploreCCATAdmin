@@ -9,9 +9,6 @@ $departmentresultSet = getData("departmenttb");
 $positions = [];
 $deptPositionCount = 0;
 
-if (isset($_POST['number_of_depts'])) {
-    $deptPositionCount = (int)$_POST['number_of_depts'];
-}
 
 if (isset($_POST['departments']) && $deptPositionCount > 0) {
     for ($i = 0; $i < $deptPositionCount; $i++) {
@@ -27,62 +24,44 @@ if (isset($_POST['departments']) && $deptPositionCount > 0) {
     }
 }
 
-if (isset($_POST['addFaculty_button'])) {
-    // Sanitize inputs to prevent SQL Injection
+if (isset($_POST['addFaculty_button'])) {  
     $name = mysqli_real_escape_string($con, $_POST['name']);
     $image = $_FILES['img']['name'];
     $path = "../uploads";
-    $image_ext = pathinfo($image, PATHINFO_EXTENSION);
-    $filename = time() . '.' . $image_ext;
 
-    // Check if the faculty member already exists
-    $checkQuery = "SELECT * FROM facultytb WHERE name = '$name'";
-    $checkResult = mysqli_query($con, $checkQuery);
-
-    if (mysqli_num_rows($checkResult) > 0) {
-        $_SESSION['error'] = "A faculty member with this name already exists!";
-        header("Location: facultyMember.php");
-        exit();
+    // Handle Image Upload
+    if (!empty($image)) {
+        $image_ext = pathinfo($image, PATHINFO_EXTENSION);
+        $filename = time() . '.' . $image_ext;
+        move_uploaded_file($_FILES['img']['tmp_name'], "$path/$filename");
+    } else {
+        $filename = 'default.jpg'; // Use a default image if none is uploaded
     }
 
-    if (!move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
-        $_SESSION['error'] = "Please upload an image!";
-        header("Location: addFacultyMember.php");
-        exit(); // Exit to prevent data from being inserted
-    }
-    
-    // Insert faculty data into the facultytb table after image is uploaded successfully
-    $addFaculty_query = "INSERT INTO facultytb (name, img) VALUES ('$name', '$filename')";
-    if (mysqli_query($con, $addFaculty_query)) {
-        $faculty_id = mysqli_insert_id($con); // Get the last inserted faculty ID
-    
-        // Handle multiple departments and positions
-        $departments = $_POST['departments'];  // Array of selected department IDs
-        $positions = $_POST['positions'];     // Array of selected position IDs
-    
-        foreach ($departments as $index => $dept_id) {
-            $position_id = $positions[$index];  // Position ID selected for this department
-            $pid = isset($_POST['pid']) ? $_POST['pid'] : 0; // Use the pid from the form submission (default to 0 if not provided)
-        
-            // Insert faculty to department position link (allow duplicates)
-            $addDepartment_query = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id, pid) 
-                                    VALUES ('$faculty_id', '$dept_id', '$position_id', '$pid')";
-        
-            if (!mysqli_query($con, $addDepartment_query)) {
-                $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
-                header("Location: facultyMember.php");
-                exit();
+    // Insert new faculty
+    $insertFacultyQuery = "INSERT INTO facultytb (name, img) VALUES ('$name', '$filename')";
+    mysqli_query($con, $insertFacultyQuery) or die(mysqli_error($con));
+
+    // Get the inserted faculty ID
+    $faculty_id = mysqli_insert_id($con);
+    // Insert department and position links
+    if (!empty($_POST['departments']) && !empty($_POST['positions'])) {
+        foreach ($_POST['departments'] as $index => $dept_id) {
+            $position_id = $_POST['positions'][$index] ?? '';
+
+            // Only insert if both department and position are selected
+            if (!empty($dept_id) && !empty($position_id)) {
+                $insertDeptPosQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
+                                    VALUES ('$faculty_id', '$dept_id', '$position_id')";
+                mysqli_query($con, $insertDeptPosQuery) or die(mysqli_error($con));
             }
         }
-    
-        $_SESSION['success'] = "✔ Faculty member added successfully!";
-        header("Location: addFacultyMember.php");
-        exit();
-    } else {
-        $_SESSION['error'] = "Adding Faculty member failed: " . mysqli_error($con);
-        header("Location: facultyMember.php");
-        exit();
     }
+
+
+    $_SESSION['success'] = "✔ Faculty member added successfully!";
+    header("Location: facultyMember.php");
+    exit();
 }
 
 ?>
@@ -105,6 +84,10 @@ if (isset($_POST['addFaculty_button'])) {
                             </div>
                         </div>
 
+                        <!-- Add Department Button -->
+                        <div class="col-md-6 mb-3">
+                            <button type="button" class="btn BlueBtn" id="addDeptBtn">Add Department</button>
+                        </div>
                         <!-- Department and Position -->
                         <div id="position-department-container">
                             <?php
@@ -114,7 +97,7 @@ if (isset($_POST['addFaculty_button'])) {
                                     $selectedPositionId = $_POST['positions'][$index] ?? '';
                                     ?>
                                     <div class="row mb-3 position-department-set">
-                                        <div class="col-md-6"> 
+                                        <div class="col-md-5"> 
                                             <div class="form-group">
                                                 <label for="department" class="form-label">Department</label>
                                                 <select class="form-control department-dropdown" name="departments[]">
@@ -134,7 +117,7 @@ if (isset($_POST['addFaculty_button'])) {
                                         </div>
 
                                         <!-- Position Dropdown (Will be shown based on department selection) -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-5">
                                             <div class="form-group">
                                                 <label for="position" class="form-label">Position</label>
                                                 <select class="form-control" name="positions[]">
@@ -150,8 +133,12 @@ if (isset($_POST['addFaculty_button'])) {
                                                         }
                                                     }
                                                     ?>
+
                                                 </select>
                                             </div>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="button" class="btn RedBtn removeDeptBtn">Remove</button>
                                         </div>
                                     </div>
                                     <?php
@@ -159,12 +146,6 @@ if (isset($_POST['addFaculty_button'])) {
                             }
                             ?>
                         </div>
-
-                        <!-- Add Department Button -->
-                        <div class="col-md-6 mb-3">
-                            <button type="button" class="btn BlueBtn" id="addDeptBtn">Add Department</button>
-                        </div>
-
                         <!-- Upload Image -->
                         <div class="col-md-12 mb-3"> 
                             <div class="form-group">
@@ -172,7 +153,7 @@ if (isset($_POST['addFaculty_button'])) {
                                 <input type="file" class="form-control" name="img" id="img">
                             </div>
                         </div>
-
+                        <input type="hidden" name="faculty_id" value="<?= isset($faculty_id) ? $faculty_id : '' ?>">
                         <!-- Save Button -->
                         <div class="col-md-6">
                             <button type="submit" class="btn BlueBtn mt-2" name="addFaculty_button">Save</button>
@@ -200,10 +181,10 @@ document.getElementById('addDeptBtn').addEventListener('click', function() {
     const container = document.getElementById('position-department-container');
     const departmentPositionSet = document.createElement('div');
     departmentPositionSet.classList.add('row', 'mb-3', 'position-department-set');
-    
-    // Department Dropdown
+
+    // Department & Position Dropdown with Remove Button
     departmentPositionSet.innerHTML = `
-        <div class="col-md-6"> 
+        <div class="col-md-5"> 
             <div class="form-group">
                 <label for="department" class="form-label">Department</label>
                 <select class="form-control department-dropdown" name="departments[]">
@@ -221,35 +202,40 @@ document.getElementById('addDeptBtn').addEventListener('click', function() {
             </div>
         </div>
         
-        <!-- Position Dropdown -->
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="form-group">
                 <label for="position" class="form-label">Position</label>
                 <select class="form-control" name="positions[]">
                     <option value="">Select Position</option>
-                    <!-- The options will be populated dynamically using JavaScript -->
                 </select>
             </div>
         </div>
-    `;
-    
-    container.appendChild(departmentPositionSet);
 
-    // Add event listener to the newly created department dropdown
+        <!-- Remove Button -->
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger removeDeptBtn">Remove</button>
+        </div>
+    `;
+
+    // Add new set to the top instead of the bottom
+    container.prepend(departmentPositionSet);
+
+    // Add event listener for remove button
+    departmentPositionSet.querySelector('.removeDeptBtn').addEventListener('click', function() {
+        departmentPositionSet.remove();
+    });
+
+    // Add event listener to department dropdown for position fetching
     const departmentDropdown = departmentPositionSet.querySelector('.department-dropdown');
     departmentDropdown.addEventListener('change', function() {
         const deptId = departmentDropdown.value;
         const positionDropdown = departmentPositionSet.querySelector('select[name="positions[]"]');
-        
-        // Fetch positions for the selected department using AJAX
+
         if (deptId) {
             fetch(`fetch_addposition.php?dept_id=${deptId}`)
                 .then(response => response.json())
                 .then(data => {
-                    // Clear existing options
                     positionDropdown.innerHTML = `<option value="">Select Position</option>`;
-                    
-                    // Populate new options
                     data.positions.forEach(position => {
                         const option = document.createElement('option');
                         option.value = position.position_id;
@@ -257,9 +243,7 @@ document.getElementById('addDeptBtn').addEventListener('click', function() {
                         positionDropdown.appendChild(option);
                     });
                 })
-                .catch(error => {
-                    console.error('Error fetching positions:', error);
-                });
+                .catch(error => console.error('Error fetching positions:', error));
         } else {
             positionDropdown.innerHTML = `<option value="">Select Position</option>`;
         }
