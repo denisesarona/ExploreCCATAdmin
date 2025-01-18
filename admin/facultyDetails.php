@@ -36,66 +36,73 @@ if (isset($_POST['editFaculty_button'])) {
     $filename = time() . '.' . $image_ext; // Generate a new filename based on the current timestamp
 
     // If image is uploaded, update it, otherwise keep the existing image
-    if ($image) {
-        $imageUpdateQuery = ", img = '$filename'";
-        if (!move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
-            $_SESSION['error'] = "Image upload failed!";
-            header("Location: facultyDetails.php?id=$faculty_id");
-            exit(); // Exit if the upload fails
-        }
-    } else {
-        $imageUpdateQuery = ""; // No new image uploaded, keep the old one
-    }
+    $isValid = true;
 
-    // Initialize $departments safely, ensuring it's an array
-    $departments = isset($_POST['departments']) ? $_POST['departments'] : [];
-
-    // Update the faculty data in the database
-    $updateFacultyQuery = "UPDATE facultytb SET name = '$name' $imageUpdateQuery WHERE faculty_id = $faculty_id";
-
-    if (mysqli_query($con, $updateFacultyQuery)) {
-        // Initialize the $positions array safely
-        $positions = isset($_POST['positions']) ? $_POST['positions'] : [];
-
-        if (isset($_POST['removed_depts']) && !empty($_POST['removed_depts'])) {
-            $removed_depts = explode(',', $_POST['removed_depts']);
-            foreach ($removed_depts as $removed_dept_id) {
-                $removed_dept_id = intval($removed_dept_id);
-                if ($removed_dept_id > 0) {
-                    $removeDeptQuery = $con->prepare("DELETE FROM dept_pos_facultytb WHERE faculty_id = ? AND dept_id = ?");
-                    $removeDeptQuery->bind_param("ii", $faculty_id, $removed_dept_id);
-                    if (!$removeDeptQuery->execute()) {
-                        $_SESSION['error'] = "Failed to remove department: " . $removeDeptQuery->error;
-                        header("Location: facultyDetails.php?id=$faculty_id");
-                        exit();
+    // Example validation logic
+    foreach ($_POST['departments'] as $index => $department) {
+        if ($department && empty($_POST['positions'][$index])) {
+            $isValid = false;
+            $_SESSION['error'] = 'Please select a position for the department!';
+            break;
+        } else {
+            if ($image) {
+                $imageUpdateQuery = ", img = '$filename'";
+                if (!move_uploaded_file($_FILES['img']['tmp_name'], $path . '/' . $filename)) {
+                    $_SESSION['error'] = "Image upload failed!";
+                    header("Location: facultyDetails.php?id=$faculty_id");
+                    exit(); // Exit if the upload fails
+                }
+            } else {
+                $imageUpdateQuery = ""; // No new image uploaded, keep the old one
+            }
+        
+            // Initialize $departments safely, ensuring it's an array
+            $departments = isset($_POST['departments']) ? $_POST['departments'] : [];
+        
+            // Update the faculty data in the database
+            $updateFacultyQuery = "UPDATE facultytb SET name = '$name' $imageUpdateQuery WHERE faculty_id = $faculty_id";
+        
+            if (mysqli_query($con, $updateFacultyQuery)) {
+                // Initialize the $positions array safely
+                $positions = isset($_POST['positions']) ? $_POST['positions'] : [];
+        
+                if (isset($_POST['removed_depts']) && !empty($_POST['removed_depts'])) {
+                    $removed_depts = explode(',', $_POST['removed_depts']);
+                    foreach ($removed_depts as $removed_dept_id) {
+                        $removed_dept_id = intval($removed_dept_id);
+                        if ($removed_dept_id > 0) {
+                            $removeDeptQuery = $con->prepare("DELETE FROM dept_pos_facultytb WHERE faculty_id = ? AND dept_id = ?");
+                            $removeDeptQuery->bind_param("ii", $faculty_id, $removed_dept_id);
+                            if (!$removeDeptQuery->execute()) {
+                                $_SESSION['error'] = "Failed to remove department: " . $removeDeptQuery->error;
+                                header("Location: facultyDetails.php?id=$faculty_id");
+                                exit();
+                            }
+                        }
                     }
                 }
-            }
-        }
+                
+                // Add new department-position pairs to the database
+                foreach ($departments as $index => $dept_id) {
+                    $position_id = isset($positions[$index]) ? $positions[$index] : null;
         
-        // Add new department-position pairs to the database
-        foreach ($departments as $index => $dept_id) {
-            $position_id = isset($positions[$index]) ? $positions[$index] : null;
-
-            // Validate that both department and position are selected
-            if (!empty($dept_id) && !empty($position_id)) {
-                // Insert new department-position pair into the dept_pos_facultytb table
-                $addDepartmentQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
-                                        VALUES ('$faculty_id', '$dept_id', '$position_id')";
-                if (!mysqli_query($con, $addDepartmentQuery)) {
-                    $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
-                    header("Location: facultyDetails.php?id=$faculty_id");
-                    exit(); // Exit if insertion fails
+                    // Validate that both department and position are selected
+                    if (!empty($dept_id) && !empty($position_id)) {
+                        // Insert new department-position pair into the dept_pos_facultytb table
+                        $addDepartmentQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
+                                                VALUES ('$faculty_id', '$dept_id', '$position_id')";
+                        if (!mysqli_query($con, $addDepartmentQuery)) {
+                            $_SESSION['error'] = "Failed to link faculty to department: " . mysqli_error($con);
+                            header("Location: facultyDetails.php?id=$faculty_id");
+                            exit(); // Exit if insertion fails
+                        }
+                    }
                 }
+                $_SESSION['success'] = "✔ Faculty member updated successfully!";
+                header("Location: facultyDetails.php?id=$faculty_id");
+                exit(); // Exit after successful update
             }
         }
-        $_SESSION['success'] = "✔ Faculty member updated successfully!";
-        header("Location: facultyMember.php?id=$faculty_id");
-        exit(); // Exit after successful update
-    } else {
-        $_SESSION['error'] = "Updating Faculty member failed: " . mysqli_error($con);
-        header("Location: facultyMember.php?id=$faculty_id");
-        exit(); // Exit if faculty update fails
     }
 }
 ?>
@@ -211,6 +218,35 @@ if (isset($_POST['editFaculty_button'])) {
                         </div>
 
 <script>
+function validateForm(event) {
+    let isValid = true; // Assume the form is valid initially
+    const deptPosSets = document.querySelectorAll('.position-department-set');
+
+    deptPosSets.forEach(function (set) {
+        const departmentDropdown = set.querySelector('.department-dropdown');
+        const positionDropdown = set.querySelector('.position-dropdown');
+
+        // Check if department and position are selected
+        if (departmentDropdown.value && !positionDropdown.value) {
+            isValid = false;
+        }
+    });
+
+    // If validation fails, stop form submission
+    if (!isValid) {
+        event.preventDefault(); // Prevent form submission
+    }
+
+    return isValid; // Ensure that validation result is returned
+}
+
+// Attach the validateForm logic to the form's submit event
+document.querySelector('form').addEventListener('submit', function (event) {
+    validateForm(event); // Pass the event to the validation function
+});
+
+
+
 document.getElementById("addDeptBtn").addEventListener("click", function () {
     var container = document.getElementById("position-department-container");
 

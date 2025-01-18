@@ -54,14 +54,14 @@ if (isset($_POST['addFaculty_button'])) {
                 $insertDeptPosQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
                                     VALUES ('$faculty_id', '$dept_id', '$position_id')";
                 mysqli_query($con, $insertDeptPosQuery) or die(mysqli_error($con));
+                $_SESSION['success'] = "✔ Faculty member added successfully!";
+                header("Location: facultyMember.php");
+                exit();
+            } else{
+                $_SESSION['error'] = 'Please select a position for the department!';
             }
         }
     }
-
-
-    $_SESSION['success'] = "✔ Faculty member added successfully!";
-    header("Location: facultyMember.php");
-    exit();
 }
 
 ?>
@@ -177,6 +177,32 @@ if (isset($_POST['addFaculty_button'])) {
 <?php include('includes/footer.php'); ?>
 
 <script>
+function validateForm(event) {
+    let isValid = true; // Assume the form is valid initially
+    const deptPosSets = document.querySelectorAll('.position-department-set');
+
+    deptPosSets.forEach(function (set) {
+        const departmentDropdown = set.querySelector('.department-dropdown');
+        const positionDropdown = set.querySelector('.position-dropdown');
+
+        // Check if department and position are selected
+        if (departmentDropdown.value && !positionDropdown.value) {
+            isValid = false;
+        }
+    });
+
+    // If validation fails, stop form submission
+    if (!isValid) {
+        event.preventDefault(); // Prevent form submission
+    }
+
+    return isValid; // Ensure that validation result is returned
+}
+
+// Attach the validateForm logic to the form's submit event
+document.querySelector('form').addEventListener('submit', function (event) {
+    validateForm(event); // Pass the event to the validation function
+});
 document.getElementById('addDeptBtn').addEventListener('click', function() {
     const container = document.getElementById('position-department-container');
     const departmentPositionSet = document.createElement('div');
@@ -249,8 +275,6 @@ document.getElementById('addDeptBtn').addEventListener('click', function() {
         }
     });
 });
-
-
 
 </script>
 
