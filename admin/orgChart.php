@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card mt-5">
-                <h3>DEPARTMENTS ORGANIZATIONAL CHARTS</h3>
+                <h3>DEPARTMENTS/OFFICES ORGANIZATIONAL CHARTS</h3>
                 <div class="card-body">
                     <table class="table text-center">
                         <thead>
