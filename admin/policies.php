@@ -2,6 +2,33 @@
     include('includes/header.php');
     include('../functions/queries.php');
     include('../middleware/adminMiddleware.php');
+    // Function to ensure the fields (Mission, Vision, Quality Policy) exist in the policies table
+    function ensureDefaultFieldsExist($name, $defaultValue) {
+        global $con;
+
+        // Check if the field already exists in the 'policies' table
+        $sql = "SELECT * FROM policies WHERE name = ?";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // If the field doesn't exist, insert it with the default value
+        if ($result->num_rows == 0) {
+            $insertSql = "INSERT INTO policies (name, pol_text, created_at) VALUES (?, ?, NOW())";
+            $insertStmt = $con->prepare($insertSql);
+            $insertStmt->bind_param("ss", $name, $defaultValue);
+            $insertStmt->execute();
+        }
+
+        $stmt->close();
+    }
+
+    // Ensure that Mission, Vision, and Quality Policy are present in the policies table
+    ensureDefaultFieldsExist('Mission', 'This is the default Mission statement.');
+    ensureDefaultFieldsExist('Vision', 'This is the default Vision statement.');
+    ensureDefaultFieldsExist('Quality Policy', 'This is the default Quality Policy statement.');
+    ensureDefaultFieldsExist('CvSU-CCAT Goals', 'This is the default CvSU-CCAT statement.');
 ?>
 <link rel="stylesheet" href="assets/css/style.css">
 

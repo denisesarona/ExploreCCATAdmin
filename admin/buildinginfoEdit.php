@@ -51,7 +51,7 @@ $departmentresultSet = getData("departmenttb");
         
         <!-- Wrapper for input and button -->
         <div class="input-group">
-            <select id="departmentSelect" class="form-control">
+            <select id="departmentSelect" class="form-control" style="margin-right:30px;">
                 <option value="" disabled selected>Select a Department</option>
                 <?php
                 while ($rows = $departmentresultSet->fetch_assoc()) {
@@ -61,7 +61,7 @@ $departmentresultSet = getData("departmenttb");
                 }
                 ?>
             </select>
-            <button type="button" class="btn btn-success" onclick="addDepartment()">Add</button>
+            <button type="button" class="btn btn-success" onclick="addDepartment()" style="border-radius: 0.375rem;">Add</button>
         </div>
         
         <!-- Display added departments dynamically -->
@@ -111,11 +111,11 @@ $departmentresultSet = getData("departmenttb");
                                                     type="text" 
                                                     id="officeInput" 
                                                     class="form-control" 
-                                                    placeholder="Enter Office Name">
+                                                    placeholder="Enter Office Name" style="margin-right:30px;">
                                                 <button 
                                                     type="button" 
                                                     class="btn btn-success" 
-                                                    onclick="addOffice()">Add Office</button>
+                                                    onclick="addOffice()" style="border-radius: 0.375rem;">Add</button>
                                             </div>
 
                                             <!-- Display added offices dynamically -->

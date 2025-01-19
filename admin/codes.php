@@ -75,6 +75,7 @@ function ensureDefaultFieldsExist($name, $defaultValue) {
 ensureDefaultFieldsExist('Mission', 'This is the default Mission statement.');
 ensureDefaultFieldsExist('Vision', 'This is the default Vision statement.');
 ensureDefaultFieldsExist('Quality Policy', 'This is the default Quality Policy statement.');
+ensureDefaultFieldsExist('CvSU-CCAT Goals', 'This is the default CvSU-CCAT statement.');
 
 if(isset($_POST['addAdmin_button'])){   
     $name = $_POST['name'];
