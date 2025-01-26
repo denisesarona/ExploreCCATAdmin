@@ -37,9 +37,9 @@ if (isset($_POST['editFaculty_button'])) {
 
     // If image is uploaded, update it, otherwise keep the existing image
     $isValid = true;
-
+    $departments = isset($_POST['departments']) ? $_POST['departments'] : [];
     // Example validation logic
-    foreach ($_POST['departments'] as $index => $department) {
+    foreach ($departments as $index => $department) {
         if ($department && empty($_POST['positions'][$index])) {
             $isValid = false;
             $_SESSION['error'] = 'Please select a position for the department!';
@@ -56,9 +56,6 @@ if (isset($_POST['editFaculty_button'])) {
                 $imageUpdateQuery = ""; // No new image uploaded, keep the old one
             }
         
-            // Initialize $departments safely, ensuring it's an array
-            $departments = isset($_POST['departments']) ? $_POST['departments'] : [];
-        
             // Update the faculty data in the database
             $updateFacultyQuery = "UPDATE facultytb SET name = '$name' $imageUpdateQuery WHERE faculty_id = $faculty_id";
         
@@ -67,6 +64,7 @@ if (isset($_POST['editFaculty_button'])) {
                 $positions = isset($_POST['positions']) ? $_POST['positions'] : [];
         
                 if (isset($_POST['removed_depts']) && !empty($_POST['removed_depts'])) {
+                    error_log('Removed Departments: ' . $_POST['removed_depts']);
                     $removed_depts = explode(',', $_POST['removed_depts']);
                     foreach ($removed_depts as $removed_dept_id) {
                         $removed_dept_id = intval($removed_dept_id);
@@ -187,7 +185,8 @@ if (isset($_POST['editFaculty_button'])) {
 
                                     <!-- Remove Button -->
                                     <div class="col-md-2 mt-4">
-                                        <button type="button" class="btn btn-danger removeDeptBtn" onclick="removeDepartment(this)">Remove</button>
+                                    <button type="button" class="btn btn-danger removeDeptBtn" onclick="removeDepartment(this)">Remove</button>
+
                                     </div>
                                 </div>
                             <?php } ?>
@@ -362,24 +361,32 @@ function fetchPositions(deptId, positionDropdown) {
 function removeDepartment(button) {
     var deptPosSet = button.closest('.position-department-set');
     var departmentDropdown = deptPosSet.querySelector('.department-dropdown');
-    var removedDeptsInput = document.getElementById('removedDepts');
+    var facultyId = <?= $faculty_id ?>; // Use the PHP variable for the current faculty ID
 
     if (departmentDropdown) {
         var deptId = departmentDropdown.value; // Get the department ID
         if (deptId) {
-            // Get existing removed departments
-            var removedDepts = removedDeptsInput.value ? removedDeptsInput.value.split(',') : [];
-            
-            // Add the department ID if it's not already in the list
-            if (!removedDepts.includes(deptId)) {
-                removedDepts.push(deptId);
-                removedDeptsInput.value = removedDepts.join(','); // Update the hidden input
-            }
+            // Send AJAX request to delete department from the database
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'delete_department.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.status === 'success') {
+                        console.log(response.message);
+                        // Remove the department-position set from the UI
+                        deptPosSet.remove();
+                    } else {
+                        alert(response.message);
+                    }
+                } else {
+                    alert('Failed to connect to the server. Please try again.');
+                }
+            };
+            xhr.send('dept_id=' + deptId + '&faculty_id=' + facultyId);
         }
     }
-
-    // Remove the department-position set from the UI
-    deptPosSet.remove();
 }
 
 
