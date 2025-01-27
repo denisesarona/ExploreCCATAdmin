@@ -72,7 +72,7 @@
             $stored_password = $userdata['password']; // Get stored password
     
             // Verify password
-            if($password == $stored_password) {
+            if (password_verify($password, $stored_password)) {
                 // Set session variables for authenticated user
                 $_SESSION['auth'] = true;
                 $_SESSION['user_id'] = $userdata['user_id']; // Ensure that user_id is set in the session
@@ -80,12 +80,12 @@
                     'name' => $userdata['name'],
                     'email' => $userdata['email']
                 ];
-    
+            
                 $role = $userdata['role']; // Get user role
                 $_SESSION['role'] = $role;
-    
+            
                 // Redirect based on user role
-                if($role == 1) {
+                if ($role == 1) {
                     $_SESSION['success'] = "Welcome to Admin Dashboard!";
                     header('Location: ../admin/index.php');
                     exit();
@@ -96,10 +96,10 @@
                 }
             } else {
                 // Set error message for incorrect password
-                $_SESSION['error'] = "Incorrect Password! $password";
+                $_SESSION['error'] = "Incorrect Password!";
                 header("Location: ../index.php");
                 exit();
-            }
+            } 
         } else {
             // Set error message for invalid credentials
             $_SESSION['error'] = "Email not Registered!";
