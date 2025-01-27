@@ -46,22 +46,28 @@ if (isset($_POST['addFaculty_button'])) {
     $faculty_id = mysqli_insert_id($con);
     // Insert department and position links
     if (!empty($_POST['departments']) && !empty($_POST['positions'])) {
+        $insertSuccess = false; // Track if any insertion was successful
         foreach ($_POST['departments'] as $index => $dept_id) {
             $position_id = $_POST['positions'][$index] ?? '';
-
+    
             // Only insert if both department and position are selected
             if (!empty($dept_id) && !empty($position_id)) {
                 $insertDeptPosQuery = "INSERT INTO dept_pos_facultytb (faculty_id, dept_id, position_id) 
                                     VALUES ('$faculty_id', '$dept_id', '$position_id')";
                 mysqli_query($con, $insertDeptPosQuery) or die(mysqli_error($con));
-                $_SESSION['success'] = "✔ Faculty member added successfully!";
-                header("Location: facultyMember.php");
-                exit();
-            } else{
+                $insertSuccess = true; // Mark as successful
+            } else {
                 $_SESSION['error'] = 'Please select a position for the department!';
             }
         }
-    }
+    
+        // Redirect only if at least one insertion was successful
+        if ($insertSuccess) {
+            $_SESSION['success'] = "✔ Faculty member added successfully!";
+            header("Location: facultyMember.php");
+            exit();
+        }
+    }    
 }
 
 ?>
