@@ -68,17 +68,6 @@ To support multiple users efficiently, update the **max_connections** setting:
 
 ---
 
-## **How to Use**  
-
-### **Admin Panel Usage:**  
-1. **Login** using the provided credentials.  
-2. **Manage Users** by adding or updating faculty and staff details.  
-3. **Add or Update Buildings** via the dashboard.  
-4. **Navigate the 3D Map** to visualize building layouts.  
-5. **Handle Maintenance Requests** submitted by faculty and building management.  
-
----
-
 ## **Technology Stack**  
 
 | **Component**      | **Technology Used** |
@@ -100,17 +89,6 @@ To support multiple users efficiently, update the **max_connections** setting:
 ### **2. Apache Server Not Running**  
 - Port 80 may be in use. Change Apache’s port in **XAMPP > Config > httpd.conf**.  
 
-### **3. 3D Map Not Updating**  
+### **3. 3D Map Not Opening**  
 - Ensure Unreal Engine is properly linked to the database.  
 - Restart the system to refresh cached data.  
-
----
-
-## **Contact & Support**  
-For technical support, reach out via:  
-📧 **Email:** support@yourdomain.com  
-📞 **Phone:** +971-XXX-XXXX  
-
----
-
-This **README** file is structured to provide clear **installation steps, usage instructions, and troubleshooting tips** for the **Admin Side** of the **Interactive 3D Map** project. Let me know if you need any modifications! 🚀
